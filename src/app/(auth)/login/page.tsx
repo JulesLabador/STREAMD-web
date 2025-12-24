@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Play } from 'lucide-react';
@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /**
  * Google icon component for the OAuth button
@@ -41,18 +42,40 @@ function GoogleIcon({ className }: { className?: string }) {
 }
 
 /**
- * Login page component
+ * Loading fallback for the login form
+ */
+function LoginFormSkeleton() {
+  return (
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-4 text-center">
+          <div className="mx-auto flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+              <Play className="h-5 w-5 fill-primary-foreground text-primary-foreground" />
+            </div>
+            <span className="text-2xl font-bold tracking-tight">STREAMD</span>
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="mx-auto h-8 w-40" />
+            <Skeleton className="mx-auto h-4 w-56" />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="mx-auto h-3 w-64" />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+/**
+ * Login form component that uses useSearchParams
  *
  * Provides Google OAuth sign-in functionality.
  * Displays error messages if authentication fails.
- *
- * Features:
- * - Centered card layout with STREAMD branding
- * - Google OAuth sign-in button
- * - Error handling for failed auth attempts
- * - Loading state during sign-in
  */
-export default function LoginPage() {
+function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -149,3 +172,22 @@ export default function LoginPage() {
   );
 }
 
+/**
+ * Login page component
+ *
+ * Wraps the LoginForm in a Suspense boundary to handle
+ * useSearchParams() during static generation.
+ *
+ * Features:
+ * - Centered card layout with STREAMD branding
+ * - Google OAuth sign-in button
+ * - Error handling for failed auth attempts
+ * - Loading state during sign-in
+ */
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFormSkeleton />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
