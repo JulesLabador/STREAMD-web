@@ -869,20 +869,12 @@ export async function getAnimeByPlatform(
     // when passing too many IDs to the .in() filter
     const paginatedAnimeIds = animeIds.slice(offset, offset + validPageSize);
 
-    // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/096fc1a5-dcb6-447b-b4e5-3ea33d1d77f9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'anime.ts:getAnimeByPlatform:before-anime-query',message:'About to query anime table',data:{animeIdsCount:animeIds.length,paginatedIdsCount:paginatedAnimeIds.length,offset,rangeEnd:offset+validPageSize-1},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'FIX'})}).catch(()=>{});
-    // #endregion
-
     // Fetch paginated anime using only the subset of IDs for this page
     const { data: animeData, error: animeError } = await supabase
       .from('anime')
       .select('*')
       .in('id', paginatedAnimeIds)
       .order('popularity', { ascending: true });
-
-    // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/096fc1a5-dcb6-447b-b4e5-3ea33d1d77f9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'anime.ts:getAnimeByPlatform:after-anime-query',message:'Anime query completed',data:{animeDataCount:animeData?.length,animeError:animeError?JSON.stringify(animeError):null,animeErrorCode:animeError?.code,animeErrorMessage:animeError?.message,animeErrorDetails:animeError?.details},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'FIX'})}).catch(()=>{});
-    // #endregion
 
     if (animeError) {
       console.error('Error fetching anime:', animeError);
