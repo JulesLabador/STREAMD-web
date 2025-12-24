@@ -1,0 +1,285 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Anime tracking status colors */
+  --color-status-watching: var(--status-watching);
+  --color-status-completed: var(--status-completed);
+  --color-status-planned: var(--status-planned);
+  --color-status-on-hold: var(--status-on-hold);
+  --color-status-dropped: var(--status-dropped);
+}
+
+/*
+ * ANIME TRACKING APP - DARK MODE FIRST DESIGN SYSTEM
+ *
+ * Design Philosophy:
+ * - Dark mode is the PRIMARY experience (not optional)
+ * - Near-black backgrounds, not gray
+ * - Cards create structure through contrast, not borders
+ * - Colors convey meaning (status), not decoration
+ * - Premium, calm, analytical feel
+ *
+ * Inspired by: Push (iOS), AniList.co
+ */
+
+/*
+ * DARK MODE (Default & Primary)
+ * This is the main experience - dark mode first
+ */
+:root {
+  /* Base radius - 16px for modern rounded feel */
+  --radius: 1rem;
+
+  /*
+   * DARK MODE COLORS (Applied by default)
+   * Near-black backgrounds create premium feel
+   */
+
+  /* Backgrounds - near black, not gray */
+  --background: oklch(0.07 0.005 285);        /* #0B0B0C - App background */
+  --foreground: oklch(0.98 0 0);              /* #FAFAFA - Primary text */
+
+  /* Card surfaces - slightly elevated */
+  --card: oklch(0.11 0.005 285);              /* #151518 - Card background */
+  --card-foreground: oklch(0.98 0 0);
+
+  /* Popover/dropdown surfaces */
+  --popover: oklch(0.11 0.005 285);
+  --popover-foreground: oklch(0.98 0 0);
+
+  /* Primary accent - cool blue for interactive elements */
+  --primary: oklch(0.62 0.19 250);            /* #3B82F6 - Links, buttons */
+  --primary-foreground: oklch(1 0 0);
+
+  /* Secondary - muted surfaces */
+  --secondary: oklch(0.18 0.005 285);         /* #1A1A1E */
+  --secondary-foreground: oklch(0.98 0 0);
+
+  /* Muted - subdued backgrounds and text */
+  --muted: oklch(0.18 0.005 285);
+  --muted-foreground: oklch(0.65 0 0);        /* 65% - Secondary text */
+
+  /* Accent - hover states */
+  --accent: oklch(0.15 0.005 285);
+  --accent-foreground: oklch(0.98 0 0);
+
+  /* Destructive - errors, dropped status (minimal use) */
+  --destructive: oklch(0.60 0.20 25);         /* Muted red */
+
+  /* Borders - subtle, structure through contrast preferred */
+  --border: oklch(0.22 0.005 285);            /* #2A2A2E */
+  --input: oklch(0.22 0.005 285);
+
+  /* Focus ring */
+  --ring: oklch(0.62 0.19 250);               /* Same as primary */
+
+  /*
+   * CHART COLORS
+   * Used for analytics and data visualization
+   */
+  --chart-1: oklch(0.62 0.19 250);            /* Blue - primary metric */
+  --chart-2: oklch(0.65 0.18 155);            /* Green - positive/growth */
+  --chart-3: oklch(0.70 0.15 85);             /* Amber - neutral/warning */
+  --chart-4: oklch(0.60 0.20 290);            /* Purple - completed */
+  --chart-5: oklch(0.55 0.12 250);            /* Muted blue - secondary */
+
+  /* Sidebar (if used) */
+  --sidebar: oklch(0.09 0.005 285);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.62 0.19 250);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.15 0.005 285);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.22 0.005 285);
+  --sidebar-ring: oklch(0.62 0.19 250);
+
+  /*
+   * ANIME TRACKING STATUS COLORS
+   * Semantic colors for tracking states
+   * Used with Badge variants and Progress indicators
+   */
+  --status-watching: oklch(0.65 0.18 155);    /* Green - currently watching */
+  --status-completed: oklch(0.60 0.20 290);   /* Purple - finished */
+  --status-planned: oklch(0.55 0.02 250);     /* Gray - plan to watch */
+  --status-on-hold: oklch(0.70 0.15 85);      /* Amber - paused */
+  --status-dropped: oklch(0.55 0.15 25);      /* Muted red - dropped (minimal use) */
+}
+
+/*
+ * LIGHT MODE (Secondary/Optional)
+ * For users who prefer light mode
+ * Maintains the same calm, analytical feel
+ */
+.light {
+  --background: oklch(0.99 0 0);              /* Near white */
+  --foreground: oklch(0.10 0 0);              /* Near black text */
+
+  --card: oklch(1 0 0);                       /* Pure white cards */
+  --card-foreground: oklch(0.10 0 0);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.10 0 0);
+
+  --primary: oklch(0.55 0.20 250);            /* Slightly darker blue for contrast */
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.96 0.005 285);
+  --secondary-foreground: oklch(0.15 0 0);
+
+  --muted: oklch(0.96 0.005 285);
+  --muted-foreground: oklch(0.45 0 0);
+
+  --accent: oklch(0.96 0.005 285);
+  --accent-foreground: oklch(0.15 0 0);
+
+  --destructive: oklch(0.55 0.22 25);
+
+  --border: oklch(0.90 0.005 285);
+  --input: oklch(0.90 0.005 285);
+
+  --ring: oklch(0.55 0.20 250);
+
+  --chart-1: oklch(0.55 0.20 250);
+  --chart-2: oklch(0.55 0.18 155);
+  --chart-3: oklch(0.60 0.15 85);
+  --chart-4: oklch(0.55 0.20 290);
+  --chart-5: oklch(0.50 0.15 250);
+
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.10 0 0);
+  --sidebar-primary: oklch(0.55 0.20 250);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.96 0.005 285);
+  --sidebar-accent-foreground: oklch(0.15 0 0);
+  --sidebar-border: oklch(0.90 0.005 285);
+  --sidebar-ring: oklch(0.55 0.20 250);
+
+  /* Status colors - slightly adjusted for light mode contrast */
+  --status-watching: oklch(0.55 0.18 155);
+  --status-completed: oklch(0.55 0.20 290);
+  --status-planned: oklch(0.50 0.02 250);
+  --status-on-hold: oklch(0.60 0.15 85);
+  --status-dropped: oklch(0.50 0.18 25);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /*
+   * Typography hierarchy through opacity
+   * Primary: 100% opacity (default)
+   * Secondary: 70% opacity
+   * Tertiary: 50% opacity
+   */
+  .text-secondary {
+    @apply text-muted-foreground;
+  }
+
+  .text-tertiary {
+    @apply text-muted-foreground/70;
+  }
+}
+
+@layer utilities {
+  /*
+   * Status color utilities
+   * Use these for status-specific styling
+   */
+  .text-status-watching {
+    color: var(--status-watching);
+  }
+  .text-status-completed {
+    color: var(--status-completed);
+  }
+  .text-status-planned {
+    color: var(--status-planned);
+  }
+  .text-status-on-hold {
+    color: var(--status-on-hold);
+  }
+  .text-status-dropped {
+    color: var(--status-dropped);
+  }
+
+  .bg-status-watching {
+    background-color: var(--status-watching);
+  }
+  .bg-status-completed {
+    background-color: var(--status-completed);
+  }
+  .bg-status-planned {
+    background-color: var(--status-planned);
+  }
+  .bg-status-on-hold {
+    background-color: var(--status-on-hold);
+  }
+  .bg-status-dropped {
+    background-color: var(--status-dropped);
+  }
+
+  .border-status-watching {
+    border-color: var(--status-watching);
+  }
+  .border-status-completed {
+    border-color: var(--status-completed);
+  }
+  .border-status-planned {
+    border-color: var(--status-planned);
+  }
+  .border-status-on-hold {
+    border-color: var(--status-on-hold);
+  }
+  .border-status-dropped {
+    border-color: var(--status-dropped);
+  }
+}
