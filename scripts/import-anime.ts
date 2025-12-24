@@ -459,6 +459,20 @@ async function getOrCreateStudio(
         .single();
 
     if (error) {
+        // Silently handle duplicate key errors - studio already exists
+        if (error.message.includes("duplicate key value")) {
+            // Re-fetch the existing studio
+            const { data: refetched } = await supabase
+                .from("studios")
+                .select("id")
+                .eq("name", studioName)
+                .single();
+
+            if (refetched) {
+                studioCache.set(studioName, refetched.id);
+                return refetched.id;
+            }
+        }
         console.error(
             `Failed to create studio "${studioName}":`,
             error.message
@@ -492,7 +506,7 @@ async function linkAnimeStudios(
         .from("anime_studios")
         .upsert(links, { onConflict: "anime_id,studio_id" });
 
-    if (error) {
+    if (error && !error.message.includes("duplicate key value")) {
         console.error(
             `Failed to link studios for anime ${animeId}:`,
             error.message
@@ -534,7 +548,7 @@ async function createStreamingLinks(
 
     const { error } = await supabase.from("streaming_links").insert(links);
 
-    if (error) {
+    if (error && !error.message.includes("duplicate key value")) {
         console.error(
             `Failed to create streaming links for anime ${animeId}:`,
             error.message
