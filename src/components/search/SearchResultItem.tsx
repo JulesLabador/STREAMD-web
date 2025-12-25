@@ -15,29 +15,15 @@ interface SearchResultItemProps {
 }
 
 /**
- * Formats the anime status for display
- */
-function formatStatus(status: Anime["status"]): string {
-    const statusMap: Record<Anime["status"], string> = {
-        FINISHED: "Finished",
-        RELEASING: "Airing",
-        NOT_YET_RELEASED: "Upcoming",
-        CANCELLED: "Cancelled",
-        HIATUS: "On Hiatus",
-    };
-    return statusMap[status] || status;
-}
-
-/**
  * SearchResultItem - Single search result row
  *
  * Displays:
- * - Cover image thumbnail
  * - Title (English preferred, fallback to Romaji)
  * - Format, year, episode count
  * - Rating
  *
  * Highlights when selected via keyboard navigation.
+ * Uses <a> tag instead of <button> to avoid browser default text-align: center.
  */
 export function SearchResultItem({ anime, index }: SearchResultItemProps) {
     const { selectedIndex, onSelect } = useSearchContext();
@@ -56,33 +42,34 @@ export function SearchResultItem({ anime, index }: SearchResultItemProps) {
     }
 
     return (
-        <button
-            type="button"
-            onClick={() => onSelect(anime)}
+        <a
+            href={`/anime/${anime.slug}`}
+            onClick={(e) => {
+                e.preventDefault();
+                onSelect(anime);
+            }}
             className={cn(
-                "w-full h-12 flex items-center justify-start gap-3 px-3 py-2 rounded-md text-left",
+                "w-full h-20 flex flex-col items-start gap-0.5 px-3 py-2 rounded-md overflow-hidden",
                 "transition-colors duration-100",
                 "hover:bg-accent hover:cursor-pointer",
                 isSelected && "bg-accent"
             )}
         >
-            {/* Title (larger, medium weight) */}
-            <p className="text-base font-medium text-foreground truncate max-w-[50%]">
+            {/* First line: Title */}
+            <p className="w-full text-sm font-medium text-foreground truncate">
                 {displayTitle}
             </p>
 
-            {/* Metadata (type, year, episodes) */}
-            <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {metadata.join(" • ")}
-            </span>
-
-            {/* Rating */}
-            {anime.averageRating !== null && (
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <span className="text-yellow-400">★</span>
-                    <span>{anime.averageRating.toFixed(1)}</span>
-                </div>
-            )}
-        </button>
+            {/* Second line: Metadata and rating */}
+            <div className="w-full flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="truncate">{metadata.join(" • ")}</span>
+                {anime.averageRating !== null && (
+                    <span className="shrink-0 flex items-center gap-0.5">
+                        <span className="text-yellow-400">★</span>
+                        <span>{anime.averageRating.toFixed(1)}</span>
+                    </span>
+                )}
+            </div>
+        </a>
     );
 }

@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
-import {
-    Dialog,
-    DialogContent,
-    DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { SearchProvider } from "./SearchProvider";
 import { SearchInput } from "./SearchInput";
 import { SearchResults } from "./SearchResults";
@@ -60,7 +56,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
-                className="sm:max-w-lg p-0 gap-0 overflow-hidden"
+                className="p-0 gap-0 overflow-hidden text-left"
                 showCloseButton={false}
             >
                 {/* Accessible title (visually hidden) */}
@@ -69,42 +65,44 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                 </VisuallyHidden>
 
                 <SearchProvider onClose={handleClose}>
-                    {/* Search input */}
-                    <div className="border-b border-border p-3">
-                        <SearchInput
-                            autoFocus
-                            placeholder="Search anime..."
-                            size="lg"
+                    <div className="flex flex-col text-left">
+                        {/* Search input */}
+                        <div className="border-b border-border p-3">
+                            <SearchInput
+                                autoFocus
+                                placeholder="Search anime..."
+                                size="lg"
+                            />
+                        </div>
+
+                        {/* Results */}
+                        <SearchResults
+                            maxHeight="400px"
+                            showEmptyState={true}
                         />
-                    </div>
 
-                    {/* Results */}
-                    <SearchResults
-                        maxHeight="400px"
-                        showEmptyState={true}
-                    />
-
-                    {/* Keyboard hints footer */}
-                    <div className="border-t border-border px-3 py-2 flex items-center justify-between text-xs text-muted-foreground">
-                        <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1">
-                                <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">
-                                    ↑↓
-                                </kbd>
-                                <span>Navigate</span>
-                            </span>
-                            <span className="flex items-center gap-1">
-                                <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">
-                                    ↵
-                                </kbd>
-                                <span>Select</span>
-                            </span>
-                            <span className="flex items-center gap-1">
-                                <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">
-                                    esc
-                                </kbd>
-                                <span>Close</span>
-                            </span>
+                        {/* Keyboard hints footer */}
+                        <div className="border-t border-border px-3 py-2 flex items-center justify-between text-xs text-muted-foreground">
+                            <div className="flex items-center gap-3">
+                                <span className="flex items-center gap-1">
+                                    <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">
+                                        ↑↓
+                                    </kbd>
+                                    <span>Navigate</span>
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">
+                                        ↵
+                                    </kbd>
+                                    <span>Select</span>
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">
+                                        esc
+                                    </kbd>
+                                    <span>Close</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </SearchProvider>
@@ -112,4 +110,3 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
         </Dialog>
     );
 }
-

@@ -42,7 +42,7 @@ export function SearchResults({
 
     return (
         <div
-            className={cn("overflow-y-auto", className)}
+            className={"overflow-y-auto overflow-x-hidden" + className}
             style={{ maxHeight }}
         >
             {/* Loading state */}
@@ -83,7 +83,7 @@ export function SearchResults({
 
             {/* Results list */}
             {!isLoading && !error && results.length > 0 && (
-                <div className="p-1">
+                <div className="p-1 text-left">
                     {results.map((anime, index) => (
                         <SearchResultItem
                             key={anime.id}
@@ -96,4 +96,3 @@ export function SearchResults({
         </div>
     );
 }
-
