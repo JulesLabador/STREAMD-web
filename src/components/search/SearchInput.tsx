@@ -48,17 +48,12 @@ export function SearchInput({
     }, [autoFocus]);
 
     return (
-        <div
-            className={cn(
-                "relative flex items-center",
-                className,
-            )}
-        >
+        <div className={cn("flex items-center", className)}>
             {/* Search icon */}
             <Search
                 className={cn(
                     "absolute text-muted-foreground pointer-events-none",
-                    size === "lg" ? "left-3 h-5 w-5" : "left-3 h-4 w-4",
+                    size === "lg" ? "left-3 h-5 w-5" : "left-3 h-4 w-4"
                 )}
             />
 
@@ -76,7 +71,7 @@ export function SearchInput({
                     "transition-colors",
                     size === "lg"
                         ? "h-12 pl-12 pr-10 text-base"
-                        : "h-10 pl-10 pr-9 text-sm",
+                        : "h-10 pl-10 pr-9 text-sm"
                 )}
                 autoComplete="off"
                 autoCorrect="off"
@@ -89,11 +84,10 @@ export function SearchInput({
                 <Loader2
                     className={cn(
                         "absolute right-3 animate-spin text-muted-foreground",
-                        size === "lg" ? "h-5 w-5" : "h-4 w-4",
+                        size === "lg" ? "h-5 w-5" : "h-4 w-4"
                     )}
                 />
             )}
         </div>
     );
 }
-
