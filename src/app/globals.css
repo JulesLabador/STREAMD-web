@@ -217,6 +217,7 @@
         @apply bg-background text-foreground;
     }
 
+
     /*
    * Typography hierarchy through opacity
    * Primary: 100% opacity (default)
