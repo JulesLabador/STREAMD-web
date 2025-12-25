@@ -8,7 +8,8 @@
         "postbuild": "next-sitemap",
         "start": "next start",
         "lint": "eslint",
-        "import:anime": "tsx scripts/import-anime.ts"
+        "import:anime": "tsx scripts/import-anime.ts",
+        "index:search": "tsx scripts/index-anime.ts"
     },
     "dependencies": {
         "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -23,6 +24,7 @@
         "@radix-ui/react-tabs": "^1.1.13",
         "@supabase/ssr": "^0.8.0",
         "@supabase/supabase-js": "^2.89.0",
+        "algoliasearch": "^5.46.2",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "dotenv": "^17.2.3",
