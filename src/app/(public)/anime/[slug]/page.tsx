@@ -262,7 +262,7 @@ export default async function AnimePage({ params }: AnimePageProps) {
                                         label="Season"
                                         value={formatSeason(
                                             anime.season,
-                                            anime.seasonYear
+                                            anime.seasonYear,
                                         )}
                                     />
                                 </div>
@@ -377,7 +377,7 @@ export default async function AnimePage({ params }: AnimePageProps) {
                                                 >
                                                     <ExternalLink className="h-3 w-3" />
                                                     {getPlatformName(
-                                                        link.platform
+                                                        link.platform,
                                                     )}
                                                 </a>
                                             </Button>

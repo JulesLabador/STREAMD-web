@@ -20,26 +20,26 @@ Inspired by: Push (iOS workout app), AniList.co
 
 Dark mode is **not optional** - it is the default and primary experience. Background colors are near-black, not gray.
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--background` | `#0B0B0C` | App background |
-| `--card` | `#151518` | Card surfaces |
-| `--foreground` | `#FAFAFA` | Primary text |
-| `--muted-foreground` | `65% opacity` | Secondary text |
-| `--primary` | `#3B82F6` | Links, interactive elements |
-| `--border` | `#2A2A2E` | Subtle borders |
+| Token                | Value         | Usage                       |
+| -------------------- | ------------- | --------------------------- |
+| `--background`       | `#0B0B0C`     | App background              |
+| `--card`             | `#151518`     | Card surfaces               |
+| `--foreground`       | `#FAFAFA`     | Primary text                |
+| `--muted-foreground` | `65% opacity` | Secondary text              |
+| `--primary`          | `#3B82F6`     | Links, interactive elements |
+| `--border`           | `#2A2A2E`     | Subtle borders              |
 
 ### Semantic Status Colors
 
 Colors convey **meaning**, not decoration:
 
-| Status | Color | Token | Usage |
-|--------|-------|-------|-------|
-| Watching | Green | `--status-watching` | Currently watching anime |
-| Completed | Purple | `--status-completed` | Finished anime |
-| Planned | Gray | `--status-planned` | Plan to watch |
-| On Hold | Amber | `--status-on-hold` | Paused anime |
-| Dropped | Red | `--status-dropped` | Dropped (minimal use) |
+| Status    | Color  | Token                | Usage                    |
+| --------- | ------ | -------------------- | ------------------------ |
+| Watching  | Green  | `--status-watching`  | Currently watching anime |
+| Completed | Purple | `--status-completed` | Finished anime           |
+| Planned   | Gray   | `--status-planned`   | Plan to watch            |
+| On Hold   | Amber  | `--status-on-hold`   | Paused anime             |
+| Dropped   | Red    | `--status-dropped`   | Dropped (minimal use)    |
 
 ---
 
@@ -48,6 +48,7 @@ Colors convey **meaning**, not decoration:
 **Font Stack:** System fonts (Geist Sans, Geist Mono)
 
 Hierarchy is achieved through:
+
 - Font weight (400 regular, 500 medium, 600 semibold)
 - Opacity levels (100%, 70%, 50%)
 - Spacing - not aggressive size jumps
@@ -74,19 +75,18 @@ Hierarchy is achieved through:
 Cards are the primary structural element. All content lives inside cards.
 
 ```tsx
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 <Card>
-  <CardHeader>
-    <CardTitle>Anime Title</CardTitle>
-  </CardHeader>
-  <CardContent>
-    {/* Content */}
-  </CardContent>
-</Card>
+    <CardHeader>
+        <CardTitle>Anime Title</CardTitle>
+    </CardHeader>
+    <CardContent>{/* Content */}</CardContent>
+</Card>;
 ```
 
 **Card Properties:**
+
 - Background: `var(--card)` - slightly lighter than app background
 - No visible borders (structure through contrast)
 - Consistent 16px radius
@@ -114,6 +114,7 @@ import { Badge } from "@/components/ui/badge"
 ```
 
 **Status Badge Styling:**
+
 - Subtle background (15% opacity)
 - Matching text color
 - Subtle border (30% opacity)
@@ -155,6 +156,7 @@ import { Button } from "@/components/ui/button"
 ```
 
 **Button Guidelines:**
+
 - Primary CTA: High contrast, large tap area
 - Secondary actions: Muted, never compete with primary data
 - Full-width on mobile where appropriate
@@ -167,24 +169,24 @@ For add-to-list, edit tracking, etc:
 
 ```tsx
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 
 <Dialog>
-  <DialogTrigger asChild>
-    <Button>Add to List</Button>
-  </DialogTrigger>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Add Anime</DialogTitle>
-    </DialogHeader>
-    {/* Form content */}
-  </DialogContent>
-</Dialog>
+    <DialogTrigger asChild>
+        <Button>Add to List</Button>
+    </DialogTrigger>
+    <DialogContent>
+        <DialogHeader>
+            <DialogTitle>Add Anime</DialogTitle>
+        </DialogHeader>
+        {/* Form content */}
+    </DialogContent>
+</Dialog>;
 ```
 
 ---
@@ -194,18 +196,16 @@ import {
 For profile sections, anime detail tabs:
 
 ```tsx
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 <Tabs defaultValue="watching">
-  <TabsList>
-    <TabsTrigger value="watching">Watching</TabsTrigger>
-    <TabsTrigger value="completed">Completed</TabsTrigger>
-    <TabsTrigger value="planned">Planned</TabsTrigger>
-  </TabsList>
-  <TabsContent value="watching">
-    {/* Anime list */}
-  </TabsContent>
-</Tabs>
+    <TabsList>
+        <TabsTrigger value="watching">Watching</TabsTrigger>
+        <TabsTrigger value="completed">Completed</TabsTrigger>
+        <TabsTrigger value="planned">Planned</TabsTrigger>
+    </TabsList>
+    <TabsContent value="watching">{/* Anime list */}</TabsContent>
+</Tabs>;
 ```
 
 ---
@@ -213,16 +213,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 ### Skeleton (Loading States)
 
 ```tsx
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Anime card skeleton
 <Card>
-  <Skeleton className="aspect-[2/3] w-full" />
-  <CardContent>
-    <Skeleton className="h-4 w-3/4" />
-    <Skeleton className="h-3 w-1/2 mt-2" />
-  </CardContent>
-</Card>
+    <Skeleton className="aspect-[2/3] w-full" />
+    <CardContent>
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2 mt-2" />
+    </CardContent>
+</Card>;
 ```
 
 ---
@@ -234,9 +234,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 ```tsx
 // Anime grid - responsive
 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-  {animeList.map(anime => (
-    <AnimeCard key={anime.id} anime={anime} />
-  ))}
+    {animeList.map((anime) => (
+        <AnimeCard key={anime.id} anime={anime} />
+    ))}
 </div>
 ```
 
@@ -253,82 +253,82 @@ import { Skeleton } from "@/components/ui/skeleton"
 ### AnimeCard Pattern
 
 ```tsx
-import { Card, CardContent } from "@/components/ui/card"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import Image from "next/image"
+import { Card, CardContent } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import Image from "next/image";
 
 interface AnimeCardProps {
-  anime: {
-    id: string
-    title: string
-    posterUrl: string
-    status: "watching" | "completed" | "planned" | "onHold" | "dropped"
-    currentEpisode: number
-    totalEpisodes: number
-  }
+    anime: {
+        id: string;
+        title: string;
+        posterUrl: string;
+        status: "watching" | "completed" | "planned" | "onHold" | "dropped";
+        currentEpisode: number;
+        totalEpisodes: number;
+    };
 }
 
 function AnimeCard({ anime }: AnimeCardProps) {
-  const progress = (anime.currentEpisode / anime.totalEpisodes) * 100
+    const progress = (anime.currentEpisode / anime.totalEpisodes) * 100;
 
-  return (
-    <Card className="overflow-hidden">
-      <AspectRatio ratio={2/3}>
-        <Image
-          src={anime.posterUrl}
-          alt={anime.title}
-          fill
-          className="object-cover"
-        />
-      </AspectRatio>
-      <CardContent className="p-3">
-        <h3 className="font-medium text-sm line-clamp-2">{anime.title}</h3>
-        <div className="flex items-center justify-between mt-2">
-          <span className="text-xs text-muted-foreground">
-            {anime.currentEpisode}/{anime.totalEpisodes}
-          </span>
-          <Badge variant={anime.status}>
-            {anime.status === "onHold" ? "On Hold" :
-             anime.status.charAt(0).toUpperCase() + anime.status.slice(1)}
-          </Badge>
-        </div>
-        {anime.status === "watching" && (
-          <Progress
-            value={progress}
-            className="mt-2 h-1 [&>div]:bg-status-watching"
-          />
-        )}
-      </CardContent>
-    </Card>
-  )
+    return (
+        <Card className="overflow-hidden">
+            <AspectRatio ratio={2 / 3}>
+                <Image
+                    src={anime.posterUrl}
+                    alt={anime.title}
+                    fill
+                    className="object-cover"
+                />
+            </AspectRatio>
+            <CardContent className="p-3">
+                <h3 className="font-medium text-sm line-clamp-2">
+                    {anime.title}
+                </h3>
+                <div className="flex items-center justify-between mt-2">
+                    <span className="text-xs text-muted-foreground">
+                        {anime.currentEpisode}/{anime.totalEpisodes}
+                    </span>
+                    <Badge variant={anime.status}>
+                        {anime.status === "onHold"
+                            ? "On Hold"
+                            : anime.status.charAt(0).toUpperCase() +
+                              anime.status.slice(1)}
+                    </Badge>
+                </div>
+                {anime.status === "watching" && (
+                    <Progress
+                        value={progress}
+                        className="mt-2 h-1 [&>div]:bg-status-watching"
+                    />
+                )}
+            </CardContent>
+        </Card>
+    );
 }
 ```
 
 ### StatusBadge Helper
 
 ```tsx
-import { Badge, type AnimeStatus } from "@/components/ui/badge"
+import { Badge, type AnimeStatus } from "@/components/ui/badge";
 
 const statusLabels: Record<AnimeStatus, string> = {
-  watching: "Watching",
-  completed: "Completed",
-  planned: "Plan to Watch",
-  onHold: "On Hold",
-  dropped: "Dropped",
-}
+    watching: "Watching",
+    completed: "Completed",
+    planned: "Plan to Watch",
+    onHold: "On Hold",
+    dropped: "Dropped",
+};
 
 interface StatusBadgeProps {
-  status: AnimeStatus
+    status: AnimeStatus;
 }
 
 function StatusBadge({ status }: StatusBadgeProps) {
-  return (
-    <Badge variant={status}>
-      {statusLabels[status]}
-    </Badge>
-  )
+    return <Badge variant={status}>{statusLabels[status]}</Badge>;
 }
 ```
 
@@ -343,14 +343,11 @@ Stats should be understandable **without reading numbers**.
 ```tsx
 // Episode progress with status color
 <div className="space-y-1">
-  <div className="flex justify-between text-sm">
-    <span>Progress</span>
-    <span className="text-muted-foreground">8/12</span>
-  </div>
-  <Progress
-    value={66}
-    className="h-2 [&>div]:bg-status-watching"
-  />
+    <div className="flex justify-between text-sm">
+        <span>Progress</span>
+        <span className="text-muted-foreground">8/12</span>
+    </div>
+    <Progress value={66} className="h-2 [&>div]:bg-status-watching" />
 </div>
 ```
 
@@ -358,11 +355,11 @@ Stats should be understandable **without reading numbers**.
 
 ```tsx
 <Card>
-  <CardContent className="p-4">
-    <p className="text-sm text-muted-foreground">Episodes Watched</p>
-    <p className="text-2xl font-semibold">1,247</p>
-    <p className="text-xs text-status-watching mt-1">+23 this week</p>
-  </CardContent>
+    <CardContent className="p-4">
+        <p className="text-sm text-muted-foreground">Episodes Watched</p>
+        <p className="text-2xl font-semibold">1,247</p>
+        <p className="text-xs text-status-watching mt-1">+23 this week</p>
+    </CardContent>
 </Card>
 ```
 
@@ -371,6 +368,7 @@ Stats should be understandable **without reading numbers**.
 ## Accessibility
 
 All components are built on Radix UI primitives with:
+
 - Full keyboard navigation
 - ARIA labels and roles
 - Focus management
@@ -432,14 +430,15 @@ The following shadcn/ui components are installed and ready to use:
 ## Emotional Tone
 
 The UI should feel:
+
 - **Calm** - A peaceful space to track your anime journey
 - **Analytical** - Data-driven insights without overwhelming
 - **Confident** - Premium feel that respects the user&apos;s time
 - **Focused** - Anime content is the star, UI supports it
 
 It should **not** feel:
+
 - Flashy or gamified
 - Cluttered with social noise
 - Generic or template-like
 - Overly decorated or &quot;anime aesthetic&quot; (no sakura petals, etc.)
-

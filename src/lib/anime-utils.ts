@@ -23,7 +23,7 @@ export function formatStatus(status: Anime["status"]): string {
  * @returns Badge variant string
  */
 export function getStatusVariant(
-    status: Anime["status"]
+    status: Anime["status"],
 ): "watching" | "completed" | "planned" | "onHold" | "secondary" {
     switch (status) {
         case "RELEASING":
@@ -47,7 +47,7 @@ export function getStatusVariant(
  */
 export function formatSeason(
     season: Anime["season"],
-    year: number | null
+    year: number | null,
 ): string {
     if (!season && !year) return "TBA";
     if (!season) return String(year);
@@ -87,4 +87,3 @@ export function getPlatformName(platform: string): string {
     };
     return platformNames[platform] || platform;
 }
-

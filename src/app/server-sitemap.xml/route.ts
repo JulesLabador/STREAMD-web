@@ -13,7 +13,7 @@ export async function GET() {
     // Using service role or anon key for read-only operations
     const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
     );
 
     const fields: ISitemapField[] = [];
@@ -83,9 +83,7 @@ export async function GET() {
             const seasonSet = new Set<string>();
             for (const row of seasonData) {
                 if (row.season && row.season_year) {
-                    const slug = `${row.season.toLowerCase()}-${
-                        row.season_year
-                    }`;
+                    const slug = `${row.season.toLowerCase()}-${row.season_year}`;
                     seasonSet.add(slug);
                 }
             }

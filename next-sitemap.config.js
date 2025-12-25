@@ -30,9 +30,7 @@ module.exports = {
     robotsTxtOptions: {
         // Additional sitemap URLs (for server-side generated sitemaps)
         additionalSitemaps: [
-            `${
-                process.env.SITE_URL || "https://streamd.app"
-            }/server-sitemap.xml`,
+            `${process.env.SITE_URL || "https://streamd.app"}/server-sitemap.xml`,
         ],
         policies: [
             {

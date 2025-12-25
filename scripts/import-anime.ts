@@ -320,7 +320,7 @@ function parseIntId(id: string | null | undefined): number | null {
  * @returns ISO date string (YYYY-MM-DD) or null
  */
 function normalizeDateField(
-    dateValue: string | { $date: string } | null | undefined
+    dateValue: string | { $date: string } | null | undefined,
 ): string | null {
     if (!dateValue) return null;
 
@@ -430,7 +430,7 @@ function transformAnime(raw: RawAnime): TransformedAnime {
 async function getOrCreateStudio(
     supabase: SupabaseClient,
     studioName: string,
-    studioCache: Map<string, string>
+    studioCache: Map<string, string>,
 ): Promise<string | null> {
     // Check cache first
     if (studioCache.has(studioName)) {
@@ -475,7 +475,7 @@ async function getOrCreateStudio(
         }
         console.error(
             `Failed to create studio "${studioName}":`,
-            error.message
+            error.message,
         );
         return null;
     }
@@ -493,7 +493,7 @@ async function getOrCreateStudio(
 async function linkAnimeStudios(
     supabase: SupabaseClient,
     animeId: string,
-    studioIds: string[]
+    studioIds: string[],
 ): Promise<void> {
     if (studioIds.length === 0) return;
 
@@ -509,7 +509,7 @@ async function linkAnimeStudios(
     if (error && !error.message.includes("duplicate key value")) {
         console.error(
             `Failed to link studios for anime ${animeId}:`,
-            error.message
+            error.message,
         );
     }
 }
@@ -523,7 +523,7 @@ async function linkAnimeStudios(
 async function createStreamingLinks(
     supabase: SupabaseClient,
     animeId: string,
-    platforms: string[]
+    platforms: string[],
 ): Promise<void> {
     if (!platforms || platforms.length === 0) return;
 
@@ -551,7 +551,7 @@ async function createStreamingLinks(
     if (error && !error.message.includes("duplicate key value")) {
         console.error(
             `Failed to create streaming links for anime ${animeId}:`,
-            error.message
+            error.message,
         );
     }
 }
@@ -566,7 +566,7 @@ async function createStreamingLinks(
 async function importBatch(
     supabase: SupabaseClient,
     batch: RawAnime[],
-    studioCache: Map<string, string>
+    studioCache: Map<string, string>,
 ): Promise<number> {
     let successCount = 0;
 
@@ -584,14 +584,14 @@ async function importBatch(
             if (animeError) {
                 console.error(
                     `Failed to import "${transformed.titles.romaji}":`,
-                    animeError.message
+                    animeError.message,
                 );
                 continue;
             }
 
             if (!anime) {
                 console.error(
-                    `No data returned for "${transformed.titles.romaji}"`
+                    `No data returned for "${transformed.titles.romaji}"`,
                 );
                 continue;
             }
@@ -603,7 +603,7 @@ async function importBatch(
                     const studioId = await getOrCreateStudio(
                         supabase,
                         studioName,
-                        studioCache
+                        studioCache,
                     );
                     if (studioId) {
                         studioIds.push(studioId);
@@ -617,7 +617,7 @@ async function importBatch(
                 await createStreamingLinks(
                     supabase,
                     anime.id,
-                    raw.streamingPlatforms
+                    raw.streamingPlatforms,
                 );
             }
 
@@ -649,7 +649,7 @@ async function main(): Promise<void> {
 
     if (!supabaseUrl || !supabaseKey) {
         console.error(
-            "Error: Missing environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY in .env.local"
+            "Error: Missing environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY in .env.local",
         );
         process.exit(1);
     }
@@ -707,14 +707,14 @@ async function main(): Promise<void> {
         const batch = animeData.slice(i, i + BATCH_SIZE);
 
         console.log(
-            `Processing batch ${batchNumber}/${totalBatches} (${batch.length} records)...`
+            `Processing batch ${batchNumber}/${totalBatches} (${batch.length} records)...`,
         );
 
         const imported = await importBatch(supabase, batch, studioCache);
         totalImported += imported;
 
         console.log(
-            `  Batch ${batchNumber} complete: ${imported}/${batch.length} imported successfully`
+            `  Batch ${batchNumber} complete: ${imported}/${batch.length} imported successfully`,
         );
     }
 

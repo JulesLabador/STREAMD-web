@@ -4,13 +4,13 @@ This folder contains SQL migration scripts for the STREAMD PostgreSQL database.
 
 ## Migration Files
 
-| File | Description |
-|------|-------------|
-| `000_reset.sql` | ⚠️ Development only - Drops all tables and data |
-| `001_initial_schema.sql` | Core table definitions with indexes and constraints |
-| `002_functions_triggers.sql` | Database functions and triggers for automation |
-| `003_rls_policies.sql` | Row Level Security policies for all tables |
-| `004_seed_data.sql` | Initial seed data (genres, studios) |
+| File                         | Description                                         |
+| ---------------------------- | --------------------------------------------------- |
+| `000_reset.sql`              | ⚠️ Development only - Drops all tables and data     |
+| `001_initial_schema.sql`     | Core table definitions with indexes and constraints |
+| `002_functions_triggers.sql` | Database functions and triggers for automation      |
+| `003_rls_policies.sql`       | Row Level Security policies for all tables          |
+| `004_seed_data.sql`          | Initial seed data (genres, studios)                 |
 
 ## Running Migrations
 
@@ -98,19 +98,23 @@ npx supabase gen types typescript --project-id <project-id> > src/types/database
 ## Key Features
 
 ### Automatic Timestamps
+
 - `updated_at` columns are automatically updated via triggers
 
 ### User Profile Creation
+
 - User profiles are automatically created when users sign up via Supabase Auth
 
 ### Rating Calculation
+
 - Anime `average_rating` is automatically recalculated when users rate anime
 
 ### Popularity Tracking
+
 - Anime `popularity` is automatically updated when users add/remove from their lists
 
 ### Row Level Security
+
 - All tables have RLS policies for secure data access
 - Public data is readable by everyone
 - Private data is restricted to owners
-

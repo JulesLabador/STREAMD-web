@@ -63,17 +63,17 @@ flowchart TB
 
 ### Technology Stack
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| Frontend | Next.js 16 (App Router) | SSR, SSG, Server Actions |
-| State Management | Zustand | ViewModel pattern, client state |
-| Database | Supabase PostgreSQL | Primary data store |
-| Authentication | Supabase Auth | OAuth, email auth, sessions |
-| Search | Meilisearch | Full-text search, fuzzy matching |
-| Cache | Upstash Redis | Caching, rate limiting, queues |
-| Object Storage | Cloudflare R2 | Images, share cards, avatars |
-| Styling | Tailwind CSS | Utility-first CSS |
-| Validation | Zod | Runtime type validation |
+| Layer            | Technology              | Purpose                          |
+| ---------------- | ----------------------- | -------------------------------- |
+| Frontend         | Next.js 16 (App Router) | SSR, SSG, Server Actions         |
+| State Management | Zustand                 | ViewModel pattern, client state  |
+| Database         | Supabase PostgreSQL     | Primary data store               |
+| Authentication   | Supabase Auth           | OAuth, email auth, sessions      |
+| Search           | Meilisearch             | Full-text search, fuzzy matching |
+| Cache            | Upstash Redis           | Caching, rate limiting, queues   |
+| Object Storage   | Cloudflare R2           | Images, share cards, avatars     |
+| Styling          | Tailwind CSS            | Utility-first CSS                |
+| Validation       | Zod                     | Runtime type validation          |
 
 ### Key Architectural Decisions
 
@@ -698,22 +698,34 @@ npx supabase gen types typescript --project-id <project-id> > src/types/database
 /**
  * Anime format types
  */
-export type AnimeFormat = 'TV' | 'MOVIE' | 'OVA' | 'ONA' | 'SPECIAL' | 'MUSIC';
+export type AnimeFormat = "TV" | "MOVIE" | "OVA" | "ONA" | "SPECIAL" | "MUSIC";
 
 /**
  * Anime airing status
  */
-export type AnimeStatus = 'FINISHED' | 'RELEASING' | 'NOT_YET_RELEASED' | 'CANCELLED' | 'HIATUS';
+export type AnimeStatus =
+    | "FINISHED"
+    | "RELEASING"
+    | "NOT_YET_RELEASED"
+    | "CANCELLED"
+    | "HIATUS";
 
 /**
  * Anime season
  */
-export type AnimeSeason = 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL';
+export type AnimeSeason = "WINTER" | "SPRING" | "SUMMER" | "FALL";
 
 /**
  * Streaming platform identifiers
  */
-export type StreamingPlatform = 'CRUNCHYROLL' | 'FUNIMATION' | 'NETFLIX' | 'HULU' | 'AMAZON' | 'HIDIVE' | 'OTHER';
+export type StreamingPlatform =
+    | "CRUNCHYROLL"
+    | "FUNIMATION"
+    | "NETFLIX"
+    | "HULU"
+    | "AMAZON"
+    | "HIDIVE"
+    | "OTHER";
 
 /**
  * External IDs are stored as separate columns for efficient querying
@@ -726,128 +738,128 @@ export type StreamingPlatform = 'CRUNCHYROLL' | 'FUNIMATION' | 'NETFLIX' | 'HULU
  * Edition metadata for anime variants
  */
 export interface AnimeEdition {
-  type: 'TV' | 'DIRECTORS_CUT' | 'THEATRICAL';
-  parentId: string | null;
+    type: "TV" | "DIRECTORS_CUT" | "THEATRICAL";
+    parentId: string | null;
 }
 
 /**
  * Anime titles in multiple languages
  */
 export interface AnimeTitles {
-  english: string | null;
-  romaji: string;
-  japanese: string | null;
+    english: string | null;
+    romaji: string;
+    japanese: string | null;
 }
 
 /**
  * Core anime entity
  */
 export interface Anime {
-  id: string;
-  slug: string;
-  titles: AnimeTitles;
-  format: AnimeFormat;
-  episodeCount: number | null;
-  episodeDuration: number | null;
-  season: AnimeSeason | null;
-  seasonYear: number | null;
-  startDate: string | null;
-  endDate: string | null;
-  synopsis: string | null;
-  averageRating: number | null;
-  popularity: number;
-  status: AnimeStatus;
-  malId: number | null;
-  anilistId: number | null;
-  kitsuId: string | null;
-  edition: AnimeEdition | null;
-  coverImageUrl: string | null;
-  bannerImageUrl: string | null;
-  createdAt: string;
-  updatedAt: string;
+    id: string;
+    slug: string;
+    titles: AnimeTitles;
+    format: AnimeFormat;
+    episodeCount: number | null;
+    episodeDuration: number | null;
+    season: AnimeSeason | null;
+    seasonYear: number | null;
+    startDate: string | null;
+    endDate: string | null;
+    synopsis: string | null;
+    averageRating: number | null;
+    popularity: number;
+    status: AnimeStatus;
+    malId: number | null;
+    anilistId: number | null;
+    kitsuId: string | null;
+    edition: AnimeEdition | null;
+    coverImageUrl: string | null;
+    bannerImageUrl: string | null;
+    createdAt: string;
+    updatedAt: string;
 }
 
 /**
  * Anime with related data (genres, studios)
  */
 export interface AnimeWithRelations extends Anime {
-  genres: Genre[];
-  studios: Studio[];
-  streamingLinks: StreamingLink[];
+    genres: Genre[];
+    studios: Studio[];
+    streamingLinks: StreamingLink[];
 }
 
 /**
  * Genre entity
  */
 export interface Genre {
-  id: string;
-  name: string;
-  slug: string;
+    id: string;
+    name: string;
+    slug: string;
 }
 
 /**
  * Studio entity
  */
 export interface Studio {
-  id: string;
-  name: string;
-  slug: string;
+    id: string;
+    name: string;
+    slug: string;
 }
 
 /**
  * Streaming link entity
  */
 export interface StreamingLink {
-  id: string;
-  animeId: string;
-  platform: StreamingPlatform;
-  url: string;
-  region: string;
+    id: string;
+    animeId: string;
+    platform: StreamingPlatform;
+    url: string;
+    region: string;
 }
 
 /**
  * Input type for creating anime
  */
 export interface CreateAnimeInput {
-  titles: AnimeTitles;
-  format: AnimeFormat;
-  status: AnimeStatus;
-  episodeCount?: number | null;
-  episodeDuration?: number | null;
-  season?: AnimeSeason | null;
-  seasonYear?: number | null;
-  startDate?: string | null;
-  endDate?: string | null;
-  synopsis?: string | null;
-  malId?: number | null;
-  anilistId?: number | null;
-  kitsuId?: string | null;
-  coverImageUrl?: string | null;
-  bannerImageUrl?: string | null;
-  genreIds?: string[];
-  studioIds?: string[];
+    titles: AnimeTitles;
+    format: AnimeFormat;
+    status: AnimeStatus;
+    episodeCount?: number | null;
+    episodeDuration?: number | null;
+    season?: AnimeSeason | null;
+    seasonYear?: number | null;
+    startDate?: string | null;
+    endDate?: string | null;
+    synopsis?: string | null;
+    malId?: number | null;
+    anilistId?: number | null;
+    kitsuId?: string | null;
+    coverImageUrl?: string | null;
+    bannerImageUrl?: string | null;
+    genreIds?: string[];
+    studioIds?: string[];
 }
 
 /**
  * Input type for updating anime
  */
 export interface UpdateAnimeInput extends Partial<CreateAnimeInput> {
-  id: string;
+    id: string;
 }
 
 /**
  * Anime search/filter parameters
  */
 export interface AnimeFilters {
-  query?: string;
-  format?: AnimeFormat[];
-  status?: AnimeStatus[];
-  season?: AnimeSeason;
-  year?: number;
-  genres?: string[];
-  studios?: string[];
-  sortBy?: 'popularity' | 'rating' | 'title' | 'startDate';
-  sortOrder?: 'asc' | 'desc';
+    query?: string;
+    format?: AnimeFormat[];
+    status?: AnimeStatus[];
+    season?: AnimeSeason;
+    year?: number;
+    genres?: string[];
+    studios?: string[];
+    sortBy?: "popularity" | "rating" | "title" | "startDate";
+    sortOrder?: "asc" | "desc";
 }
 ```
 
@@ -857,183 +869,188 @@ export interface AnimeFilters {
 /**
  * User tracking status for anime
  */
-export type TrackingStatus = 'PLANNING' | 'WATCHING' | 'COMPLETED' | 'PAUSED' | 'DROPPED';
+export type TrackingStatus =
+    | "PLANNING"
+    | "WATCHING"
+    | "COMPLETED"
+    | "PAUSED"
+    | "DROPPED";
 
 /**
  * Import source for list imports
  */
-export type ImportSource = 'MAL' | 'ANILIST' | 'KITSU';
+export type ImportSource = "MAL" | "ANILIST" | "KITSU";
 
 /**
  * Import job status
  */
-export type ImportJobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+export type ImportJobStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
 
 /**
  * User preferences stored as JSONB
  */
 export interface UserPreferences {
-  theme: 'light' | 'dark' | 'system';
-  defaultListPrivacy: boolean;
-  showAdultContent: boolean;
-  emailNotifications: {
-    newFollower: boolean;
-    listUpdates: boolean;
-    recaps: boolean;
-  };
+    theme: "light" | "dark" | "system";
+    defaultListPrivacy: boolean;
+    showAdultContent: boolean;
+    emailNotifications: {
+        newFollower: boolean;
+        listUpdates: boolean;
+        recaps: boolean;
+    };
 }
 
 /**
  * Core user entity
  */
 export interface User {
-  id: string;
-  username: string;
-  displayName: string | null;
-  email: string;
-  avatarUrl: string | null;
-  preferences: UserPreferences;
-  createdAt: string;
-  updatedAt: string;
+    id: string;
+    username: string;
+    displayName: string | null;
+    email: string;
+    avatarUrl: string | null;
+    preferences: UserPreferences;
+    createdAt: string;
+    updatedAt: string;
 }
 
 /**
  * Public user profile (excludes sensitive data)
  */
 export interface PublicUser {
-  id: string;
-  username: string;
-  displayName: string | null;
-  avatarUrl: string | null;
-  createdAt: string;
+    id: string;
+    username: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+    createdAt: string;
 }
 
 /**
  * User with statistics
  */
 export interface UserWithStats extends PublicUser {
-  stats: UserStats;
+    stats: UserStats;
 }
 
 /**
  * User statistics
  */
 export interface UserStats {
-  animeCount: number;
-  episodesWatched: number;
-  daysWatched: number;
-  meanScore: number | null;
-  completedCount: number;
-  watchingCount: number;
-  planningCount: number;
-  droppedCount: number;
-  pausedCount: number;
-  followerCount: number;
-  followingCount: number;
+    animeCount: number;
+    episodesWatched: number;
+    daysWatched: number;
+    meanScore: number | null;
+    completedCount: number;
+    watchingCount: number;
+    planningCount: number;
+    droppedCount: number;
+    pausedCount: number;
+    followerCount: number;
+    followingCount: number;
 }
 
 /**
  * User anime tracking entry
  */
 export interface UserAnime {
-  id: string;
-  userId: string;
-  animeId: string;
-  status: TrackingStatus;
-  currentEpisode: number;
-  rating: number | null;
-  rewatchCount: number;
-  lastRewatchAt: string | null;
-  startedAt: string | null;
-  completedAt: string | null;
-  notes: string | null;
-  isPrivate: boolean;
-  createdAt: string;
-  updatedAt: string;
+    id: string;
+    userId: string;
+    animeId: string;
+    status: TrackingStatus;
+    currentEpisode: number;
+    rating: number | null;
+    rewatchCount: number;
+    lastRewatchAt: string | null;
+    startedAt: string | null;
+    completedAt: string | null;
+    notes: string | null;
+    isPrivate: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
 /**
  * User anime with anime details
  */
 export interface UserAnimeWithDetails extends UserAnime {
-  anime: Anime;
+    anime: Anime;
 }
 
 /**
  * Input for adding anime to list
  */
 export interface AddToListInput {
-  animeId: string;
-  status: TrackingStatus;
-  currentEpisode?: number;
-  rating?: number | null;
-  startedAt?: string | null;
-  notes?: string | null;
-  isPrivate?: boolean;
+    animeId: string;
+    status: TrackingStatus;
+    currentEpisode?: number;
+    rating?: number | null;
+    startedAt?: string | null;
+    notes?: string | null;
+    isPrivate?: boolean;
 }
 
 /**
  * Input for updating tracking entry
  */
 export interface UpdateTrackingInput {
-  id: string;
-  status?: TrackingStatus;
-  currentEpisode?: number;
-  rating?: number | null;
-  startedAt?: string | null;
-  completedAt?: string | null;
-  notes?: string | null;
-  isPrivate?: boolean;
+    id: string;
+    status?: TrackingStatus;
+    currentEpisode?: number;
+    rating?: number | null;
+    startedAt?: string | null;
+    completedAt?: string | null;
+    notes?: string | null;
+    isPrivate?: boolean;
 }
 
 /**
  * Follow relationship
  */
 export interface Follow {
-  id: string;
-  followerId: string;
-  followingId: string;
-  createdAt: string;
+    id: string;
+    followerId: string;
+    followingId: string;
+    createdAt: string;
 }
 
 /**
  * Review entity
  */
 export interface Review {
-  id: string;
-  userId: string;
-  animeId: string;
-  content: string;
-  isSpoiler: boolean;
-  helpfulCount: number;
-  createdAt: string;
-  updatedAt: string;
+    id: string;
+    userId: string;
+    animeId: string;
+    content: string;
+    isSpoiler: boolean;
+    helpfulCount: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 /**
  * Review with user info
  */
 export interface ReviewWithUser extends Review {
-  user: PublicUser;
+    user: PublicUser;
 }
 
 /**
  * Import job entity
  */
 export interface ImportJob {
-  id: string;
-  userId: string;
-  source: ImportSource;
-  status: ImportJobStatus;
-  metadata: {
-    totalItems?: number;
-    processedItems?: number;
-    fileUrl?: string;
-  };
-  errorMessage: string | null;
-  startedAt: string | null;
-  completedAt: string | null;
-  createdAt: string;
+    id: string;
+    userId: string;
+    source: ImportSource;
+    status: ImportJobStatus;
+    metadata: {
+        totalItems?: number;
+        processedItems?: number;
+        fileUrl?: string;
+    };
+    errorMessage: string | null;
+    startedAt: string | null;
+    completedAt: string | null;
+    createdAt: string;
 }
 ```
 
@@ -1044,38 +1061,38 @@ export interface ImportJob {
  * Standard action result type for Server Actions
  */
 export type ActionResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string; code?: string };
+    | { success: true; data: T }
+    | { success: false; error: string; code?: string };
 
 /**
  * Paginated response wrapper
  */
 export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    totalCount: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
+    data: T[];
+    pagination: {
+        page: number;
+        pageSize: number;
+        totalCount: number;
+        totalPages: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+    };
 }
 
 /**
  * Pagination parameters
  */
 export interface PaginationParams {
-  page?: number;
-  pageSize?: number;
+    page?: number;
+    pageSize?: number;
 }
 
 /**
  * Sort parameters
  */
 export interface SortParams<T extends string = string> {
-  sortBy?: T;
-  sortOrder?: 'asc' | 'desc';
+    sortBy?: T;
+    sortOrder?: "asc" | "desc";
 }
 ```
 
@@ -1084,75 +1101,88 @@ export interface SortParams<T extends string = string> {
 #### `src/lib/validations/anime.ts`
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Anime format enum schema
  */
-export const animeFormatSchema = z.enum(['TV', 'MOVIE', 'OVA', 'ONA', 'SPECIAL', 'MUSIC']);
+export const animeFormatSchema = z.enum([
+    "TV",
+    "MOVIE",
+    "OVA",
+    "ONA",
+    "SPECIAL",
+    "MUSIC",
+]);
 
 /**
  * Anime status enum schema
  */
-export const animeStatusSchema = z.enum(['FINISHED', 'RELEASING', 'NOT_YET_RELEASED', 'CANCELLED', 'HIATUS']);
+export const animeStatusSchema = z.enum([
+    "FINISHED",
+    "RELEASING",
+    "NOT_YET_RELEASED",
+    "CANCELLED",
+    "HIATUS",
+]);
 
 /**
  * Anime season enum schema
  */
-export const animeSeasonSchema = z.enum(['WINTER', 'SPRING', 'SUMMER', 'FALL']);
+export const animeSeasonSchema = z.enum(["WINTER", "SPRING", "SUMMER", "FALL"]);
 
 /**
  * Anime titles schema
  */
 export const animeTitlesSchema = z.object({
-  english: z.string().nullable(),
-  romaji: z.string().min(1, 'Romaji title is required'),
-  japanese: z.string().nullable(),
+    english: z.string().nullable(),
+    romaji: z.string().min(1, "Romaji title is required"),
+    japanese: z.string().nullable(),
 });
 
 /**
  * Create anime input validation schema
  */
 export const createAnimeSchema = z.object({
-  titles: animeTitlesSchema,
-  format: animeFormatSchema,
-  status: animeStatusSchema,
-  episodeCount: z.number().int().positive().nullable().optional(),
-  episodeDuration: z.number().int().positive().nullable().optional(),
-  season: animeSeasonSchema.nullable().optional(),
-  seasonYear: z.number().int().min(1900).max(2100).nullable().optional(),
-  startDate: z.string().datetime().nullable().optional(),
-  endDate: z.string().datetime().nullable().optional(),
-  synopsis: z.string().max(10000).nullable().optional(),
-  malId: z.number().int().positive().nullable().optional(),
-  anilistId: z.number().int().positive().nullable().optional(),
-  kitsuId: z.string().nullable().optional(),
-  coverImageUrl: z.string().url().nullable().optional(),
-  bannerImageUrl: z.string().url().nullable().optional(),
-  genreIds: z.array(z.string().uuid()).optional(),
-  studioIds: z.array(z.string().uuid()).optional(),
+    titles: animeTitlesSchema,
+    format: animeFormatSchema,
+    status: animeStatusSchema,
+    episodeCount: z.number().int().positive().nullable().optional(),
+    episodeDuration: z.number().int().positive().nullable().optional(),
+    season: animeSeasonSchema.nullable().optional(),
+    seasonYear: z.number().int().min(1900).max(2100).nullable().optional(),
+    startDate: z.string().datetime().nullable().optional(),
+    endDate: z.string().datetime().nullable().optional(),
+    synopsis: z.string().max(10000).nullable().optional(),
+    malId: z.number().int().positive().nullable().optional(),
+    anilistId: z.number().int().positive().nullable().optional(),
+    kitsuId: z.string().nullable().optional(),
+    coverImageUrl: z.string().url().nullable().optional(),
+    bannerImageUrl: z.string().url().nullable().optional(),
+    genreIds: z.array(z.string().uuid()).optional(),
+    studioIds: z.array(z.string().uuid()).optional(),
 });
 
 /**
  * Update anime input validation schema
  */
 export const updateAnimeSchema = createAnimeSchema.partial().extend({
-  id: z.string().uuid(),
+    id: z.string().uuid(),
 });
 
 /**
  * Anime search filters schema
  */
 export const animeFiltersSchema = z.object({
-  query: z.string().max(200).optional(),
-  format: z.array(animeFormatSchema).optional(),
-  status: z.array(animeStatusSchema).optional(),
-  season: animeSeasonSchema.optional(),
-  year: z.number().int().min(1900).max(2100).optional(),
-  genres: z.array(z.string()).optional(),
-  studios: z.array(z.string()).optional(),
-  sortBy: z.enum(['popularity', 'rating', 'title', 'startDate']).optional(),
-  sortOrder: z.enum(['asc', 'desc']).optional(),
+    query: z.string().max(200).optional(),
+    format: z.array(animeFormatSchema).optional(),
+    status: z.array(animeStatusSchema).optional(),
+    season: animeSeasonSchema.optional(),
+    year: z.number().int().min(1900).max(2100).optional(),
+    genres: z.array(z.string()).optional(),
+    studios: z.array(z.string()).optional(),
+    sortBy: z.enum(["popularity", "rating", "title", "startDate"]).optional(),
+    sortOrder: z.enum(["asc", "desc"]).optional(),
 });
 
 export type CreateAnimeInput = z.infer<typeof createAnimeSchema>;
@@ -1163,88 +1193,100 @@ export type AnimeFilters = z.infer<typeof animeFiltersSchema>;
 #### `src/lib/validations/user.ts`
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Tracking status enum schema
  */
-export const trackingStatusSchema = z.enum(['PLANNING', 'WATCHING', 'COMPLETED', 'PAUSED', 'DROPPED']);
+export const trackingStatusSchema = z.enum([
+    "PLANNING",
+    "WATCHING",
+    "COMPLETED",
+    "PAUSED",
+    "DROPPED",
+]);
 
 /**
  * Username validation schema
  */
 export const usernameSchema = z
-  .string()
-  .min(3, 'Username must be at least 3 characters')
-  .max(30, 'Username must be at most 30 characters')
-  .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores');
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(30, "Username must be at most 30 characters")
+    .regex(
+        /^[a-zA-Z0-9_]+$/,
+        "Username can only contain letters, numbers, and underscores",
+    );
 
 /**
  * Update user profile schema
  */
 export const updateProfileSchema = z.object({
-  username: usernameSchema.optional(),
-  displayName: z.string().max(100).nullable().optional(),
-  avatarUrl: z.string().url().nullable().optional(),
-  preferences: z
-    .object({
-      theme: z.enum(['light', 'dark', 'system']).optional(),
-      defaultListPrivacy: z.boolean().optional(),
-      showAdultContent: z.boolean().optional(),
-      emailNotifications: z
+    username: usernameSchema.optional(),
+    displayName: z.string().max(100).nullable().optional(),
+    avatarUrl: z.string().url().nullable().optional(),
+    preferences: z
         .object({
-          newFollower: z.boolean().optional(),
-          listUpdates: z.boolean().optional(),
-          recaps: z.boolean().optional(),
+            theme: z.enum(["light", "dark", "system"]).optional(),
+            defaultListPrivacy: z.boolean().optional(),
+            showAdultContent: z.boolean().optional(),
+            emailNotifications: z
+                .object({
+                    newFollower: z.boolean().optional(),
+                    listUpdates: z.boolean().optional(),
+                    recaps: z.boolean().optional(),
+                })
+                .optional(),
         })
         .optional(),
-    })
-    .optional(),
 });
 
 /**
  * Add to list input schema
  */
 export const addToListSchema = z.object({
-  animeId: z.string().uuid(),
-  status: trackingStatusSchema,
-  currentEpisode: z.number().int().min(0).optional().default(0),
-  rating: z.number().min(0).max(10).nullable().optional(),
-  startedAt: z.string().datetime().nullable().optional(),
-  notes: z.string().max(5000).nullable().optional(),
-  isPrivate: z.boolean().optional().default(false),
+    animeId: z.string().uuid(),
+    status: trackingStatusSchema,
+    currentEpisode: z.number().int().min(0).optional().default(0),
+    rating: z.number().min(0).max(10).nullable().optional(),
+    startedAt: z.string().datetime().nullable().optional(),
+    notes: z.string().max(5000).nullable().optional(),
+    isPrivate: z.boolean().optional().default(false),
 });
 
 /**
  * Update tracking input schema
  */
 export const updateTrackingSchema = z.object({
-  id: z.string().uuid(),
-  status: trackingStatusSchema.optional(),
-  currentEpisode: z.number().int().min(0).optional(),
-  rating: z.number().min(0).max(10).nullable().optional(),
-  startedAt: z.string().datetime().nullable().optional(),
-  completedAt: z.string().datetime().nullable().optional(),
-  notes: z.string().max(5000).nullable().optional(),
-  isPrivate: z.boolean().optional(),
+    id: z.string().uuid(),
+    status: trackingStatusSchema.optional(),
+    currentEpisode: z.number().int().min(0).optional(),
+    rating: z.number().min(0).max(10).nullable().optional(),
+    startedAt: z.string().datetime().nullable().optional(),
+    completedAt: z.string().datetime().nullable().optional(),
+    notes: z.string().max(5000).nullable().optional(),
+    isPrivate: z.boolean().optional(),
 });
 
 /**
  * Create review schema
  */
 export const createReviewSchema = z.object({
-  animeId: z.string().uuid(),
-  content: z.string().min(50, 'Review must be at least 50 characters').max(10000),
-  isSpoiler: z.boolean().optional().default(false),
+    animeId: z.string().uuid(),
+    content: z
+        .string()
+        .min(50, "Review must be at least 50 characters")
+        .max(10000),
+    isSpoiler: z.boolean().optional().default(false),
 });
 
 /**
  * Update review schema
  */
 export const updateReviewSchema = z.object({
-  id: z.string().uuid(),
-  content: z.string().min(50).max(10000).optional(),
-  isSpoiler: z.boolean().optional(),
+    id: z.string().uuid(),
+    content: z.string().min(50).max(10000).optional(),
+    isSpoiler: z.boolean().optional(),
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
@@ -1257,14 +1299,14 @@ export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
 #### `src/lib/validations/common.ts`
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Pagination parameters schema
  */
 export const paginationSchema = z.object({
-  page: z.number().int().min(1).optional().default(1),
-  pageSize: z.number().int().min(1).max(100).optional().default(20),
+    page: z.number().int().min(1).optional().default(1),
+    pageSize: z.number().int().min(1).max(100).optional().default(20),
 });
 
 /**
@@ -1275,7 +1317,9 @@ export const uuidSchema = z.string().uuid();
 /**
  * Slug parameter schema
  */
-export const slugSchema = z.string().regex(/^[a-z0-9-]+$/, 'Invalid slug format');
+export const slugSchema = z
+    .string()
+    .regex(/^[a-z0-9-]+$/, "Invalid slug format");
 
 export type PaginationParams = z.infer<typeof paginationSchema>;
 ```
@@ -1309,125 +1353,123 @@ sequenceDiagram
 #### `src/lib/supabase/client.ts` (Browser Client)
 
 ```typescript
-import { createBrowserClient } from '@supabase/ssr';
-import type { Database } from '@/types/database.types';
+import { createBrowserClient } from "@supabase/ssr";
+import type { Database } from "@/types/database.types";
 
 /**
  * Creates a Supabase client for browser-side operations
  * Use this in Client Components
  */
 export function createClient() {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+    return createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
 }
 ```
 
 #### `src/lib/supabase/server.ts` (Server Client)
 
 ```typescript
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import type { Database } from '@/types/database.types';
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import type { Database } from "@/types/database.types";
 
 /**
  * Creates a Supabase client for server-side operations
  * Use this in Server Components, Server Actions, and Route Handlers
  */
 export async function createClient() {
-  const cookieStore = await cookies();
+    const cookieStore = await cookies();
 
-  return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
+    return createServerClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return cookieStore.getAll();
+                },
+                setAll(cookiesToSet) {
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options),
+                        );
+                    } catch {
+                        // Called from Server Component - ignore
+                    }
+                },
+            },
         },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Called from Server Component - ignore
-          }
-        },
-      },
-    }
-  );
+    );
 }
 ```
 
 #### `src/middleware.ts` (Session Refresh)
 
 ```typescript
-import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
 /**
  * Middleware to refresh Supabase auth session
  * Runs on every request to keep session alive
  */
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+    let supabaseResponse = NextResponse.next({
+        request,
+    });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return request.cookies.getAll();
+                },
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value }) =>
+                        request.cookies.set(name, value),
+                    );
+                    supabaseResponse = NextResponse.next({
+                        request,
+                    });
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                        supabaseResponse.cookies.set(name, value, options),
+                    );
+                },
+            },
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
+    );
+
+    // Refresh session if expired
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    // Protect dashboard routes
+    if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/login";
+        url.searchParams.set("redirectTo", request.nextUrl.pathname);
+        return NextResponse.redirect(url);
     }
-  );
 
-  // Refresh session if expired
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Protect dashboard routes
-  if (
-    !user &&
-    request.nextUrl.pathname.startsWith('/dashboard')
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    url.searchParams.set('redirectTo', request.nextUrl.pathname);
-    return NextResponse.redirect(url);
-  }
-
-  return supabaseResponse;
+    return supabaseResponse;
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+    matcher: [
+        "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    ],
 };
 ```
 
 ### OAuth Providers Configuration
 
 Supported providers:
+
 - **Google** - Primary OAuth provider
 - **Discord** - Popular in anime community
 
@@ -1482,562 +1524,589 @@ flowchart LR
 #### `src/stores/useUserStore.ts`
 
 ```typescript
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { User, UserPreferences } from '@/types/user';
-import type { ActionResult } from '@/types/common';
-import { getCurrentUser, updateUserProfile, signOut } from '@/app/actions/user';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import type { User, UserPreferences } from "@/types/user";
+import type { ActionResult } from "@/types/common";
+import { getCurrentUser, updateUserProfile, signOut } from "@/app/actions/user";
 
 /**
  * User store state interface
  */
 interface UserState {
-  // State
-  user: User | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  error: string | null;
+    // State
+    user: User | null;
+    isLoading: boolean;
+    isAuthenticated: boolean;
+    error: string | null;
 
-  // Actions
-  fetchUser: () => Promise<void>;
-  updateProfile: (data: Partial<User>) => Promise<ActionResult<User>>;
-  updatePreferences: (prefs: Partial<UserPreferences>) => Promise<ActionResult<User>>;
-  logout: () => Promise<void>;
-  reset: () => void;
+    // Actions
+    fetchUser: () => Promise<void>;
+    updateProfile: (data: Partial<User>) => Promise<ActionResult<User>>;
+    updatePreferences: (
+        prefs: Partial<UserPreferences>,
+    ) => Promise<ActionResult<User>>;
+    logout: () => Promise<void>;
+    reset: () => void;
 }
 
 /**
  * Initial state for reset
  */
 const initialState = {
-  user: null,
-  isLoading: false,
-  isAuthenticated: false,
-  error: null,
+    user: null,
+    isLoading: false,
+    isAuthenticated: false,
+    error: null,
 };
 
 /**
  * User store - manages authentication state and user profile
  */
 export const useUserStore = create<UserState>()(
-  persist(
-    (set, get) => ({
-      ...initialState,
+    persist(
+        (set, get) => ({
+            ...initialState,
 
-      /**
-       * Fetches the current authenticated user
-       */
-      fetchUser: async () => {
-        set({ isLoading: true, error: null });
+            /**
+             * Fetches the current authenticated user
+             */
+            fetchUser: async () => {
+                set({ isLoading: true, error: null });
 
-        const result = await getCurrentUser();
+                const result = await getCurrentUser();
 
-        if (result.success) {
-          set({
-            user: result.data,
-            isAuthenticated: true,
-            isLoading: false,
-          });
-        } else {
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: result.error,
-          });
-        }
-      },
+                if (result.success) {
+                    set({
+                        user: result.data,
+                        isAuthenticated: true,
+                        isLoading: false,
+                    });
+                } else {
+                    set({
+                        user: null,
+                        isAuthenticated: false,
+                        isLoading: false,
+                        error: result.error,
+                    });
+                }
+            },
 
-      /**
-       * Updates the user profile
-       */
-      updateProfile: async (data) => {
-        const { user } = get();
-        if (!user) {
-          return { success: false, error: 'Not authenticated' };
-        }
+            /**
+             * Updates the user profile
+             */
+            updateProfile: async (data) => {
+                const { user } = get();
+                if (!user) {
+                    return { success: false, error: "Not authenticated" };
+                }
 
-        // Optimistic update
-        set({ user: { ...user, ...data } });
+                // Optimistic update
+                set({ user: { ...user, ...data } });
 
-        const result = await updateUserProfile(data);
+                const result = await updateUserProfile(data);
 
-        if (result.success) {
-          set({ user: result.data });
-        } else {
-          // Revert on failure
-          set({ user, error: result.error });
-        }
+                if (result.success) {
+                    set({ user: result.data });
+                } else {
+                    // Revert on failure
+                    set({ user, error: result.error });
+                }
 
-        return result;
-      },
+                return result;
+            },
 
-      /**
-       * Updates user preferences
-       */
-      updatePreferences: async (prefs) => {
-        const { user } = get();
-        if (!user) {
-          return { success: false, error: 'Not authenticated' };
-        }
+            /**
+             * Updates user preferences
+             */
+            updatePreferences: async (prefs) => {
+                const { user } = get();
+                if (!user) {
+                    return { success: false, error: "Not authenticated" };
+                }
 
-        const newPreferences = { ...user.preferences, ...prefs };
-        return get().updateProfile({ preferences: newPreferences } as Partial<User>);
-      },
+                const newPreferences = { ...user.preferences, ...prefs };
+                return get().updateProfile({
+                    preferences: newPreferences,
+                } as Partial<User>);
+            },
 
-      /**
-       * Signs out the user
-       */
-      logout: async () => {
-        await signOut();
-        set(initialState);
-      },
+            /**
+             * Signs out the user
+             */
+            logout: async () => {
+                await signOut();
+                set(initialState);
+            },
 
-      /**
-       * Resets the store to initial state
-       */
-      reset: () => set(initialState),
-    }),
-    {
-      name: 'user-storage',
-      partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
-    }
-  )
+            /**
+             * Resets the store to initial state
+             */
+            reset: () => set(initialState),
+        }),
+        {
+            name: "user-storage",
+            partialize: (state) => ({
+                user: state.user,
+                isAuthenticated: state.isAuthenticated,
+            }),
+        },
+    ),
 );
 ```
 
 #### `src/stores/useAnimeStore.ts`
 
 ```typescript
-import { create } from 'zustand';
-import type { Anime, AnimeWithRelations, AnimeFilters } from '@/types/anime';
-import type { ActionResult, PaginatedResponse } from '@/types/common';
+import { create } from "zustand";
+import type { Anime, AnimeWithRelations, AnimeFilters } from "@/types/anime";
+import type { ActionResult, PaginatedResponse } from "@/types/common";
 import {
-  getAnimeById,
-  getAnimeBySlug,
-  searchAnime,
-  createAnime,
-  updateAnime,
-} from '@/app/actions/anime';
+    getAnimeById,
+    getAnimeBySlug,
+    searchAnime,
+    createAnime,
+    updateAnime,
+} from "@/app/actions/anime";
 
 /**
  * Anime store state interface
  */
 interface AnimeState {
-  // Current anime detail
-  currentAnime: AnimeWithRelations | null;
-  isLoadingDetail: boolean;
-  detailError: string | null;
+    // Current anime detail
+    currentAnime: AnimeWithRelations | null;
+    isLoadingDetail: boolean;
+    detailError: string | null;
 
-  // Anime list/search results
-  animeList: Anime[];
-  isLoadingList: boolean;
-  listError: string | null;
-  pagination: PaginatedResponse<Anime>['pagination'] | null;
+    // Anime list/search results
+    animeList: Anime[];
+    isLoadingList: boolean;
+    listError: string | null;
+    pagination: PaginatedResponse<Anime>["pagination"] | null;
 
-  // Filters
-  filters: AnimeFilters;
+    // Filters
+    filters: AnimeFilters;
 
-  // Actions
-  fetchAnimeById: (id: string) => Promise<void>;
-  fetchAnimeBySlug: (slug: string) => Promise<void>;
-  searchAnime: (filters?: AnimeFilters, page?: number) => Promise<void>;
-  setFilters: (filters: Partial<AnimeFilters>) => void;
-  clearFilters: () => void;
-  createAnime: (data: Parameters<typeof createAnime>[0]) => Promise<ActionResult<Anime>>;
-  updateAnime: (data: Parameters<typeof updateAnime>[0]) => Promise<ActionResult<Anime>>;
-  clearCurrentAnime: () => void;
-  reset: () => void;
+    // Actions
+    fetchAnimeById: (id: string) => Promise<void>;
+    fetchAnimeBySlug: (slug: string) => Promise<void>;
+    searchAnime: (filters?: AnimeFilters, page?: number) => Promise<void>;
+    setFilters: (filters: Partial<AnimeFilters>) => void;
+    clearFilters: () => void;
+    createAnime: (
+        data: Parameters<typeof createAnime>[0],
+    ) => Promise<ActionResult<Anime>>;
+    updateAnime: (
+        data: Parameters<typeof updateAnime>[0],
+    ) => Promise<ActionResult<Anime>>;
+    clearCurrentAnime: () => void;
+    reset: () => void;
 }
 
 /**
  * Default filters
  */
 const defaultFilters: AnimeFilters = {
-  sortBy: 'popularity',
-  sortOrder: 'desc',
+    sortBy: "popularity",
+    sortOrder: "desc",
 };
 
 /**
  * Initial state
  */
 const initialState = {
-  currentAnime: null,
-  isLoadingDetail: false,
-  detailError: null,
-  animeList: [],
-  isLoadingList: false,
-  listError: null,
-  pagination: null,
-  filters: defaultFilters,
+    currentAnime: null,
+    isLoadingDetail: false,
+    detailError: null,
+    animeList: [],
+    isLoadingList: false,
+    listError: null,
+    pagination: null,
+    filters: defaultFilters,
 };
 
 /**
  * Anime store - manages anime browsing and detail state
  */
 export const useAnimeStore = create<AnimeState>((set, get) => ({
-  ...initialState,
+    ...initialState,
 
-  /**
-   * Fetches anime by ID
-   */
-  fetchAnimeById: async (id) => {
-    set({ isLoadingDetail: true, detailError: null });
+    /**
+     * Fetches anime by ID
+     */
+    fetchAnimeById: async (id) => {
+        set({ isLoadingDetail: true, detailError: null });
 
-    const result = await getAnimeById(id);
+        const result = await getAnimeById(id);
 
-    if (result.success) {
-      set({ currentAnime: result.data, isLoadingDetail: false });
-    } else {
-      set({ detailError: result.error, isLoadingDetail: false });
-    }
-  },
+        if (result.success) {
+            set({ currentAnime: result.data, isLoadingDetail: false });
+        } else {
+            set({ detailError: result.error, isLoadingDetail: false });
+        }
+    },
 
-  /**
-   * Fetches anime by slug (for SEO-friendly URLs)
-   */
-  fetchAnimeBySlug: async (slug) => {
-    set({ isLoadingDetail: true, detailError: null });
+    /**
+     * Fetches anime by slug (for SEO-friendly URLs)
+     */
+    fetchAnimeBySlug: async (slug) => {
+        set({ isLoadingDetail: true, detailError: null });
 
-    const result = await getAnimeBySlug(slug);
+        const result = await getAnimeBySlug(slug);
 
-    if (result.success) {
-      set({ currentAnime: result.data, isLoadingDetail: false });
-    } else {
-      set({ detailError: result.error, isLoadingDetail: false });
-    }
-  },
+        if (result.success) {
+            set({ currentAnime: result.data, isLoadingDetail: false });
+        } else {
+            set({ detailError: result.error, isLoadingDetail: false });
+        }
+    },
 
-  /**
-   * Searches anime with filters
-   */
-  searchAnime: async (filters, page = 1) => {
-    const currentFilters = filters || get().filters;
-    set({ isLoadingList: true, listError: null, filters: currentFilters });
+    /**
+     * Searches anime with filters
+     */
+    searchAnime: async (filters, page = 1) => {
+        const currentFilters = filters || get().filters;
+        set({ isLoadingList: true, listError: null, filters: currentFilters });
 
-    const result = await searchAnime(currentFilters, { page, pageSize: 20 });
+        const result = await searchAnime(currentFilters, {
+            page,
+            pageSize: 20,
+        });
 
-    if (result.success) {
-      set({
-        animeList: result.data.data,
-        pagination: result.data.pagination,
-        isLoadingList: false,
-      });
-    } else {
-      set({ listError: result.error, isLoadingList: false });
-    }
-  },
+        if (result.success) {
+            set({
+                animeList: result.data.data,
+                pagination: result.data.pagination,
+                isLoadingList: false,
+            });
+        } else {
+            set({ listError: result.error, isLoadingList: false });
+        }
+    },
 
-  /**
-   * Updates filters (does not trigger search)
-   */
-  setFilters: (filters) => {
-    set({ filters: { ...get().filters, ...filters } });
-  },
+    /**
+     * Updates filters (does not trigger search)
+     */
+    setFilters: (filters) => {
+        set({ filters: { ...get().filters, ...filters } });
+    },
 
-  /**
-   * Clears all filters to defaults
-   */
-  clearFilters: () => {
-    set({ filters: defaultFilters });
-  },
+    /**
+     * Clears all filters to defaults
+     */
+    clearFilters: () => {
+        set({ filters: defaultFilters });
+    },
 
-  /**
-   * Creates a new anime entry
-   */
-  createAnime: async (data) => {
-    const result = await createAnime(data);
+    /**
+     * Creates a new anime entry
+     */
+    createAnime: async (data) => {
+        const result = await createAnime(data);
 
-    if (result.success) {
-      // Optionally add to list or refresh
-      set((state) => ({
-        animeList: [result.data, ...state.animeList],
-      }));
-    }
+        if (result.success) {
+            // Optionally add to list or refresh
+            set((state) => ({
+                animeList: [result.data, ...state.animeList],
+            }));
+        }
 
-    return result;
-  },
+        return result;
+    },
 
-  /**
-   * Updates an existing anime
-   */
-  updateAnime: async (data) => {
-    const result = await updateAnime(data);
+    /**
+     * Updates an existing anime
+     */
+    updateAnime: async (data) => {
+        const result = await updateAnime(data);
 
-    if (result.success) {
-      const { currentAnime, animeList } = get();
+        if (result.success) {
+            const { currentAnime, animeList } = get();
 
-      // Update current anime if it matches
-      if (currentAnime?.id === result.data.id) {
-        set({ currentAnime: { ...currentAnime, ...result.data } });
-      }
+            // Update current anime if it matches
+            if (currentAnime?.id === result.data.id) {
+                set({ currentAnime: { ...currentAnime, ...result.data } });
+            }
 
-      // Update in list if present
-      set({
-        animeList: animeList.map((a) =>
-          a.id === result.data.id ? { ...a, ...result.data } : a
-        ),
-      });
-    }
+            // Update in list if present
+            set({
+                animeList: animeList.map((a) =>
+                    a.id === result.data.id ? { ...a, ...result.data } : a,
+                ),
+            });
+        }
 
-    return result;
-  },
+        return result;
+    },
 
-  /**
-   * Clears the current anime detail
-   */
-  clearCurrentAnime: () => {
-    set({ currentAnime: null, detailError: null });
-  },
+    /**
+     * Clears the current anime detail
+     */
+    clearCurrentAnime: () => {
+        set({ currentAnime: null, detailError: null });
+    },
 
-  /**
-   * Resets the store to initial state
-   */
-  reset: () => set(initialState),
+    /**
+     * Resets the store to initial state
+     */
+    reset: () => set(initialState),
 }));
 ```
 
 #### `src/stores/useTrackingStore.ts`
 
 ```typescript
-import { create } from 'zustand';
-import type { UserAnime, UserAnimeWithDetails, TrackingStatus, AddToListInput, UpdateTrackingInput } from '@/types/user';
-import type { ActionResult, PaginatedResponse } from '@/types/common';
+import { create } from "zustand";
+import type {
+    UserAnime,
+    UserAnimeWithDetails,
+    TrackingStatus,
+    AddToListInput,
+    UpdateTrackingInput,
+} from "@/types/user";
+import type { ActionResult, PaginatedResponse } from "@/types/common";
 import {
-  getUserAnimeList,
-  addToList,
-  updateTracking,
-  removeFromList,
-  incrementEpisode,
-} from '@/app/actions/tracking';
+    getUserAnimeList,
+    addToList,
+    updateTracking,
+    removeFromList,
+    incrementEpisode,
+} from "@/app/actions/tracking";
 
 /**
  * Tracking store state interface
  */
 interface TrackingState {
-  // User&apos;s anime list
-  list: UserAnimeWithDetails[];
-  isLoading: boolean;
-  error: string | null;
-  pagination: PaginatedResponse<UserAnimeWithDetails>['pagination'] | null;
+    // User&apos;s anime list
+    list: UserAnimeWithDetails[];
+    isLoading: boolean;
+    error: string | null;
+    pagination: PaginatedResponse<UserAnimeWithDetails>["pagination"] | null;
 
-  // Current filter
-  statusFilter: TrackingStatus | 'ALL';
+    // Current filter
+    statusFilter: TrackingStatus | "ALL";
 
-  // Quick lookup map for tracking status
-  trackingMap: Map<string, UserAnime>;
+    // Quick lookup map for tracking status
+    trackingMap: Map<string, UserAnime>;
 
-  // Actions
-  fetchList: (status?: TrackingStatus | 'ALL', page?: number) => Promise<void>;
-  addToList: (input: AddToListInput) => Promise<ActionResult<UserAnime>>;
-  updateTracking: (input: UpdateTrackingInput) => Promise<ActionResult<UserAnime>>;
-  removeFromList: (id: string) => Promise<ActionResult<void>>;
-  incrementEpisode: (id: string) => Promise<ActionResult<UserAnime>>;
-  setStatusFilter: (status: TrackingStatus | 'ALL') => void;
-  getTrackingForAnime: (animeId: string) => UserAnime | undefined;
-  reset: () => void;
+    // Actions
+    fetchList: (
+        status?: TrackingStatus | "ALL",
+        page?: number,
+    ) => Promise<void>;
+    addToList: (input: AddToListInput) => Promise<ActionResult<UserAnime>>;
+    updateTracking: (
+        input: UpdateTrackingInput,
+    ) => Promise<ActionResult<UserAnime>>;
+    removeFromList: (id: string) => Promise<ActionResult<void>>;
+    incrementEpisode: (id: string) => Promise<ActionResult<UserAnime>>;
+    setStatusFilter: (status: TrackingStatus | "ALL") => void;
+    getTrackingForAnime: (animeId: string) => UserAnime | undefined;
+    reset: () => void;
 }
 
 /**
  * Initial state
  */
 const initialState = {
-  list: [],
-  isLoading: false,
-  error: null,
-  pagination: null,
-  statusFilter: 'ALL' as const,
-  trackingMap: new Map<string, UserAnime>(),
+    list: [],
+    isLoading: false,
+    error: null,
+    pagination: null,
+    statusFilter: "ALL" as const,
+    trackingMap: new Map<string, UserAnime>(),
 };
 
 /**
  * Tracking store - manages user&apos;s anime list and tracking operations
  */
 export const useTrackingStore = create<TrackingState>((set, get) => ({
-  ...initialState,
+    ...initialState,
 
-  /**
-   * Fetches user&apos;s anime list with optional status filter
-   */
-  fetchList: async (status = 'ALL', page = 1) => {
-    set({ isLoading: true, error: null, statusFilter: status });
+    /**
+     * Fetches user&apos;s anime list with optional status filter
+     */
+    fetchList: async (status = "ALL", page = 1) => {
+        set({ isLoading: true, error: null, statusFilter: status });
 
-    const result = await getUserAnimeList(
-      status === 'ALL' ? undefined : status,
-      { page, pageSize: 20 }
-    );
+        const result = await getUserAnimeList(
+            status === "ALL" ? undefined : status,
+            { page, pageSize: 20 },
+        );
 
-    if (result.success) {
-      // Build tracking map for quick lookups
-      const trackingMap = new Map<string, UserAnime>();
-      result.data.data.forEach((item) => {
-        trackingMap.set(item.animeId, item);
-      });
+        if (result.success) {
+            // Build tracking map for quick lookups
+            const trackingMap = new Map<string, UserAnime>();
+            result.data.data.forEach((item) => {
+                trackingMap.set(item.animeId, item);
+            });
 
-      set({
-        list: result.data.data,
-        pagination: result.data.pagination,
-        trackingMap,
-        isLoading: false,
-      });
-    } else {
-      set({ error: result.error, isLoading: false });
-    }
-  },
+            set({
+                list: result.data.data,
+                pagination: result.data.pagination,
+                trackingMap,
+                isLoading: false,
+            });
+        } else {
+            set({ error: result.error, isLoading: false });
+        }
+    },
 
-  /**
-   * Adds anime to user&apos;s list
-   */
-  addToList: async (input) => {
-    const result = await addToList(input);
+    /**
+     * Adds anime to user&apos;s list
+     */
+    addToList: async (input) => {
+        const result = await addToList(input);
 
-    if (result.success) {
-      const { trackingMap } = get();
-      trackingMap.set(input.animeId, result.data);
-      set({ trackingMap: new Map(trackingMap) });
+        if (result.success) {
+            const { trackingMap } = get();
+            trackingMap.set(input.animeId, result.data);
+            set({ trackingMap: new Map(trackingMap) });
 
-      // Refresh list if viewing relevant status
-      const { statusFilter } = get();
-      if (statusFilter === 'ALL' || statusFilter === input.status) {
-        get().fetchList(statusFilter);
-      }
-    }
+            // Refresh list if viewing relevant status
+            const { statusFilter } = get();
+            if (statusFilter === "ALL" || statusFilter === input.status) {
+                get().fetchList(statusFilter);
+            }
+        }
 
-    return result;
-  },
+        return result;
+    },
 
-  /**
-   * Updates tracking entry
-   */
-  updateTracking: async (input) => {
-    const { list, trackingMap } = get();
+    /**
+     * Updates tracking entry
+     */
+    updateTracking: async (input) => {
+        const { list, trackingMap } = get();
 
-    // Optimistic update
-    const existingItem = list.find((item) => item.id === input.id);
-    if (existingItem) {
-      const optimisticItem = { ...existingItem, ...input };
-      set({
-        list: list.map((item) => (item.id === input.id ? { ...item, ...input } : item)),
-      });
-      trackingMap.set(existingItem.animeId, optimisticItem);
-      set({ trackingMap: new Map(trackingMap) });
-    }
+        // Optimistic update
+        const existingItem = list.find((item) => item.id === input.id);
+        if (existingItem) {
+            const optimisticItem = { ...existingItem, ...input };
+            set({
+                list: list.map((item) =>
+                    item.id === input.id ? { ...item, ...input } : item,
+                ),
+            });
+            trackingMap.set(existingItem.animeId, optimisticItem);
+            set({ trackingMap: new Map(trackingMap) });
+        }
 
-    const result = await updateTracking(input);
+        const result = await updateTracking(input);
 
-    if (!result.success && existingItem) {
-      // Revert on failure
-      set({ list });
-      trackingMap.set(existingItem.animeId, existingItem);
-      set({ trackingMap: new Map(trackingMap) });
-    }
+        if (!result.success && existingItem) {
+            // Revert on failure
+            set({ list });
+            trackingMap.set(existingItem.animeId, existingItem);
+            set({ trackingMap: new Map(trackingMap) });
+        }
 
-    return result;
-  },
+        return result;
+    },
 
-  /**
-   * Removes anime from user&apos;s list
-   */
-  removeFromList: async (id) => {
-    const { list, trackingMap } = get();
-    const item = list.find((i) => i.id === id);
+    /**
+     * Removes anime from user&apos;s list
+     */
+    removeFromList: async (id) => {
+        const { list, trackingMap } = get();
+        const item = list.find((i) => i.id === id);
 
-    // Optimistic removal
-    set({ list: list.filter((i) => i.id !== id) });
-    if (item) {
-      trackingMap.delete(item.animeId);
-      set({ trackingMap: new Map(trackingMap) });
-    }
+        // Optimistic removal
+        set({ list: list.filter((i) => i.id !== id) });
+        if (item) {
+            trackingMap.delete(item.animeId);
+            set({ trackingMap: new Map(trackingMap) });
+        }
 
-    const result = await removeFromList(id);
+        const result = await removeFromList(id);
 
-    if (!result.success) {
-      // Revert on failure
-      set({ list });
-      if (item) {
-        trackingMap.set(item.animeId, item);
-        set({ trackingMap: new Map(trackingMap) });
-      }
-    }
+        if (!result.success) {
+            // Revert on failure
+            set({ list });
+            if (item) {
+                trackingMap.set(item.animeId, item);
+                set({ trackingMap: new Map(trackingMap) });
+            }
+        }
 
-    return result;
-  },
+        return result;
+    },
 
-  /**
-   * Increments episode count by 1
-   */
-  incrementEpisode: async (id) => {
-    const { list } = get();
-    const item = list.find((i) => i.id === id);
+    /**
+     * Increments episode count by 1
+     */
+    incrementEpisode: async (id) => {
+        const { list } = get();
+        const item = list.find((i) => i.id === id);
 
-    if (item) {
-      // Optimistic update
-      const newEpisode = item.currentEpisode + 1;
-      set({
-        list: list.map((i) =>
-          i.id === id ? { ...i, currentEpisode: newEpisode } : i
-        ),
-      });
-    }
+        if (item) {
+            // Optimistic update
+            const newEpisode = item.currentEpisode + 1;
+            set({
+                list: list.map((i) =>
+                    i.id === id ? { ...i, currentEpisode: newEpisode } : i,
+                ),
+            });
+        }
 
-    const result = await incrementEpisode(id);
+        const result = await incrementEpisode(id);
 
-    if (!result.success && item) {
-      // Revert on failure
-      set({ list });
-    }
+        if (!result.success && item) {
+            // Revert on failure
+            set({ list });
+        }
 
-    return result;
-  },
+        return result;
+    },
 
-  /**
-   * Sets the status filter
-   */
-  setStatusFilter: (status) => {
-    set({ statusFilter: status });
-  },
+    /**
+     * Sets the status filter
+     */
+    setStatusFilter: (status) => {
+        set({ statusFilter: status });
+    },
 
-  /**
-   * Gets tracking info for a specific anime
-   */
-  getTrackingForAnime: (animeId) => {
-    return get().trackingMap.get(animeId);
-  },
+    /**
+     * Gets tracking info for a specific anime
+     */
+    getTrackingForAnime: (animeId) => {
+        return get().trackingMap.get(animeId);
+    },
 
-  /**
-   * Resets the store to initial state
-   */
-  reset: () => set({ ...initialState, trackingMap: new Map() }),
+    /**
+     * Resets the store to initial state
+     */
+    reset: () => set({ ...initialState, trackingMap: new Map() }),
 }));
 ```
 
 #### `src/stores/useSearchStore.ts`
 
 ```typescript
-import { create } from 'zustand';
-import type { Anime, AnimeFilters } from '@/types/anime';
-import { searchAnime } from '@/app/actions/search';
+import { create } from "zustand";
+import type { Anime, AnimeFilters } from "@/types/anime";
+import { searchAnime } from "@/app/actions/search";
 
 /**
  * Search store state interface
  */
 interface SearchState {
-  // Search state
-  query: string;
-  results: Anime[];
-  isSearching: boolean;
-  error: string | null;
+    // Search state
+    query: string;
+    results: Anime[];
+    isSearching: boolean;
+    error: string | null;
 
-  // Recent searches (persisted)
-  recentSearches: string[];
+    // Recent searches (persisted)
+    recentSearches: string[];
 
-  // Actions
-  search: (query: string) => Promise<void>;
-  setQuery: (query: string) => void;
-  clearResults: () => void;
-  addToRecent: (query: string) => void;
-  clearRecent: () => void;
-  reset: () => void;
+    // Actions
+    search: (query: string) => Promise<void>;
+    setQuery: (query: string) => void;
+    clearResults: () => void;
+    addToRecent: (query: string) => void;
+    clearRecent: () => void;
+    reset: () => void;
 }
 
 /**
@@ -2049,223 +2118,223 @@ const MAX_RECENT_SEARCHES = 10;
  * Initial state
  */
 const initialState = {
-  query: '',
-  results: [],
-  isSearching: false,
-  error: null,
-  recentSearches: [],
+    query: "",
+    results: [],
+    isSearching: false,
+    error: null,
+    recentSearches: [],
 };
 
 /**
  * Search store - manages search queries and results
  */
 export const useSearchStore = create<SearchState>((set, get) => ({
-  ...initialState,
+    ...initialState,
 
-  /**
-   * Performs a search
-   */
-  search: async (query) => {
-    if (!query.trim()) {
-      set({ results: [], isSearching: false });
-      return;
-    }
+    /**
+     * Performs a search
+     */
+    search: async (query) => {
+        if (!query.trim()) {
+            set({ results: [], isSearching: false });
+            return;
+        }
 
-    set({ query, isSearching: true, error: null });
+        set({ query, isSearching: true, error: null });
 
-    const result = await searchAnime({ query });
+        const result = await searchAnime({ query });
 
-    if (result.success) {
-      set({ results: result.data, isSearching: false });
-      get().addToRecent(query);
-    } else {
-      set({ error: result.error, isSearching: false });
-    }
-  },
+        if (result.success) {
+            set({ results: result.data, isSearching: false });
+            get().addToRecent(query);
+        } else {
+            set({ error: result.error, isSearching: false });
+        }
+    },
 
-  /**
-   * Sets the query without searching
-   */
-  setQuery: (query) => {
-    set({ query });
-  },
+    /**
+     * Sets the query without searching
+     */
+    setQuery: (query) => {
+        set({ query });
+    },
 
-  /**
-   * Clears search results
-   */
-  clearResults: () => {
-    set({ query: '', results: [], error: null });
-  },
+    /**
+     * Clears search results
+     */
+    clearResults: () => {
+        set({ query: "", results: [], error: null });
+    },
 
-  /**
-   * Adds a query to recent searches
-   */
-  addToRecent: (query) => {
-    const { recentSearches } = get();
-    const trimmed = query.trim();
+    /**
+     * Adds a query to recent searches
+     */
+    addToRecent: (query) => {
+        const { recentSearches } = get();
+        const trimmed = query.trim();
 
-    if (!trimmed) return;
+        if (!trimmed) return;
 
-    // Remove if already exists, add to front
-    const filtered = recentSearches.filter((s) => s !== trimmed);
-    const updated = [trimmed, ...filtered].slice(0, MAX_RECENT_SEARCHES);
+        // Remove if already exists, add to front
+        const filtered = recentSearches.filter((s) => s !== trimmed);
+        const updated = [trimmed, ...filtered].slice(0, MAX_RECENT_SEARCHES);
 
-    set({ recentSearches: updated });
-  },
+        set({ recentSearches: updated });
+    },
 
-  /**
-   * Clears recent searches
-   */
-  clearRecent: () => {
-    set({ recentSearches: [] });
-  },
+    /**
+     * Clears recent searches
+     */
+    clearRecent: () => {
+        set({ recentSearches: [] });
+    },
 
-  /**
-   * Resets the store to initial state
-   */
-  reset: () => set(initialState),
+    /**
+     * Resets the store to initial state
+     */
+    reset: () => set(initialState),
 }));
 ```
 
 #### `src/stores/useSocialStore.ts`
 
 ```typescript
-import { create } from 'zustand';
-import type { PublicUser, Follow } from '@/types/user';
-import type { ActionResult, PaginatedResponse } from '@/types/common';
+import { create } from "zustand";
+import type { PublicUser, Follow } from "@/types/user";
+import type { ActionResult, PaginatedResponse } from "@/types/common";
 import {
-  getFollowers,
-  getFollowing,
-  followUser,
-  unfollowUser,
-  checkFollowStatus,
-} from '@/app/actions/social';
+    getFollowers,
+    getFollowing,
+    followUser,
+    unfollowUser,
+    checkFollowStatus,
+} from "@/app/actions/social";
 
 /**
  * Social store state interface
  */
 interface SocialState {
-  // Followers/Following lists
-  followers: PublicUser[];
-  following: PublicUser[];
-  isLoadingFollowers: boolean;
-  isLoadingFollowing: boolean;
+    // Followers/Following lists
+    followers: PublicUser[];
+    following: PublicUser[];
+    isLoadingFollowers: boolean;
+    isLoadingFollowing: boolean;
 
-  // Follow status cache
-  followStatusCache: Map<string, boolean>;
+    // Follow status cache
+    followStatusCache: Map<string, boolean>;
 
-  // Actions
-  fetchFollowers: (userId: string, page?: number) => Promise<void>;
-  fetchFollowing: (userId: string, page?: number) => Promise<void>;
-  follow: (userId: string) => Promise<ActionResult<Follow>>;
-  unfollow: (userId: string) => Promise<ActionResult<void>>;
-  isFollowing: (userId: string) => Promise<boolean>;
-  reset: () => void;
+    // Actions
+    fetchFollowers: (userId: string, page?: number) => Promise<void>;
+    fetchFollowing: (userId: string, page?: number) => Promise<void>;
+    follow: (userId: string) => Promise<ActionResult<Follow>>;
+    unfollow: (userId: string) => Promise<ActionResult<void>>;
+    isFollowing: (userId: string) => Promise<boolean>;
+    reset: () => void;
 }
 
 /**
  * Initial state
  */
 const initialState = {
-  followers: [],
-  following: [],
-  isLoadingFollowers: false,
-  isLoadingFollowing: false,
-  followStatusCache: new Map<string, boolean>(),
+    followers: [],
+    following: [],
+    isLoadingFollowers: false,
+    isLoadingFollowing: false,
+    followStatusCache: new Map<string, boolean>(),
 };
 
 /**
  * Social store - manages follows and social features
  */
 export const useSocialStore = create<SocialState>((set, get) => ({
-  ...initialState,
+    ...initialState,
 
-  /**
-   * Fetches followers for a user
-   */
-  fetchFollowers: async (userId, page = 1) => {
-    set({ isLoadingFollowers: true });
+    /**
+     * Fetches followers for a user
+     */
+    fetchFollowers: async (userId, page = 1) => {
+        set({ isLoadingFollowers: true });
 
-    const result = await getFollowers(userId, { page, pageSize: 20 });
+        const result = await getFollowers(userId, { page, pageSize: 20 });
 
-    if (result.success) {
-      set({ followers: result.data.data, isLoadingFollowers: false });
-    } else {
-      set({ isLoadingFollowers: false });
-    }
-  },
+        if (result.success) {
+            set({ followers: result.data.data, isLoadingFollowers: false });
+        } else {
+            set({ isLoadingFollowers: false });
+        }
+    },
 
-  /**
-   * Fetches users that a user is following
-   */
-  fetchFollowing: async (userId, page = 1) => {
-    set({ isLoadingFollowing: true });
+    /**
+     * Fetches users that a user is following
+     */
+    fetchFollowing: async (userId, page = 1) => {
+        set({ isLoadingFollowing: true });
 
-    const result = await getFollowing(userId, { page, pageSize: 20 });
+        const result = await getFollowing(userId, { page, pageSize: 20 });
 
-    if (result.success) {
-      set({ following: result.data.data, isLoadingFollowing: false });
-    } else {
-      set({ isLoadingFollowing: false });
-    }
-  },
+        if (result.success) {
+            set({ following: result.data.data, isLoadingFollowing: false });
+        } else {
+            set({ isLoadingFollowing: false });
+        }
+    },
 
-  /**
-   * Follows a user
-   */
-  follow: async (userId) => {
-    const result = await followUser(userId);
+    /**
+     * Follows a user
+     */
+    follow: async (userId) => {
+        const result = await followUser(userId);
 
-    if (result.success) {
-      const { followStatusCache } = get();
-      followStatusCache.set(userId, true);
-      set({ followStatusCache: new Map(followStatusCache) });
-    }
+        if (result.success) {
+            const { followStatusCache } = get();
+            followStatusCache.set(userId, true);
+            set({ followStatusCache: new Map(followStatusCache) });
+        }
 
-    return result;
-  },
+        return result;
+    },
 
-  /**
-   * Unfollows a user
-   */
-  unfollow: async (userId) => {
-    const result = await unfollowUser(userId);
+    /**
+     * Unfollows a user
+     */
+    unfollow: async (userId) => {
+        const result = await unfollowUser(userId);
 
-    if (result.success) {
-      const { followStatusCache } = get();
-      followStatusCache.set(userId, false);
-      set({ followStatusCache: new Map(followStatusCache) });
-    }
+        if (result.success) {
+            const { followStatusCache } = get();
+            followStatusCache.set(userId, false);
+            set({ followStatusCache: new Map(followStatusCache) });
+        }
 
-    return result;
-  },
+        return result;
+    },
 
-  /**
-   * Checks if current user is following another user
-   */
-  isFollowing: async (userId) => {
-    const { followStatusCache } = get();
+    /**
+     * Checks if current user is following another user
+     */
+    isFollowing: async (userId) => {
+        const { followStatusCache } = get();
 
-    // Check cache first
-    if (followStatusCache.has(userId)) {
-      return followStatusCache.get(userId)!;
-    }
+        // Check cache first
+        if (followStatusCache.has(userId)) {
+            return followStatusCache.get(userId)!;
+        }
 
-    const result = await checkFollowStatus(userId);
+        const result = await checkFollowStatus(userId);
 
-    if (result.success) {
-      followStatusCache.set(userId, result.data);
-      set({ followStatusCache: new Map(followStatusCache) });
-      return result.data;
-    }
+        if (result.success) {
+            followStatusCache.set(userId, result.data);
+            set({ followStatusCache: new Map(followStatusCache) });
+            return result.data;
+        }
 
-    return false;
-  },
+        return false;
+    },
 
-  /**
-   * Resets the store to initial state
-   */
-  reset: () => set({ ...initialState, followStatusCache: new Map() }),
+    /**
+     * Resets the store to initial state
+     */
+    reset: () => set({ ...initialState, followStatusCache: new Map() }),
 }));
 ```
 
@@ -2400,632 +2469,747 @@ All server actions return a consistent `ActionResult<T>` type:
 #### `src/app/actions/anime.ts`
 
 ```typescript
-'use server';
+"use server";
 
-import { createClient } from '@/lib/supabase/server';
-import { createAnimeSchema, updateAnimeSchema, animeFiltersSchema } from '@/lib/validations/anime';
-import { paginationSchema } from '@/lib/validations/common';
-import type { Anime, AnimeWithRelations, AnimeFilters, CreateAnimeInput, UpdateAnimeInput } from '@/types/anime';
-import type { ActionResult, PaginatedResponse, PaginationParams } from '@/types/common';
-import { generateSlug } from '@/lib/utils/slug';
+import { createClient } from "@/lib/supabase/server";
+import {
+    createAnimeSchema,
+    updateAnimeSchema,
+    animeFiltersSchema,
+} from "@/lib/validations/anime";
+import { paginationSchema } from "@/lib/validations/common";
+import type {
+    Anime,
+    AnimeWithRelations,
+    AnimeFilters,
+    CreateAnimeInput,
+    UpdateAnimeInput,
+} from "@/types/anime";
+import type {
+    ActionResult,
+    PaginatedResponse,
+    PaginationParams,
+} from "@/types/common";
+import { generateSlug } from "@/lib/utils/slug";
 
 /**
  * Fetches an anime by ID with all relations
  */
-export async function getAnimeById(id: string): Promise<ActionResult<AnimeWithRelations>> {
-  try {
-    const supabase = await createClient();
+export async function getAnimeById(
+    id: string,
+): Promise<ActionResult<AnimeWithRelations>> {
+    try {
+        const supabase = await createClient();
 
-    const { data, error } = await supabase
-      .from('anime')
-      .select(`
+        const { data, error } = await supabase
+            .from("anime")
+            .select(
+                `
         *,
         genres:anime_genres(genre:genres(*)),
         studios:anime_studios(studio:studios(*)),
         streaming_links(*)
-      `)
-      .eq('id', id)
-      .single();
+      `,
+            )
+            .eq("id", id)
+            .single();
 
-    if (error) {
-      return { success: false, error: 'Anime not found', code: 'NOT_FOUND' };
+        if (error) {
+            return {
+                success: false,
+                error: "Anime not found",
+                code: "NOT_FOUND",
+            };
+        }
+
+        // Transform the nested data
+        const anime = transformAnimeResponse(data);
+
+        return { success: true, data: anime };
+    } catch (error) {
+        console.error("Error fetching anime:", error);
+        return { success: false, error: "Failed to fetch anime" };
     }
-
-    // Transform the nested data
-    const anime = transformAnimeResponse(data);
-
-    return { success: true, data: anime };
-  } catch (error) {
-    console.error('Error fetching anime:', error);
-    return { success: false, error: 'Failed to fetch anime' };
-  }
 }
 
 /**
  * Fetches an anime by slug
  */
-export async function getAnimeBySlug(slug: string): Promise<ActionResult<AnimeWithRelations>> {
-  try {
-    const supabase = await createClient();
+export async function getAnimeBySlug(
+    slug: string,
+): Promise<ActionResult<AnimeWithRelations>> {
+    try {
+        const supabase = await createClient();
 
-    const { data, error } = await supabase
-      .from('anime')
-      .select(`
+        const { data, error } = await supabase
+            .from("anime")
+            .select(
+                `
         *,
         genres:anime_genres(genre:genres(*)),
         studios:anime_studios(studio:studios(*)),
         streaming_links(*)
-      `)
-      .eq('slug', slug)
-      .single();
+      `,
+            )
+            .eq("slug", slug)
+            .single();
 
-    if (error) {
-      return { success: false, error: 'Anime not found', code: 'NOT_FOUND' };
+        if (error) {
+            return {
+                success: false,
+                error: "Anime not found",
+                code: "NOT_FOUND",
+            };
+        }
+
+        const anime = transformAnimeResponse(data);
+
+        return { success: true, data: anime };
+    } catch (error) {
+        console.error("Error fetching anime:", error);
+        return { success: false, error: "Failed to fetch anime" };
     }
-
-    const anime = transformAnimeResponse(data);
-
-    return { success: true, data: anime };
-  } catch (error) {
-    console.error('Error fetching anime:', error);
-    return { success: false, error: 'Failed to fetch anime' };
-  }
 }
 
 /**
  * Searches anime with filters and pagination
  */
 export async function searchAnime(
-  filters: AnimeFilters,
-  pagination: PaginationParams = {}
+    filters: AnimeFilters,
+    pagination: PaginationParams = {},
 ): Promise<ActionResult<PaginatedResponse<Anime>>> {
-  try {
-    // Validate inputs
-    const validatedFilters = animeFiltersSchema.parse(filters);
-    const validatedPagination = paginationSchema.parse(pagination);
+    try {
+        // Validate inputs
+        const validatedFilters = animeFiltersSchema.parse(filters);
+        const validatedPagination = paginationSchema.parse(pagination);
 
-    const supabase = await createClient();
-    const { page, pageSize } = validatedPagination;
-    const offset = (page - 1) * pageSize;
+        const supabase = await createClient();
+        const { page, pageSize } = validatedPagination;
+        const offset = (page - 1) * pageSize;
 
-    // Build query
-    let query = supabase
-      .from('anime')
-      .select('*', { count: 'exact' });
+        // Build query
+        let query = supabase.from("anime").select("*", { count: "exact" });
 
-    // Apply filters
-    if (validatedFilters.format?.length) {
-      query = query.in('format', validatedFilters.format);
+        // Apply filters
+        if (validatedFilters.format?.length) {
+            query = query.in("format", validatedFilters.format);
+        }
+        if (validatedFilters.status?.length) {
+            query = query.in("status", validatedFilters.status);
+        }
+        if (validatedFilters.season) {
+            query = query.eq("season", validatedFilters.season);
+        }
+        if (validatedFilters.year) {
+            query = query.eq("season_year", validatedFilters.year);
+        }
+
+        // Apply sorting
+        const sortColumn =
+            validatedFilters.sortBy === "rating"
+                ? "average_rating"
+                : validatedFilters.sortBy === "title"
+                  ? "titles->romaji"
+                  : validatedFilters.sortBy === "startDate"
+                    ? "start_date"
+                    : "popularity";
+        const sortOrder = validatedFilters.sortOrder === "asc" ? true : false;
+        query = query.order(sortColumn, {
+            ascending: sortOrder,
+            nullsFirst: false,
+        });
+
+        // Apply pagination
+        query = query.range(offset, offset + pageSize - 1);
+
+        const { data, error, count } = await query;
+
+        if (error) {
+            return { success: false, error: "Search failed" };
+        }
+
+        const totalCount = count || 0;
+        const totalPages = Math.ceil(totalCount / pageSize);
+
+        return {
+            success: true,
+            data: {
+                data: data.map(transformAnimeRow),
+                pagination: {
+                    page,
+                    pageSize,
+                    totalCount,
+                    totalPages,
+                    hasNextPage: page < totalPages,
+                    hasPreviousPage: page > 1,
+                },
+            },
+        };
+    } catch (error) {
+        console.error("Error searching anime:", error);
+        return { success: false, error: "Search failed" };
     }
-    if (validatedFilters.status?.length) {
-      query = query.in('status', validatedFilters.status);
-    }
-    if (validatedFilters.season) {
-      query = query.eq('season', validatedFilters.season);
-    }
-    if (validatedFilters.year) {
-      query = query.eq('season_year', validatedFilters.year);
-    }
-
-    // Apply sorting
-    const sortColumn = validatedFilters.sortBy === 'rating' ? 'average_rating' :
-                       validatedFilters.sortBy === 'title' ? 'titles->romaji' :
-                       validatedFilters.sortBy === 'startDate' ? 'start_date' :
-                       'popularity';
-    const sortOrder = validatedFilters.sortOrder === 'asc' ? true : false;
-    query = query.order(sortColumn, { ascending: sortOrder, nullsFirst: false });
-
-    // Apply pagination
-    query = query.range(offset, offset + pageSize - 1);
-
-    const { data, error, count } = await query;
-
-    if (error) {
-      return { success: false, error: 'Search failed' };
-    }
-
-    const totalCount = count || 0;
-    const totalPages = Math.ceil(totalCount / pageSize);
-
-    return {
-      success: true,
-      data: {
-        data: data.map(transformAnimeRow),
-        pagination: {
-          page,
-          pageSize,
-          totalCount,
-          totalPages,
-          hasNextPage: page < totalPages,
-          hasPreviousPage: page > 1,
-        },
-      },
-    };
-  } catch (error) {
-    console.error('Error searching anime:', error);
-    return { success: false, error: 'Search failed' };
-  }
 }
 
 /**
  * Creates a new anime entry
  */
-export async function createAnime(input: CreateAnimeInput): Promise<ActionResult<Anime>> {
-  try {
-    const validated = createAnimeSchema.parse(input);
-    const supabase = await createClient();
+export async function createAnime(
+    input: CreateAnimeInput,
+): Promise<ActionResult<Anime>> {
+    try {
+        const validated = createAnimeSchema.parse(input);
+        const supabase = await createClient();
 
-    // Check auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' };
+        // Check auth
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+            return {
+                success: false,
+                error: "Unauthorized",
+                code: "UNAUTHORIZED",
+            };
+        }
+
+        // Generate slug from title
+        const slug = generateSlug(validated.titles.romaji);
+
+        const { data, error } = await supabase
+            .from("anime")
+            .insert({
+                slug,
+                titles: validated.titles,
+                format: validated.format,
+                status: validated.status,
+                episode_count: validated.episodeCount,
+                episode_duration: validated.episodeDuration,
+                season: validated.season,
+                season_year: validated.seasonYear,
+                start_date: validated.startDate,
+                end_date: validated.endDate,
+                synopsis: validated.synopsis,
+                mal_id: validated.malId,
+                anilist_id: validated.anilistId,
+                kitsu_id: validated.kitsuId,
+                cover_image_url: validated.coverImageUrl,
+                banner_image_url: validated.bannerImageUrl,
+            })
+            .select()
+            .single();
+
+        if (error) {
+            return { success: false, error: "Failed to create anime" };
+        }
+
+        // Add genres if provided
+        if (validated.genreIds?.length) {
+            await supabase.from("anime_genres").insert(
+                validated.genreIds.map((genreId) => ({
+                    anime_id: data.id,
+                    genre_id: genreId,
+                })),
+            );
+        }
+
+        // Add studios if provided
+        if (validated.studioIds?.length) {
+            await supabase.from("anime_studios").insert(
+                validated.studioIds.map((studioId) => ({
+                    anime_id: data.id,
+                    studio_id: studioId,
+                })),
+            );
+        }
+
+        return { success: true, data: transformAnimeRow(data) };
+    } catch (error) {
+        console.error("Error creating anime:", error);
+        return { success: false, error: "Failed to create anime" };
     }
-
-    // Generate slug from title
-    const slug = generateSlug(validated.titles.romaji);
-
-    const { data, error } = await supabase
-      .from('anime')
-      .insert({
-        slug,
-        titles: validated.titles,
-        format: validated.format,
-        status: validated.status,
-        episode_count: validated.episodeCount,
-        episode_duration: validated.episodeDuration,
-        season: validated.season,
-        season_year: validated.seasonYear,
-        start_date: validated.startDate,
-        end_date: validated.endDate,
-        synopsis: validated.synopsis,
-        mal_id: validated.malId,
-        anilist_id: validated.anilistId,
-        kitsu_id: validated.kitsuId,
-        cover_image_url: validated.coverImageUrl,
-        banner_image_url: validated.bannerImageUrl,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return { success: false, error: 'Failed to create anime' };
-    }
-
-    // Add genres if provided
-    if (validated.genreIds?.length) {
-      await supabase.from('anime_genres').insert(
-        validated.genreIds.map((genreId) => ({
-          anime_id: data.id,
-          genre_id: genreId,
-        }))
-      );
-    }
-
-    // Add studios if provided
-    if (validated.studioIds?.length) {
-      await supabase.from('anime_studios').insert(
-        validated.studioIds.map((studioId) => ({
-          anime_id: data.id,
-          studio_id: studioId,
-        }))
-      );
-    }
-
-    return { success: true, data: transformAnimeRow(data) };
-  } catch (error) {
-    console.error('Error creating anime:', error);
-    return { success: false, error: 'Failed to create anime' };
-  }
 }
 
 /**
  * Updates an existing anime
  */
-export async function updateAnime(input: UpdateAnimeInput): Promise<ActionResult<Anime>> {
-  try {
-    const validated = updateAnimeSchema.parse(input);
-    const supabase = await createClient();
+export async function updateAnime(
+    input: UpdateAnimeInput,
+): Promise<ActionResult<Anime>> {
+    try {
+        const validated = updateAnimeSchema.parse(input);
+        const supabase = await createClient();
 
-    // Check auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' };
+        // Check auth
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+            return {
+                success: false,
+                error: "Unauthorized",
+                code: "UNAUTHORIZED",
+            };
+        }
+
+        const { data, error } = await supabase
+            .from("anime")
+            .update({
+                titles: validated.titles,
+                format: validated.format,
+                status: validated.status,
+                episode_count: validated.episodeCount,
+                episode_duration: validated.episodeDuration,
+                season: validated.season,
+                season_year: validated.seasonYear,
+                start_date: validated.startDate,
+                end_date: validated.endDate,
+                synopsis: validated.synopsis,
+                mal_id: validated.malId,
+                anilist_id: validated.anilistId,
+                kitsu_id: validated.kitsuId,
+                cover_image_url: validated.coverImageUrl,
+                banner_image_url: validated.bannerImageUrl,
+            })
+            .eq("id", validated.id)
+            .select()
+            .single();
+
+        if (error) {
+            return { success: false, error: "Failed to update anime" };
+        }
+
+        return { success: true, data: transformAnimeRow(data) };
+    } catch (error) {
+        console.error("Error updating anime:", error);
+        return { success: false, error: "Failed to update anime" };
     }
-
-    const { data, error } = await supabase
-      .from('anime')
-      .update({
-        titles: validated.titles,
-        format: validated.format,
-        status: validated.status,
-        episode_count: validated.episodeCount,
-        episode_duration: validated.episodeDuration,
-        season: validated.season,
-        season_year: validated.seasonYear,
-        start_date: validated.startDate,
-        end_date: validated.endDate,
-        synopsis: validated.synopsis,
-        mal_id: validated.malId,
-        anilist_id: validated.anilistId,
-        kitsu_id: validated.kitsuId,
-        cover_image_url: validated.coverImageUrl,
-        banner_image_url: validated.bannerImageUrl,
-      })
-      .eq('id', validated.id)
-      .select()
-      .single();
-
-    if (error) {
-      return { success: false, error: 'Failed to update anime' };
-    }
-
-    return { success: true, data: transformAnimeRow(data) };
-  } catch (error) {
-    console.error('Error updating anime:', error);
-    return { success: false, error: 'Failed to update anime' };
-  }
 }
 
 /**
  * Helper to transform database row to Anime type
  */
 function transformAnimeRow(row: Record<string, unknown>): Anime {
-  return {
-    id: row.id as string,
-    slug: row.slug as string,
-    titles: row.titles as Anime['titles'],
-    format: row.format as Anime['format'],
-    episodeCount: row.episode_count as number | null,
-    episodeDuration: row.episode_duration as number | null,
-    season: row.season as Anime['season'],
-    seasonYear: row.season_year as number | null,
-    startDate: row.start_date as string | null,
-    endDate: row.end_date as string | null,
-    synopsis: row.synopsis as string | null,
-    averageRating: row.average_rating as number | null,
-    popularity: row.popularity as number,
-    status: row.status as Anime['status'],
-    malId: row.mal_id as number | null,
-    anilistId: row.anilist_id as number | null,
-    kitsuId: row.kitsu_id as string | null,
-    edition: row.edition as Anime['edition'],
-    coverImageUrl: row.cover_image_url as string | null,
-    bannerImageUrl: row.banner_image_url as string | null,
-    createdAt: row.created_at as string,
-    updatedAt: row.updated_at as string,
-  };
+    return {
+        id: row.id as string,
+        slug: row.slug as string,
+        titles: row.titles as Anime["titles"],
+        format: row.format as Anime["format"],
+        episodeCount: row.episode_count as number | null,
+        episodeDuration: row.episode_duration as number | null,
+        season: row.season as Anime["season"],
+        seasonYear: row.season_year as number | null,
+        startDate: row.start_date as string | null,
+        endDate: row.end_date as string | null,
+        synopsis: row.synopsis as string | null,
+        averageRating: row.average_rating as number | null,
+        popularity: row.popularity as number,
+        status: row.status as Anime["status"],
+        malId: row.mal_id as number | null,
+        anilistId: row.anilist_id as number | null,
+        kitsuId: row.kitsu_id as string | null,
+        edition: row.edition as Anime["edition"],
+        coverImageUrl: row.cover_image_url as string | null,
+        bannerImageUrl: row.banner_image_url as string | null,
+        createdAt: row.created_at as string,
+        updatedAt: row.updated_at as string,
+    };
 }
 
 /**
  * Helper to transform full anime response with relations
  */
-function transformAnimeResponse(row: Record<string, unknown>): AnimeWithRelations {
-  const base = transformAnimeRow(row);
-  return {
-    ...base,
-    genres: ((row.genres as Array<{ genre: Record<string, unknown> }>) || []).map((g) => ({
-      id: g.genre.id as string,
-      name: g.genre.name as string,
-      slug: g.genre.slug as string,
-    })),
-    studios: ((row.studios as Array<{ studio: Record<string, unknown> }>) || []).map((s) => ({
-      id: s.studio.id as string,
-      name: s.studio.name as string,
-      slug: s.studio.slug as string,
-    })),
-    streamingLinks: ((row.streaming_links as Array<Record<string, unknown>>) || []).map((l) => ({
-      id: l.id as string,
-      animeId: l.anime_id as string,
-      platform: l.platform as StreamingPlatform,
-      url: l.url as string,
-      region: l.region as string,
-    })),
-  };
+function transformAnimeResponse(
+    row: Record<string, unknown>,
+): AnimeWithRelations {
+    const base = transformAnimeRow(row);
+    return {
+        ...base,
+        genres: (
+            (row.genres as Array<{ genre: Record<string, unknown> }>) || []
+        ).map((g) => ({
+            id: g.genre.id as string,
+            name: g.genre.name as string,
+            slug: g.genre.slug as string,
+        })),
+        studios: (
+            (row.studios as Array<{ studio: Record<string, unknown> }>) || []
+        ).map((s) => ({
+            id: s.studio.id as string,
+            name: s.studio.name as string,
+            slug: s.studio.slug as string,
+        })),
+        streamingLinks: (
+            (row.streaming_links as Array<Record<string, unknown>>) || []
+        ).map((l) => ({
+            id: l.id as string,
+            animeId: l.anime_id as string,
+            platform: l.platform as StreamingPlatform,
+            url: l.url as string,
+            region: l.region as string,
+        })),
+    };
 }
 ```
 
 #### `src/app/actions/tracking.ts`
 
 ```typescript
-'use server';
+"use server";
 
-import { createClient } from '@/lib/supabase/server';
-import { addToListSchema, updateTrackingSchema } from '@/lib/validations/user';
-import { paginationSchema } from '@/lib/validations/common';
-import type { UserAnime, UserAnimeWithDetails, TrackingStatus, AddToListInput, UpdateTrackingInput } from '@/types/user';
-import type { ActionResult, PaginatedResponse, PaginationParams } from '@/types/common';
+import { createClient } from "@/lib/supabase/server";
+import { addToListSchema, updateTrackingSchema } from "@/lib/validations/user";
+import { paginationSchema } from "@/lib/validations/common";
+import type {
+    UserAnime,
+    UserAnimeWithDetails,
+    TrackingStatus,
+    AddToListInput,
+    UpdateTrackingInput,
+} from "@/types/user";
+import type {
+    ActionResult,
+    PaginatedResponse,
+    PaginationParams,
+} from "@/types/common";
 
 /**
  * Gets user&apos;s anime list with optional status filter
  */
 export async function getUserAnimeList(
-  status?: TrackingStatus,
-  pagination: PaginationParams = {}
+    status?: TrackingStatus,
+    pagination: PaginationParams = {},
 ): Promise<ActionResult<PaginatedResponse<UserAnimeWithDetails>>> {
-  try {
-    const validatedPagination = paginationSchema.parse(pagination);
-    const supabase = await createClient();
+    try {
+        const validatedPagination = paginationSchema.parse(pagination);
+        const supabase = await createClient();
 
-    // Check auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' };
+        // Check auth
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+            return {
+                success: false,
+                error: "Unauthorized",
+                code: "UNAUTHORIZED",
+            };
+        }
+
+        const { page, pageSize } = validatedPagination;
+        const offset = (page - 1) * pageSize;
+
+        let query = supabase
+            .from("user_anime")
+            .select("*, anime(*)", { count: "exact" })
+            .eq("user_id", user.id);
+
+        if (status) {
+            query = query.eq("status", status);
+        }
+
+        query = query
+            .order("updated_at", { ascending: false })
+            .range(offset, offset + pageSize - 1);
+
+        const { data, error, count } = await query;
+
+        if (error) {
+            return { success: false, error: "Failed to fetch list" };
+        }
+
+        const totalCount = count || 0;
+        const totalPages = Math.ceil(totalCount / pageSize);
+
+        return {
+            success: true,
+            data: {
+                data: data.map(transformUserAnimeRow),
+                pagination: {
+                    page,
+                    pageSize,
+                    totalCount,
+                    totalPages,
+                    hasNextPage: page < totalPages,
+                    hasPreviousPage: page > 1,
+                },
+            },
+        };
+    } catch (error) {
+        console.error("Error fetching user anime list:", error);
+        return { success: false, error: "Failed to fetch list" };
     }
-
-    const { page, pageSize } = validatedPagination;
-    const offset = (page - 1) * pageSize;
-
-    let query = supabase
-      .from('user_anime')
-      .select('*, anime(*)', { count: 'exact' })
-      .eq('user_id', user.id);
-
-    if (status) {
-      query = query.eq('status', status);
-    }
-
-    query = query
-      .order('updated_at', { ascending: false })
-      .range(offset, offset + pageSize - 1);
-
-    const { data, error, count } = await query;
-
-    if (error) {
-      return { success: false, error: 'Failed to fetch list' };
-    }
-
-    const totalCount = count || 0;
-    const totalPages = Math.ceil(totalCount / pageSize);
-
-    return {
-      success: true,
-      data: {
-        data: data.map(transformUserAnimeRow),
-        pagination: {
-          page,
-          pageSize,
-          totalCount,
-          totalPages,
-          hasNextPage: page < totalPages,
-          hasPreviousPage: page > 1,
-        },
-      },
-    };
-  } catch (error) {
-    console.error('Error fetching user anime list:', error);
-    return { success: false, error: 'Failed to fetch list' };
-  }
 }
 
 /**
  * Adds anime to user&apos;s list
  */
-export async function addToList(input: AddToListInput): Promise<ActionResult<UserAnime>> {
-  try {
-    const validated = addToListSchema.parse(input);
-    const supabase = await createClient();
+export async function addToList(
+    input: AddToListInput,
+): Promise<ActionResult<UserAnime>> {
+    try {
+        const validated = addToListSchema.parse(input);
+        const supabase = await createClient();
 
-    // Check auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' };
+        // Check auth
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+            return {
+                success: false,
+                error: "Unauthorized",
+                code: "UNAUTHORIZED",
+            };
+        }
+
+        // Check if already in list
+        const { data: existing } = await supabase
+            .from("user_anime")
+            .select("id")
+            .eq("user_id", user.id)
+            .eq("anime_id", validated.animeId)
+            .single();
+
+        if (existing) {
+            return {
+                success: false,
+                error: "Anime already in list",
+                code: "DUPLICATE",
+            };
+        }
+
+        const { data, error } = await supabase
+            .from("user_anime")
+            .insert({
+                user_id: user.id,
+                anime_id: validated.animeId,
+                status: validated.status,
+                current_episode: validated.currentEpisode || 0,
+                rating: validated.rating,
+                started_at: validated.startedAt,
+                notes: validated.notes,
+                is_private: validated.isPrivate || false,
+            })
+            .select()
+            .single();
+
+        if (error) {
+            return { success: false, error: "Failed to add to list" };
+        }
+
+        return { success: true, data: transformUserAnimeRowSimple(data) };
+    } catch (error) {
+        console.error("Error adding to list:", error);
+        return { success: false, error: "Failed to add to list" };
     }
-
-    // Check if already in list
-    const { data: existing } = await supabase
-      .from('user_anime')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('anime_id', validated.animeId)
-      .single();
-
-    if (existing) {
-      return { success: false, error: 'Anime already in list', code: 'DUPLICATE' };
-    }
-
-    const { data, error } = await supabase
-      .from('user_anime')
-      .insert({
-        user_id: user.id,
-        anime_id: validated.animeId,
-        status: validated.status,
-        current_episode: validated.currentEpisode || 0,
-        rating: validated.rating,
-        started_at: validated.startedAt,
-        notes: validated.notes,
-        is_private: validated.isPrivate || false,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return { success: false, error: 'Failed to add to list' };
-    }
-
-    return { success: true, data: transformUserAnimeRowSimple(data) };
-  } catch (error) {
-    console.error('Error adding to list:', error);
-    return { success: false, error: 'Failed to add to list' };
-  }
 }
 
 /**
  * Updates a tracking entry
  */
-export async function updateTracking(input: UpdateTrackingInput): Promise<ActionResult<UserAnime>> {
-  try {
-    const validated = updateTrackingSchema.parse(input);
-    const supabase = await createClient();
+export async function updateTracking(
+    input: UpdateTrackingInput,
+): Promise<ActionResult<UserAnime>> {
+    try {
+        const validated = updateTrackingSchema.parse(input);
+        const supabase = await createClient();
 
-    // Check auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' };
+        // Check auth
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+            return {
+                success: false,
+                error: "Unauthorized",
+                code: "UNAUTHORIZED",
+            };
+        }
+
+        // Build update object
+        const updates: Record<string, unknown> = {};
+        if (validated.status !== undefined) updates.status = validated.status;
+        if (validated.currentEpisode !== undefined)
+            updates.current_episode = validated.currentEpisode;
+        if (validated.rating !== undefined) updates.rating = validated.rating;
+        if (validated.startedAt !== undefined)
+            updates.started_at = validated.startedAt;
+        if (validated.completedAt !== undefined)
+            updates.completed_at = validated.completedAt;
+        if (validated.notes !== undefined) updates.notes = validated.notes;
+        if (validated.isPrivate !== undefined)
+            updates.is_private = validated.isPrivate;
+
+        const { data, error } = await supabase
+            .from("user_anime")
+            .update(updates)
+            .eq("id", validated.id)
+            .eq("user_id", user.id) // Ensure user owns this entry
+            .select()
+            .single();
+
+        if (error) {
+            return { success: false, error: "Failed to update tracking" };
+        }
+
+        return { success: true, data: transformUserAnimeRowSimple(data) };
+    } catch (error) {
+        console.error("Error updating tracking:", error);
+        return { success: false, error: "Failed to update tracking" };
     }
-
-    // Build update object
-    const updates: Record<string, unknown> = {};
-    if (validated.status !== undefined) updates.status = validated.status;
-    if (validated.currentEpisode !== undefined) updates.current_episode = validated.currentEpisode;
-    if (validated.rating !== undefined) updates.rating = validated.rating;
-    if (validated.startedAt !== undefined) updates.started_at = validated.startedAt;
-    if (validated.completedAt !== undefined) updates.completed_at = validated.completedAt;
-    if (validated.notes !== undefined) updates.notes = validated.notes;
-    if (validated.isPrivate !== undefined) updates.is_private = validated.isPrivate;
-
-    const { data, error } = await supabase
-      .from('user_anime')
-      .update(updates)
-      .eq('id', validated.id)
-      .eq('user_id', user.id) // Ensure user owns this entry
-      .select()
-      .single();
-
-    if (error) {
-      return { success: false, error: 'Failed to update tracking' };
-    }
-
-    return { success: true, data: transformUserAnimeRowSimple(data) };
-  } catch (error) {
-    console.error('Error updating tracking:', error);
-    return { success: false, error: 'Failed to update tracking' };
-  }
 }
 
 /**
  * Removes anime from user&apos;s list
  */
 export async function removeFromList(id: string): Promise<ActionResult<void>> {
-  try {
-    const supabase = await createClient();
+    try {
+        const supabase = await createClient();
 
-    // Check auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' };
+        // Check auth
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+            return {
+                success: false,
+                error: "Unauthorized",
+                code: "UNAUTHORIZED",
+            };
+        }
+
+        const { error } = await supabase
+            .from("user_anime")
+            .delete()
+            .eq("id", id)
+            .eq("user_id", user.id);
+
+        if (error) {
+            return { success: false, error: "Failed to remove from list" };
+        }
+
+        return { success: true, data: undefined };
+    } catch (error) {
+        console.error("Error removing from list:", error);
+        return { success: false, error: "Failed to remove from list" };
     }
-
-    const { error } = await supabase
-      .from('user_anime')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user.id);
-
-    if (error) {
-      return { success: false, error: 'Failed to remove from list' };
-    }
-
-    return { success: true, data: undefined };
-  } catch (error) {
-    console.error('Error removing from list:', error);
-    return { success: false, error: 'Failed to remove from list' };
-  }
 }
 
 /**
  * Increments episode count by 1
  */
-export async function incrementEpisode(id: string): Promise<ActionResult<UserAnime>> {
-  try {
-    const supabase = await createClient();
+export async function incrementEpisode(
+    id: string,
+): Promise<ActionResult<UserAnime>> {
+    try {
+        const supabase = await createClient();
 
-    // Check auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: 'Unauthorized', code: 'UNAUTHORIZED' };
+        // Check auth
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+            return {
+                success: false,
+                error: "Unauthorized",
+                code: "UNAUTHORIZED",
+            };
+        }
+
+        // Get current episode and anime episode count
+        const { data: current, error: fetchError } = await supabase
+            .from("user_anime")
+            .select("*, anime(episode_count)")
+            .eq("id", id)
+            .eq("user_id", user.id)
+            .single();
+
+        if (fetchError || !current) {
+            return { success: false, error: "Entry not found" };
+        }
+
+        const newEpisode = current.current_episode + 1;
+        const maxEpisodes = current.anime?.episode_count;
+
+        // Don&apos;t exceed max episodes
+        if (maxEpisodes && newEpisode > maxEpisodes) {
+            return { success: false, error: "Already at max episodes" };
+        }
+
+        // Auto-complete if reaching max
+        const updates: Record<string, unknown> = {
+            current_episode: newEpisode,
+        };
+
+        if (maxEpisodes && newEpisode === maxEpisodes) {
+            updates.status = "COMPLETED";
+            updates.completed_at = new Date().toISOString();
+        }
+
+        const { data, error } = await supabase
+            .from("user_anime")
+            .update(updates)
+            .eq("id", id)
+            .select()
+            .single();
+
+        if (error) {
+            return { success: false, error: "Failed to increment episode" };
+        }
+
+        return { success: true, data: transformUserAnimeRowSimple(data) };
+    } catch (error) {
+        console.error("Error incrementing episode:", error);
+        return { success: false, error: "Failed to increment episode" };
     }
-
-    // Get current episode and anime episode count
-    const { data: current, error: fetchError } = await supabase
-      .from('user_anime')
-      .select('*, anime(episode_count)')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single();
-
-    if (fetchError || !current) {
-      return { success: false, error: 'Entry not found' };
-    }
-
-    const newEpisode = current.current_episode + 1;
-    const maxEpisodes = current.anime?.episode_count;
-
-    // Don&apos;t exceed max episodes
-    if (maxEpisodes && newEpisode > maxEpisodes) {
-      return { success: false, error: 'Already at max episodes' };
-    }
-
-    // Auto-complete if reaching max
-    const updates: Record<string, unknown> = {
-      current_episode: newEpisode,
-    };
-
-    if (maxEpisodes && newEpisode === maxEpisodes) {
-      updates.status = 'COMPLETED';
-      updates.completed_at = new Date().toISOString();
-    }
-
-    const { data, error } = await supabase
-      .from('user_anime')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      return { success: false, error: 'Failed to increment episode' };
-    }
-
-    return { success: true, data: transformUserAnimeRowSimple(data) };
-  } catch (error) {
-    console.error('Error incrementing episode:', error);
-    return { success: false, error: 'Failed to increment episode' };
-  }
 }
 
 /**
  * Transform user_anime row with anime relation
  */
-function transformUserAnimeRow(row: Record<string, unknown>): UserAnimeWithDetails {
-  return {
-    id: row.id as string,
-    userId: row.user_id as string,
-    animeId: row.anime_id as string,
-    status: row.status as TrackingStatus,
-    currentEpisode: row.current_episode as number,
-    rating: row.rating as number | null,
-    rewatchCount: row.rewatch_count as number,
-    lastRewatchAt: row.last_rewatch_at as string | null,
-    startedAt: row.started_at as string | null,
-    completedAt: row.completed_at as string | null,
-    notes: row.notes as string | null,
-    isPrivate: row.is_private as boolean,
-    createdAt: row.created_at as string,
-    updatedAt: row.updated_at as string,
-    anime: row.anime as UserAnimeWithDetails['anime'],
-  };
+function transformUserAnimeRow(
+    row: Record<string, unknown>,
+): UserAnimeWithDetails {
+    return {
+        id: row.id as string,
+        userId: row.user_id as string,
+        animeId: row.anime_id as string,
+        status: row.status as TrackingStatus,
+        currentEpisode: row.current_episode as number,
+        rating: row.rating as number | null,
+        rewatchCount: row.rewatch_count as number,
+        lastRewatchAt: row.last_rewatch_at as string | null,
+        startedAt: row.started_at as string | null,
+        completedAt: row.completed_at as string | null,
+        notes: row.notes as string | null,
+        isPrivate: row.is_private as boolean,
+        createdAt: row.created_at as string,
+        updatedAt: row.updated_at as string,
+        anime: row.anime as UserAnimeWithDetails["anime"],
+    };
 }
 
 /**
  * Transform user_anime row without relations
  */
 function transformUserAnimeRowSimple(row: Record<string, unknown>): UserAnime {
-  return {
-    id: row.id as string,
-    userId: row.user_id as string,
-    animeId: row.anime_id as string,
-    status: row.status as TrackingStatus,
-    currentEpisode: row.current_episode as number,
-    rating: row.rating as number | null,
-    rewatchCount: row.rewatch_count as number,
-    lastRewatchAt: row.last_rewatch_at as string | null,
-    startedAt: row.started_at as string | null,
-    completedAt: row.completed_at as string | null,
-    notes: row.notes as string | null,
-    isPrivate: row.is_private as boolean,
-    createdAt: row.created_at as string,
-    updatedAt: row.updated_at as string,
-  };
+    return {
+        id: row.id as string,
+        userId: row.user_id as string,
+        animeId: row.anime_id as string,
+        status: row.status as TrackingStatus,
+        currentEpisode: row.current_episode as number,
+        rating: row.rating as number | null,
+        rewatchCount: row.rewatch_count as number,
+        lastRewatchAt: row.last_rewatch_at as string | null,
+        startedAt: row.started_at as string | null,
+        completedAt: row.completed_at as string | null,
+        notes: row.notes as string | null,
+        isPrivate: row.is_private as boolean,
+        createdAt: row.created_at as string,
+        updatedAt: row.updated_at as string,
+    };
 }
 ```
 
@@ -3038,20 +3222,20 @@ function transformUserAnimeRowSimple(row: Record<string, unknown>): UserAnime {
 #### `src/lib/meilisearch/client.ts`
 
 ```typescript
-import { MeiliSearch } from 'meilisearch';
+import { MeiliSearch } from "meilisearch";
 
 /**
  * Meilisearch client singleton
  */
 export const meilisearch = new MeiliSearch({
-  host: process.env.MEILISEARCH_HOST!,
-  apiKey: process.env.MEILISEARCH_API_KEY,
+    host: process.env.MEILISEARCH_HOST!,
+    apiKey: process.env.MEILISEARCH_API_KEY,
 });
 
 /**
  * Anime search index name
  */
-export const ANIME_INDEX = 'anime';
+export const ANIME_INDEX = "anime";
 ```
 
 #### Index Document Structure
@@ -3061,22 +3245,27 @@ export const ANIME_INDEX = 'anime';
  * Document structure for Meilisearch anime index
  */
 export interface AnimeSearchDocument {
-  id: string;
-  slug: string;
-  titles: {
-    english: string | null;
-    romaji: string;
-    japanese: string | null;
-  };
-  format: 'TV' | 'MOVIE' | 'OVA' | 'ONA' | 'SPECIAL' | 'MUSIC';
-  status: 'FINISHED' | 'RELEASING' | 'NOT_YET_RELEASED' | 'CANCELLED' | 'HIATUS';
-  season: string | null;
-  seasonYear: number | null;
-  genres: string[];
-  studios: string[];
-  popularity: number;
-  averageRating: number | null;
-  coverImageUrl: string | null;
+    id: string;
+    slug: string;
+    titles: {
+        english: string | null;
+        romaji: string;
+        japanese: string | null;
+    };
+    format: "TV" | "MOVIE" | "OVA" | "ONA" | "SPECIAL" | "MUSIC";
+    status:
+        | "FINISHED"
+        | "RELEASING"
+        | "NOT_YET_RELEASED"
+        | "CANCELLED"
+        | "HIATUS";
+    season: string | null;
+    seasonYear: number | null;
+    genres: string[];
+    studios: string[];
+    popularity: number;
+    averageRating: number | null;
+    coverImageUrl: string | null;
 }
 ```
 
@@ -3087,56 +3276,56 @@ export interface AnimeSearchDocument {
  * Configure Meilisearch index settings
  */
 export async function configureAnimeIndex() {
-  const index = meilisearch.index(ANIME_INDEX);
+    const index = meilisearch.index(ANIME_INDEX);
 
-  await index.updateSettings({
-    // Searchable attributes in priority order
-    searchableAttributes: [
-      'titles.english',
-      'titles.romaji',
-      'titles.japanese',
-      'genres',
-      'studios',
-    ],
+    await index.updateSettings({
+        // Searchable attributes in priority order
+        searchableAttributes: [
+            "titles.english",
+            "titles.romaji",
+            "titles.japanese",
+            "genres",
+            "studios",
+        ],
 
-    // Filterable attributes for faceted search
-    filterableAttributes: [
-      'format',
-      'status',
-      'season',
-      'seasonYear',
-      'genres',
-      'studios',
-    ],
+        // Filterable attributes for faceted search
+        filterableAttributes: [
+            "format",
+            "status",
+            "season",
+            "seasonYear",
+            "genres",
+            "studios",
+        ],
 
-    // Sortable attributes
-    sortableAttributes: [
-      'popularity',
-      'averageRating',
-      'titles.romaji',
-      'seasonYear',
-    ],
+        // Sortable attributes
+        sortableAttributes: [
+            "popularity",
+            "averageRating",
+            "titles.romaji",
+            "seasonYear",
+        ],
 
-    // Ranking rules
-    rankingRules: [
-      'words',
-      'typo',
-      'proximity',
-      'attribute',
-      'sort',
-      'exactness',
-      'popularity:desc',
-    ],
+        // Ranking rules
+        rankingRules: [
+            "words",
+            "typo",
+            "proximity",
+            "attribute",
+            "sort",
+            "exactness",
+            "popularity:desc",
+        ],
 
-    // Typo tolerance
-    typoTolerance: {
-      enabled: true,
-      minWordSizeForTypos: {
-        oneTypo: 4,
-        twoTypos: 8,
-      },
-    },
-  });
+        // Typo tolerance
+        typoTolerance: {
+            enabled: true,
+            minWordSizeForTypos: {
+                oneTypo: 4,
+                twoTypos: 8,
+            },
+        },
+    });
 }
 ```
 
@@ -3144,88 +3333,107 @@ export async function configureAnimeIndex() {
 
 ```typescript
 // src/app/actions/search.ts
-'use server';
+"use server";
 
-import { meilisearch, ANIME_INDEX, type AnimeSearchDocument } from '@/lib/meilisearch/client';
-import type { Anime, AnimeFilters } from '@/types/anime';
-import type { ActionResult } from '@/types/common';
+import {
+    meilisearch,
+    ANIME_INDEX,
+    type AnimeSearchDocument,
+} from "@/lib/meilisearch/client";
+import type { Anime, AnimeFilters } from "@/types/anime";
+import type { ActionResult } from "@/types/common";
 
 /**
  * Searches anime using Meilisearch
  */
 export async function searchAnime(
-  filters: AnimeFilters
+    filters: AnimeFilters,
 ): Promise<ActionResult<Anime[]>> {
-  try {
-    const index = meilisearch.index(ANIME_INDEX);
+    try {
+        const index = meilisearch.index(ANIME_INDEX);
 
-    // Build filter array
-    const filterConditions: string[] = [];
+        // Build filter array
+        const filterConditions: string[] = [];
 
-    if (filters.format?.length) {
-      filterConditions.push(`format IN [${filters.format.map(f => `"${f}"`).join(', ')}]`);
-    }
-    if (filters.status?.length) {
-      filterConditions.push(`status IN [${filters.status.map(s => `"${s}"`).join(', ')}]`);
-    }
-    if (filters.season) {
-      filterConditions.push(`season = "${filters.season}"`);
-    }
-    if (filters.year) {
-      filterConditions.push(`seasonYear = ${filters.year}`);
-    }
-    if (filters.genres?.length) {
-      filterConditions.push(`genres IN [${filters.genres.map(g => `"${g}"`).join(', ')}]`);
-    }
+        if (filters.format?.length) {
+            filterConditions.push(
+                `format IN [${filters.format.map((f) => `"${f}"`).join(", ")}]`,
+            );
+        }
+        if (filters.status?.length) {
+            filterConditions.push(
+                `status IN [${filters.status.map((s) => `"${s}"`).join(", ")}]`,
+            );
+        }
+        if (filters.season) {
+            filterConditions.push(`season = "${filters.season}"`);
+        }
+        if (filters.year) {
+            filterConditions.push(`seasonYear = ${filters.year}`);
+        }
+        if (filters.genres?.length) {
+            filterConditions.push(
+                `genres IN [${filters.genres.map((g) => `"${g}"`).join(", ")}]`,
+            );
+        }
 
-    // Build sort
-    const sort: string[] = [];
-    if (filters.sortBy) {
-      const sortField = filters.sortBy === 'rating' ? 'averageRating' :
-                        filters.sortBy === 'title' ? 'titles.romaji' :
-                        filters.sortBy === 'startDate' ? 'seasonYear' :
-                        'popularity';
-      sort.push(`${sortField}:${filters.sortOrder || 'desc'}`);
+        // Build sort
+        const sort: string[] = [];
+        if (filters.sortBy) {
+            const sortField =
+                filters.sortBy === "rating"
+                    ? "averageRating"
+                    : filters.sortBy === "title"
+                      ? "titles.romaji"
+                      : filters.sortBy === "startDate"
+                        ? "seasonYear"
+                        : "popularity";
+            sort.push(`${sortField}:${filters.sortOrder || "desc"}`);
+        }
+
+        const result = await index.search<AnimeSearchDocument>(
+            filters.query || "",
+            {
+                filter: filterConditions.length
+                    ? filterConditions.join(" AND ")
+                    : undefined,
+                sort: sort.length ? sort : undefined,
+                limit: 50,
+            },
+        );
+
+        // Transform to Anime type
+        const anime: Anime[] = result.hits.map((hit) => ({
+            id: hit.id,
+            slug: hit.slug,
+            titles: hit.titles,
+            format: hit.format,
+            status: hit.status,
+            season: hit.season as Anime["season"],
+            seasonYear: hit.seasonYear,
+            popularity: hit.popularity,
+            averageRating: hit.averageRating,
+            coverImageUrl: hit.coverImageUrl,
+            // Fill in defaults for fields not in search index
+            episodeCount: null,
+            episodeDuration: null,
+            startDate: null,
+            endDate: null,
+            synopsis: null,
+            malId: null,
+            anilistId: null,
+            kitsuId: null,
+            edition: null,
+            bannerImageUrl: null,
+            createdAt: "",
+            updatedAt: "",
+        }));
+
+        return { success: true, data: anime };
+    } catch (error) {
+        console.error("Search error:", error);
+        return { success: false, error: "Search failed" };
     }
-
-    const result = await index.search<AnimeSearchDocument>(filters.query || '', {
-      filter: filterConditions.length ? filterConditions.join(' AND ') : undefined,
-      sort: sort.length ? sort : undefined,
-      limit: 50,
-    });
-
-    // Transform to Anime type
-    const anime: Anime[] = result.hits.map((hit) => ({
-      id: hit.id,
-      slug: hit.slug,
-      titles: hit.titles,
-      format: hit.format,
-      status: hit.status,
-      season: hit.season as Anime['season'],
-      seasonYear: hit.seasonYear,
-      popularity: hit.popularity,
-      averageRating: hit.averageRating,
-      coverImageUrl: hit.coverImageUrl,
-      // Fill in defaults for fields not in search index
-      episodeCount: null,
-      episodeDuration: null,
-      startDate: null,
-      endDate: null,
-      synopsis: null,
-      malId: null,
-      anilistId: null,
-      kitsuId: null,
-      edition: null,
-      bannerImageUrl: null,
-      createdAt: '',
-      updatedAt: '',
-    }));
-
-    return { success: true, data: anime };
-  } catch (error) {
-    console.error('Search error:', error);
-    return { success: false, error: 'Search failed' };
-  }
 }
 ```
 
@@ -3264,36 +3472,37 @@ flowchart LR
 #### `src/lib/redis/client.ts`
 
 ```typescript
-import { Redis } from '@upstash/redis';
+import { Redis } from "@upstash/redis";
 
 /**
  * Upstash Redis client
  */
 export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    url: process.env.UPSTASH_REDIS_REST_URL!,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
 /**
  * Cache key prefixes
  */
 export const CacheKeys = {
-  anime: (id: string) => `anime:${id}`,
-  animeBySlug: (slug: string) => `anime:slug:${slug}`,
-  userProfile: (id: string) => `user:${id}`,
-  userList: (userId: string, status?: string) => `user:${userId}:list:${status || 'all'}`,
-  searchResults: (hash: string) => `search:${hash}`,
-  rateLimit: (key: string) => `ratelimit:${key}`,
+    anime: (id: string) => `anime:${id}`,
+    animeBySlug: (slug: string) => `anime:slug:${slug}`,
+    userProfile: (id: string) => `user:${id}`,
+    userList: (userId: string, status?: string) =>
+        `user:${userId}:list:${status || "all"}`,
+    searchResults: (hash: string) => `search:${hash}`,
+    rateLimit: (key: string) => `ratelimit:${key}`,
 } as const;
 
 /**
  * Default TTL values in seconds
  */
 export const CacheTTL = {
-  anime: 3600,        // 1 hour
-  userProfile: 1800,  // 30 minutes
-  userList: 300,      // 5 minutes
-  searchResults: 300, // 5 minutes
+    anime: 3600, // 1 hour
+    userProfile: 1800, // 30 minutes
+    userList: 300, // 5 minutes
+    searchResults: 300, // 5 minutes
 } as const;
 ```
 
@@ -3302,18 +3511,18 @@ export const CacheTTL = {
 #### `src/lib/redis/ratelimit.ts`
 
 ```typescript
-import { Ratelimit } from '@upstash/ratelimit';
-import { redis } from './client';
+import { Ratelimit } from "@upstash/ratelimit";
+import { redis } from "./client";
 
 /**
  * Rate limiter for API endpoints
  * 100 requests per 10 seconds per IP
  */
 export const apiRateLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(100, '10 s'),
-  analytics: true,
-  prefix: 'ratelimit:api',
+    redis,
+    limiter: Ratelimit.slidingWindow(100, "10 s"),
+    analytics: true,
+    prefix: "ratelimit:api",
 });
 
 /**
@@ -3321,10 +3530,10 @@ export const apiRateLimiter = new Ratelimit({
  * 30 searches per minute per user
  */
 export const searchRateLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(30, '1 m'),
-  analytics: true,
-  prefix: 'ratelimit:search',
+    redis,
+    limiter: Ratelimit.slidingWindow(30, "1 m"),
+    analytics: true,
+    prefix: "ratelimit:search",
 });
 
 /**
@@ -3332,10 +3541,10 @@ export const searchRateLimiter = new Ratelimit({
  * 50 syncs per day
  */
 export const autoTrackRateLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(50, '24 h'),
-  analytics: true,
-  prefix: 'ratelimit:autotrack',
+    redis,
+    limiter: Ratelimit.slidingWindow(50, "24 h"),
+    analytics: true,
+    prefix: "ratelimit:autotrack",
 });
 ```
 
@@ -3344,51 +3553,54 @@ export const autoTrackRateLimiter = new Ratelimit({
 ```typescript
 // src/lib/redis/cache.ts
 
-import { redis, CacheKeys, CacheTTL } from './client';
-import type { Anime, AnimeWithRelations } from '@/types/anime';
+import { redis, CacheKeys, CacheTTL } from "./client";
+import type { Anime, AnimeWithRelations } from "@/types/anime";
 
 /**
  * Gets anime from cache or fetches from database
  */
 export async function getCachedAnime(
-  id: string,
-  fetcher: () => Promise<AnimeWithRelations | null>
+    id: string,
+    fetcher: () => Promise<AnimeWithRelations | null>,
 ): Promise<AnimeWithRelations | null> {
-  const cacheKey = CacheKeys.anime(id);
+    const cacheKey = CacheKeys.anime(id);
 
-  // Try cache first
-  const cached = await redis.get<AnimeWithRelations>(cacheKey);
-  if (cached) {
-    return cached;
-  }
+    // Try cache first
+    const cached = await redis.get<AnimeWithRelations>(cacheKey);
+    if (cached) {
+        return cached;
+    }
 
-  // Fetch from database
-  const anime = await fetcher();
+    // Fetch from database
+    const anime = await fetcher();
 
-  if (anime) {
-    // Cache for future requests
-    await redis.setex(cacheKey, CacheTTL.anime, anime);
-  }
+    if (anime) {
+        // Cache for future requests
+        await redis.setex(cacheKey, CacheTTL.anime, anime);
+    }
 
-  return anime;
+    return anime;
 }
 
 /**
  * Invalidates anime cache
  */
-export async function invalidateAnimeCache(id: string, slug?: string): Promise<void> {
-  const keys = [CacheKeys.anime(id)];
-  if (slug) {
-    keys.push(CacheKeys.animeBySlug(slug));
-  }
-  await redis.del(...keys);
+export async function invalidateAnimeCache(
+    id: string,
+    slug?: string,
+): Promise<void> {
+    const keys = [CacheKeys.anime(id)];
+    if (slug) {
+        keys.push(CacheKeys.animeBySlug(slug));
+    }
+    await redis.del(...keys);
 }
 
 /**
  * Generates a hash for search cache keys
  */
 export function generateSearchHash(filters: Record<string, unknown>): string {
-  return Buffer.from(JSON.stringify(filters)).toString('base64');
+    return Buffer.from(JSON.stringify(filters)).toString("base64");
 }
 ```
 
@@ -3425,50 +3637,55 @@ src/app/
 ```typescript
 // src/app/(public)/anime/[slug]/page.tsx
 
-import { Metadata } from 'next';
-import { getAnimeBySlug } from '@/app/actions/anime';
+import { Metadata } from "next";
+import { getAnimeBySlug } from "@/app/actions/anime";
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+    params: Promise<{ slug: string }>;
 }
 
 /**
  * Generate dynamic metadata for anime pages
  */
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const result = await getAnimeBySlug(slug);
+export async function generateMetadata({
+    params,
+}: PageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const result = await getAnimeBySlug(slug);
 
-  if (!result.success) {
+    if (!result.success) {
+        return {
+            title: "Anime Not Found | STREAMD",
+        };
+    }
+
+    const anime = result.data;
+    const title = anime.titles.english || anime.titles.romaji;
+
     return {
-      title: 'Anime Not Found | STREAMD',
+        title: `${title} | STREAMD`,
+        description:
+            anime.synopsis?.slice(0, 160) || `Track ${title} on STREAMD`,
+        openGraph: {
+            title: `${title} | STREAMD`,
+            description:
+                anime.synopsis?.slice(0, 160) || `Track ${title} on STREAMD`,
+            images: anime.coverImageUrl ? [{ url: anime.coverImageUrl }] : [],
+            type: "website",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${title} | STREAMD`,
+            description:
+                anime.synopsis?.slice(0, 160) || `Track ${title} on STREAMD`,
+            images: anime.coverImageUrl ? [anime.coverImageUrl] : [],
+        },
     };
-  }
-
-  const anime = result.data;
-  const title = anime.titles.english || anime.titles.romaji;
-
-  return {
-    title: `${title} | STREAMD`,
-    description: anime.synopsis?.slice(0, 160) || `Track ${title} on STREAMD`,
-    openGraph: {
-      title: `${title} | STREAMD`,
-      description: anime.synopsis?.slice(0, 160) || `Track ${title} on STREAMD`,
-      images: anime.coverImageUrl ? [{ url: anime.coverImageUrl }] : [],
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${title} | STREAMD`,
-      description: anime.synopsis?.slice(0, 160) || `Track ${title} on STREAMD`,
-      images: anime.coverImageUrl ? [anime.coverImageUrl] : [],
-    },
-  };
 }
 
 export default async function AnimePage({ params }: PageProps) {
-  const { slug } = await params;
-  // Page implementation...
+    const { slug } = await params;
+    // Page implementation...
 }
 ```
 
@@ -3527,72 +3744,72 @@ export function AnimeJsonLd({ anime }: AnimeJsonLdProps) {
 ```typescript
 // src/app/sitemap.ts
 
-import { MetadataRoute } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { MetadataRoute } from "next";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Generates sitemap for all public pages
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabase = await createClient();
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://streamd.app';
+    const supabase = await createClient();
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://streamd.app";
 
-  // Get all anime slugs
-  const { data: anime } = await supabase
-    .from('anime')
-    .select('slug, updated_at')
-    .is('deleted_at', null);
+    // Get all anime slugs
+    const { data: anime } = await supabase
+        .from("anime")
+        .select("slug, updated_at")
+        .is("deleted_at", null);
 
-  // Get all public users
-  const { data: users } = await supabase
-    .from('users')
-    .select('username, updated_at')
-    .is('deleted_at', null);
+    // Get all public users
+    const { data: users } = await supabase
+        .from("users")
+        .select("username, updated_at")
+        .is("deleted_at", null);
 
-  // Get all genres
-  const { data: genres } = await supabase.from('genres').select('slug');
+    // Get all genres
+    const { data: genres } = await supabase.from("genres").select("slug");
 
-  // Get all studios
-  const { data: studios } = await supabase.from('studios').select('slug');
+    // Get all studios
+    const { data: studios } = await supabase.from("studios").select("slug");
 
-  const animeUrls = (anime || []).map((a) => ({
-    url: `${baseUrl}/anime/${a.slug}`,
-    lastModified: new Date(a.updated_at),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
+    const animeUrls = (anime || []).map((a) => ({
+        url: `${baseUrl}/anime/${a.slug}`,
+        lastModified: new Date(a.updated_at),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+    }));
 
-  const userUrls = (users || []).map((u) => ({
-    url: `${baseUrl}/user/${u.username}`,
-    lastModified: new Date(u.updated_at),
-    changeFrequency: 'daily' as const,
-    priority: 0.6,
-  }));
+    const userUrls = (users || []).map((u) => ({
+        url: `${baseUrl}/user/${u.username}`,
+        lastModified: new Date(u.updated_at),
+        changeFrequency: "daily" as const,
+        priority: 0.6,
+    }));
 
-  const genreUrls = (genres || []).map((g) => ({
-    url: `${baseUrl}/genre/${g.slug}`,
-    changeFrequency: 'monthly' as const,
-    priority: 0.5,
-  }));
+    const genreUrls = (genres || []).map((g) => ({
+        url: `${baseUrl}/genre/${g.slug}`,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+    }));
 
-  const studioUrls = (studios || []).map((s) => ({
-    url: `${baseUrl}/studio/${s.slug}`,
-    changeFrequency: 'monthly' as const,
-    priority: 0.5,
-  }));
+    const studioUrls = (studios || []).map((s) => ({
+        url: `${baseUrl}/studio/${s.slug}`,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+    }));
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    ...animeUrls,
-    ...userUrls,
-    ...genreUrls,
-    ...studioUrls,
-  ];
+    return [
+        {
+            url: baseUrl,
+            lastModified: new Date(),
+            changeFrequency: "daily",
+            priority: 1,
+        },
+        ...animeUrls,
+        ...userUrls,
+        ...genreUrls,
+        ...studioUrls,
+    ];
 }
 ```
 
@@ -3647,53 +3864,53 @@ flowchart TB
 
 ### Job Types
 
-| Job Type | Trigger | Description |
-|----------|---------|-------------|
-| `import.process` | User action | Process MAL/AniList import file |
-| `search.sync` | DB trigger | Sync anime changes to Meilisearch |
-| `search.reindex` | Manual/Cron | Full reindex of search |
-| `analytics.aggregate` | Daily cron | Aggregate user statistics |
-| `recap.generate` | Monthly cron | Generate monthly recap cards |
-| `notification.send` | Various | Send push/email notifications |
+| Job Type              | Trigger      | Description                       |
+| --------------------- | ------------ | --------------------------------- |
+| `import.process`      | User action  | Process MAL/AniList import file   |
+| `search.sync`         | DB trigger   | Sync anime changes to Meilisearch |
+| `search.reindex`      | Manual/Cron  | Full reindex of search            |
+| `analytics.aggregate` | Daily cron   | Aggregate user statistics         |
+| `recap.generate`      | Monthly cron | Generate monthly recap cards      |
+| `notification.send`   | Various      | Send push/email notifications     |
 
 ### QStash Integration
 
 ```typescript
 // src/lib/jobs/client.ts
 
-import { Client } from '@upstash/qstash';
+import { Client } from "@upstash/qstash";
 
 /**
  * QStash client for job queuing
  */
 export const qstash = new Client({
-  token: process.env.QSTASH_TOKEN!,
+    token: process.env.QSTASH_TOKEN!,
 });
 
 /**
  * Job handler base URL
  */
-const HANDLER_BASE_URL = process.env.NEXT_PUBLIC_APP_URL + '/api/jobs';
+const HANDLER_BASE_URL = process.env.NEXT_PUBLIC_APP_URL + "/api/jobs";
 
 /**
  * Enqueue a job
  */
 export async function enqueueJob<T extends Record<string, unknown>>(
-  jobType: string,
-  payload: T,
-  options?: {
-    delay?: number;
-    retries?: number;
-  }
+    jobType: string,
+    payload: T,
+    options?: {
+        delay?: number;
+        retries?: number;
+    },
 ): Promise<string> {
-  const response = await qstash.publishJSON({
-    url: `${HANDLER_BASE_URL}/${jobType}`,
-    body: payload,
-    delay: options?.delay,
-    retries: options?.retries ?? 3,
-  });
+    const response = await qstash.publishJSON({
+        url: `${HANDLER_BASE_URL}/${jobType}`,
+        body: payload,
+        delay: options?.delay,
+        retries: options?.retries ?? 3,
+    });
 
-  return response.messageId;
+    return response.messageId;
 }
 ```
 
@@ -3702,59 +3919,60 @@ export async function enqueueJob<T extends Record<string, unknown>>(
 ```typescript
 // src/app/api/jobs/import.process/route.ts
 
-import { NextRequest, NextResponse } from 'next/server';
-import { verifySignatureAppRouter } from '@upstash/qstash/nextjs';
-import { createClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from "next/server";
+import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
+import { createClient } from "@/lib/supabase/server";
 
 interface ImportJobPayload {
-  jobId: string;
-  userId: string;
-  source: 'MAL' | 'ANILIST' | 'KITSU';
-  fileUrl: string;
+    jobId: string;
+    userId: string;
+    source: "MAL" | "ANILIST" | "KITSU";
+    fileUrl: string;
 }
 
 /**
  * Handler for import processing jobs
  */
 async function handler(request: NextRequest) {
-  const payload = (await request.json()) as ImportJobPayload;
-  const supabase = await createClient();
+    const payload = (await request.json()) as ImportJobPayload;
+    const supabase = await createClient();
 
-  try {
-    // Update job status to processing
-    await supabase
-      .from('import_jobs')
-      .update({
-        status: 'PROCESSING',
-        started_at: new Date().toISOString(),
-      })
-      .eq('id', payload.jobId);
+    try {
+        // Update job status to processing
+        await supabase
+            .from("import_jobs")
+            .update({
+                status: "PROCESSING",
+                started_at: new Date().toISOString(),
+            })
+            .eq("id", payload.jobId);
 
-    // Process import (implementation depends on source)
-    // ... processing logic ...
+        // Process import (implementation depends on source)
+        // ... processing logic ...
 
-    // Update job status to completed
-    await supabase
-      .from('import_jobs')
-      .update({
-        status: 'COMPLETED',
-        completed_at: new Date().toISOString(),
-      })
-      .eq('id', payload.jobId);
+        // Update job status to completed
+        await supabase
+            .from("import_jobs")
+            .update({
+                status: "COMPLETED",
+                completed_at: new Date().toISOString(),
+            })
+            .eq("id", payload.jobId);
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    // Update job status to failed
-    await supabase
-      .from('import_jobs')
-      .update({
-        status: 'FAILED',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-      })
-      .eq('id', payload.jobId);
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        // Update job status to failed
+        await supabase
+            .from("import_jobs")
+            .update({
+                status: "FAILED",
+                error_message:
+                    error instanceof Error ? error.message : "Unknown error",
+            })
+            .eq("id", payload.jobId);
 
-    return NextResponse.json({ success: false }, { status: 500 });
-  }
+        return NextResponse.json({ success: false }, { status: 500 });
+    }
 }
 
 // Verify QStash signature
@@ -3914,30 +4132,30 @@ src/
 
 ```json
 {
-  "dependencies": {
-    "next": "^16.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "dependencies": {
+        "next": "^16.1.0",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
 
-    "@supabase/supabase-js": "^2.47.0",
-    "@supabase/ssr": "^0.5.0",
+        "@supabase/supabase-js": "^2.47.0",
+        "@supabase/ssr": "^0.5.0",
 
-    "zustand": "^5.0.0",
+        "zustand": "^5.0.0",
 
-    "meilisearch": "^0.44.0",
+        "meilisearch": "^0.44.0",
 
-    "@upstash/redis": "^1.34.0",
-    "@upstash/ratelimit": "^2.0.0",
-    "@upstash/qstash": "^2.7.0",
+        "@upstash/redis": "^1.34.0",
+        "@upstash/ratelimit": "^2.0.0",
+        "@upstash/qstash": "^2.7.0",
 
-    "zod": "^3.24.0",
-    "date-fns": "^4.1.0",
-    "lucide-react": "^0.468.0",
+        "zod": "^3.24.0",
+        "date-fns": "^4.1.0",
+        "lucide-react": "^0.468.0",
 
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.0",
-    "tailwind-merge": "^2.5.0"
-  }
+        "class-variance-authority": "^0.7.0",
+        "clsx": "^2.1.0",
+        "tailwind-merge": "^2.5.0"
+    }
 }
 ```
 
@@ -3945,20 +4163,20 @@ src/
 
 ```json
 {
-  "devDependencies": {
-    "typescript": "^5.7.0",
-    "@types/node": "^22.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "devDependencies": {
+        "typescript": "^5.7.0",
+        "@types/node": "^22.0.0",
+        "@types/react": "^19.0.0",
+        "@types/react-dom": "^19.0.0",
 
-    "tailwindcss": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.0",
+        "tailwindcss": "^4.0.0",
+        "@tailwindcss/postcss": "^4.0.0",
 
-    "eslint": "^9.0.0",
-    "eslint-config-next": "^16.1.0",
+        "eslint": "^9.0.0",
+        "eslint-config-next": "^16.1.0",
 
-    "supabase": "^1.200.0"
-  }
+        "supabase": "^1.200.0"
+    }
 }
 ```
 
@@ -4012,16 +4230,17 @@ R2_BUCKET_NAME=streamd-assets
 
 **Goal:** Core tracking functionality with public pages
 
-| Week | Deliverables |
-|------|--------------|
-| 1 | Project setup, Supabase configuration, database schema |
-| 2 | Authentication flow, user profiles, middleware |
-| 3 | Anime CRUD, Zustand stores, basic UI components |
-| 4 | User tracking (add, update, remove), list views |
-| 5 | Public anime pages, user profiles, SEO metadata |
-| 6 | Search integration, polish, deployment |
+| Week | Deliverables                                           |
+| ---- | ------------------------------------------------------ |
+| 1    | Project setup, Supabase configuration, database schema |
+| 2    | Authentication flow, user profiles, middleware         |
+| 3    | Anime CRUD, Zustand stores, basic UI components        |
+| 4    | User tracking (add, update, remove), list views        |
+| 5    | Public anime pages, user profiles, SEO metadata        |
+| 6    | Search integration, polish, deployment                 |
 
 **Phase 1 Checklist:**
+
 - [ ] Supabase project setup
 - [ ] Database schema with RLS
 - [ ] Auth flow (email + OAuth)
@@ -4039,14 +4258,15 @@ R2_BUCKET_NAME=streamd-assets
 
 **Goal:** Social features, imports, and user analytics
 
-| Week | Deliverables |
-|------|--------------|
-| 7 | Follow system, activity feed |
-| 8 | MAL/AniList import processing |
-| 9 | User analytics dashboard |
-| 10 | Share cards, monthly recaps |
+| Week | Deliverables                  |
+| ---- | ----------------------------- |
+| 7    | Follow system, activity feed  |
+| 8    | MAL/AniList import processing |
+| 9    | User analytics dashboard      |
+| 10   | Share cards, monthly recaps   |
 
 **Phase 2 Checklist:**
+
 - [ ] Follow/unfollow functionality
 - [ ] Activity feed
 - [ ] MAL XML import
@@ -4061,14 +4281,15 @@ R2_BUCKET_NAME=streamd-assets
 
 **Goal:** Episode tracking, auto-tracking, premium features
 
-| Week | Deliverables |
-|------|--------------|
-| 11-12 | Episode-level tracking |
+| Week  | Deliverables                 |
+| ----- | ---------------------------- |
+| 11-12 | Episode-level tracking       |
 | 13-14 | Auto-tracking infrastructure |
-| 15 | Premium features, API access |
-| 16 | Public API documentation |
+| 15    | Premium features, API access |
+| 16    | Public API documentation     |
 
 **Phase 3 Checklist:**
+
 - [ ] Episode tracking table
 - [ ] Episode UI components
 - [ ] Auto-tracking browser extension
@@ -4092,30 +4313,30 @@ R2_BUCKET_NAME=streamd-assets
  * Generates a URL-safe slug from a string
  */
 export function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')  // Remove non-word chars
-    .replace(/[\s_-]+/g, '-')   // Replace spaces/underscores with hyphens
-    .replace(/^-+|-+$/g, '');   // Remove leading/trailing hyphens
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "") // Remove non-word chars
+        .replace(/[\s_-]+/g, "-") // Replace spaces/underscores with hyphens
+        .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
 }
 
 /**
  * Generates a unique slug by appending a suffix if needed
  */
 export async function generateUniqueSlug(
-  text: string,
-  checkExists: (slug: string) => Promise<boolean>
+    text: string,
+    checkExists: (slug: string) => Promise<boolean>,
 ): Promise<string> {
-  let slug = generateSlug(text);
-  let suffix = 0;
+    let slug = generateSlug(text);
+    let suffix = 0;
 
-  while (await checkExists(slug)) {
-    suffix++;
-    slug = `${generateSlug(text)}-${suffix}`;
-  }
+    while (await checkExists(slug)) {
+        suffix++;
+        slug = `${generateSlug(text)}-${suffix}`;
+    }
 
-  return slug;
+    return slug;
 }
 ```
 
@@ -4124,27 +4345,27 @@ export async function generateUniqueSlug(
 ```typescript
 // src/lib/utils/date.ts
 
-import { format, formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow } from "date-fns";
 
 /**
  * Formats a date for display
  */
 export function formatDate(date: string | Date): string {
-  return format(new Date(date), 'MMM d, yyyy');
+    return format(new Date(date), "MMM d, yyyy");
 }
 
 /**
  * Formats a date as relative time
  */
 export function formatRelativeTime(date: string | Date): string {
-  return formatDistanceToNow(new Date(date), { addSuffix: true });
+    return formatDistanceToNow(new Date(date), { addSuffix: true });
 }
 
 /**
  * Formats a season string
  */
 export function formatSeason(season: string, year: number): string {
-  return `${season.charAt(0)}${season.slice(1).toLowerCase()} ${year}`;
+    return `${season.charAt(0)}${season.slice(1).toLowerCase()} ${year}`;
 }
 ```
 
@@ -4233,5 +4454,4 @@ export class ErrorBoundary extends Component<Props, State> {
 
 ---
 
-*End of Technical Specification*
-
+_End of Technical Specification_

@@ -6,43 +6,43 @@
 /**
  * Anime format types (TV series, movies, etc.)
  */
-export type AnimeFormat = 'TV' | 'MOVIE' | 'OVA' | 'ONA' | 'SPECIAL' | 'MUSIC';
+export type AnimeFormat = "TV" | "MOVIE" | "OVA" | "ONA" | "SPECIAL" | "MUSIC";
 
 /**
  * Anime airing status
  */
 export type AnimeStatus =
-  | 'FINISHED'
-  | 'RELEASING'
-  | 'NOT_YET_RELEASED'
-  | 'CANCELLED'
-  | 'HIATUS';
+    | "FINISHED"
+    | "RELEASING"
+    | "NOT_YET_RELEASED"
+    | "CANCELLED"
+    | "HIATUS";
 
 /**
  * Anime season (quarterly release periods)
  */
-export type AnimeSeason = 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL';
+export type AnimeSeason = "WINTER" | "SPRING" | "SUMMER" | "FALL";
 
 /**
  * Streaming platform identifiers
  */
 export type StreamingPlatform =
-  | 'CRUNCHYROLL'
-  | 'FUNIMATION'
-  | 'NETFLIX'
-  | 'HULU'
-  | 'AMAZON'
-  | 'HIDIVE'
-  | 'OTHER';
+    | "CRUNCHYROLL"
+    | "FUNIMATION"
+    | "NETFLIX"
+    | "HULU"
+    | "AMAZON"
+    | "HIDIVE"
+    | "OTHER";
 
 /**
  * Anime titles in multiple languages
  * Stored as JSONB in the database
  */
 export interface AnimeTitles {
-  english: string | null;
-  romaji: string;
-  japanese: string | null;
+    english: string | null;
+    romaji: string;
+    japanese: string | null;
 }
 
 /**
@@ -50,56 +50,56 @@ export interface AnimeTitles {
  * Represents the main anime record from the database
  */
 export interface Anime {
-  id: string;
-  slug: string;
-  titles: AnimeTitles;
-  format: AnimeFormat;
-  episodeCount: number | null;
-  episodeDuration: number | null;
-  season: AnimeSeason | null;
-  seasonYear: number | null;
-  startDate: string | null;
-  endDate: string | null;
-  synopsis: string | null;
-  averageRating: number | null;
-  popularity: number;
-  status: AnimeStatus;
-  malId: number | null;
-  anilistId: number | null;
-  kitsuId: string | null;
-  coverImageUrl: string | null;
-  bannerImageUrl: string | null;
-  createdAt: string;
-  updatedAt: string;
+    id: string;
+    slug: string;
+    titles: AnimeTitles;
+    format: AnimeFormat;
+    episodeCount: number | null;
+    episodeDuration: number | null;
+    season: AnimeSeason | null;
+    seasonYear: number | null;
+    startDate: string | null;
+    endDate: string | null;
+    synopsis: string | null;
+    averageRating: number | null;
+    popularity: number;
+    status: AnimeStatus;
+    malId: number | null;
+    anilistId: number | null;
+    kitsuId: string | null;
+    coverImageUrl: string | null;
+    bannerImageUrl: string | null;
+    createdAt: string;
+    updatedAt: string;
 }
 
 /**
  * Genre entity
  */
 export interface Genre {
-  id: string;
-  name: string;
-  slug: string;
+    id: string;
+    name: string;
+    slug: string;
 }
 
 /**
  * Studio entity
  */
 export interface Studio {
-  id: string;
-  name: string;
-  slug: string;
+    id: string;
+    name: string;
+    slug: string;
 }
 
 /**
  * Streaming link entity
  */
 export interface StreamingLink {
-  id: string;
-  animeId: string;
-  platform: StreamingPlatform;
-  url: string;
-  region: string;
+    id: string;
+    animeId: string;
+    platform: StreamingPlatform;
+    url: string;
+    region: string;
 }
 
 /**
@@ -107,9 +107,9 @@ export interface StreamingLink {
  * Used for detail pages where full information is needed
  */
 export interface AnimeWithRelations extends Anime {
-  genres: Genre[];
-  studios: Studio[];
-  streamingLinks: StreamingLink[];
+    genres: Genre[];
+    studios: Studio[];
+    streamingLinks: StreamingLink[];
 }
 
 /**
@@ -117,27 +117,27 @@ export interface AnimeWithRelations extends Anime {
  * Matches the snake_case column names from PostgreSQL
  */
 export interface AnimeRow {
-  id: string;
-  slug: string;
-  titles: AnimeTitles;
-  format: AnimeFormat;
-  episode_count: number | null;
-  episode_duration: number | null;
-  season: AnimeSeason | null;
-  season_year: number | null;
-  start_date: string | null;
-  end_date: string | null;
-  synopsis: string | null;
-  average_rating: number | null;
-  popularity: number;
-  status: AnimeStatus;
-  id_mal: number | null;
-  id_anilist: number | null;
-  id_kitsu: string | null;
-  cover_image_url: string | null;
-  banner_image_url: string | null;
-  created_at: string;
-  updated_at: string;
+    id: string;
+    slug: string;
+    titles: AnimeTitles;
+    format: AnimeFormat;
+    episode_count: number | null;
+    episode_duration: number | null;
+    season: AnimeSeason | null;
+    season_year: number | null;
+    start_date: string | null;
+    end_date: string | null;
+    synopsis: string | null;
+    average_rating: number | null;
+    popularity: number;
+    status: AnimeStatus;
+    id_mal: number | null;
+    id_anilist: number | null;
+    id_kitsu: string | null;
+    cover_image_url: string | null;
+    banner_image_url: string | null;
+    created_at: string;
+    updated_at: string;
 }
 
 /**
@@ -145,29 +145,29 @@ export interface AnimeRow {
  * Converts snake_case to camelCase
  */
 export function transformAnimeRow(row: AnimeRow): Anime {
-  return {
-    id: row.id,
-    slug: row.slug,
-    titles: row.titles,
-    format: row.format,
-    episodeCount: row.episode_count,
-    episodeDuration: row.episode_duration,
-    season: row.season,
-    seasonYear: row.season_year,
-    startDate: row.start_date,
-    endDate: row.end_date,
-    synopsis: row.synopsis,
-    averageRating: row.average_rating,
-    popularity: row.popularity,
-    status: row.status,
-    malId: row.id_mal,
-    anilistId: row.id_anilist,
-    kitsuId: row.id_kitsu,
-    coverImageUrl: row.cover_image_url,
-    bannerImageUrl: row.banner_image_url,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
+    return {
+        id: row.id,
+        slug: row.slug,
+        titles: row.titles,
+        format: row.format,
+        episodeCount: row.episode_count,
+        episodeDuration: row.episode_duration,
+        season: row.season,
+        seasonYear: row.season_year,
+        startDate: row.start_date,
+        endDate: row.end_date,
+        synopsis: row.synopsis,
+        averageRating: row.average_rating,
+        popularity: row.popularity,
+        status: row.status,
+        malId: row.id_mal,
+        anilistId: row.id_anilist,
+        kitsuId: row.id_kitsu,
+        coverImageUrl: row.cover_image_url,
+        bannerImageUrl: row.banner_image_url,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+    };
 }
 
 // =============================================
@@ -178,14 +178,14 @@ export function transformAnimeRow(row: AnimeRow): Anime {
  * Studio with anime count for browse pages
  */
 export interface StudioWithCount extends Studio {
-  animeCount: number;
+    animeCount: number;
 }
 
 /**
  * Genre with anime count for browse pages
  */
 export interface GenreWithCount extends Genre {
-  animeCount: number;
+    animeCount: number;
 }
 
 /**
@@ -193,10 +193,10 @@ export interface GenreWithCount extends Genre {
  * Represents a specific season/year combination
  */
 export interface SeasonInfo {
-  season: AnimeSeason;
-  year: number;
-  slug: string;
-  animeCount: number;
+    season: AnimeSeason;
+    year: number;
+    slug: string;
+    animeCount: number;
 }
 
 /**
@@ -204,10 +204,10 @@ export interface SeasonInfo {
  * Represents a streaming platform with anime count
  */
 export interface PlatformInfo {
-  platform: StreamingPlatform;
-  slug: string;
-  name: string;
-  animeCount: number;
+    platform: StreamingPlatform;
+    slug: string;
+    name: string;
+    animeCount: number;
 }
 
 /**
@@ -217,7 +217,7 @@ export interface PlatformInfo {
  * @returns Slug in format "winter-2024"
  */
 export function createSeasonSlug(season: AnimeSeason, year: number): string {
-  return `${season.toLowerCase()}-${year}`;
+    return `${season.toLowerCase()}-${year}`;
 }
 
 /**
@@ -225,14 +225,16 @@ export function createSeasonSlug(season: AnimeSeason, year: number): string {
  * @param slug - Slug in format "winter-2024"
  * @returns Object with season and year, or null if invalid
  */
-export function parseSeasonSlug(slug: string): { season: AnimeSeason; year: number } | null {
-  const match = slug.match(/^(winter|spring|summer|fall)-(\d{4})$/i);
-  if (!match) return null;
+export function parseSeasonSlug(
+    slug: string,
+): { season: AnimeSeason; year: number } | null {
+    const match = slug.match(/^(winter|spring|summer|fall)-(\d{4})$/i);
+    if (!match) return null;
 
-  const season = match[1].toUpperCase() as AnimeSeason;
-  const year = parseInt(match[2], 10);
+    const season = match[1].toUpperCase() as AnimeSeason;
+    const year = parseInt(match[2], 10);
 
-  return { season, year };
+    return { season, year };
 }
 
 /**
@@ -241,7 +243,7 @@ export function parseSeasonSlug(slug: string): { season: AnimeSeason; year: numb
  * @returns Lowercase slug
  */
 export function createPlatformSlug(platform: StreamingPlatform): string {
-  return platform.toLowerCase();
+    return platform.toLowerCase();
 }
 
 /**
@@ -250,17 +252,16 @@ export function createPlatformSlug(platform: StreamingPlatform): string {
  * @returns StreamingPlatform or null if invalid
  */
 export function parsePlatformSlug(slug: string): StreamingPlatform | null {
-  const platform = slug.toUpperCase() as StreamingPlatform;
-  const validPlatforms: StreamingPlatform[] = [
-    'CRUNCHYROLL',
-    'FUNIMATION',
-    'NETFLIX',
-    'HULU',
-    'AMAZON',
-    'HIDIVE',
-    'OTHER',
-  ];
+    const platform = slug.toUpperCase() as StreamingPlatform;
+    const validPlatforms: StreamingPlatform[] = [
+        "CRUNCHYROLL",
+        "FUNIMATION",
+        "NETFLIX",
+        "HULU",
+        "AMAZON",
+        "HIDIVE",
+        "OTHER",
+    ];
 
-  return validPlatforms.includes(platform) ? platform : null;
+    return validPlatforms.includes(platform) ? platform : null;
 }
-

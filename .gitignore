@@ -9,6 +9,7 @@ node_modules
 # Next.js
 .next
 out
+tsconfig.tsbuildinfo
 
 # Build
 dist
@@ -26,3 +27,6 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Cursor
+.cursor/**

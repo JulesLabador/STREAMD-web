@@ -67,6 +67,7 @@ npm run import:anime
 ```
 
 This script:
+
 - Reads the `anime.json` file from the project root
 - Transforms and maps fields to the database schema
 - Creates studios on-the-fly and links them via junction tables
@@ -75,6 +76,7 @@ This script:
 - Uses upsert to allow re-running without duplicates
 
 **Requirements:**
+
 - `anime.json` file in the project root
 - Valid Supabase credentials in `.env.local`
 - Database tables must already exist (see `docs/technical-spec.md`)

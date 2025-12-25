@@ -17,38 +17,37 @@
  * ```
  */
 export type ActionResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string; code?: string };
+    | { success: true; data: T }
+    | { success: false; error: string; code?: string };
 
 /**
  * Paginated response wrapper for list endpoints
  * Includes data array and pagination metadata
  */
 export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    totalCount: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
+    data: T[];
+    pagination: {
+        page: number;
+        pageSize: number;
+        totalCount: number;
+        totalPages: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+    };
 }
 
 /**
  * Pagination parameters for list queries
  */
 export interface PaginationParams {
-  page?: number;
-  pageSize?: number;
+    page?: number;
+    pageSize?: number;
 }
 
 /**
  * Sort parameters for list queries
  */
 export interface SortParams<T extends string = string> {
-  sortBy?: T;
-  sortOrder?: 'asc' | 'desc';
+    sortBy?: T;
+    sortOrder?: "asc" | "desc";
 }
-

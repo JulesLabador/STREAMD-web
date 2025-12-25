@@ -89,4 +89,3 @@ export function RatingBarSegmented({ rating }: RatingBarProps) {
         </div>
     );
 }
-

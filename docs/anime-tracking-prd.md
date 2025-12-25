@@ -3,12 +3,15 @@
 ## 1. Product Overview
 
 ### Product Name
+
 TBD (working title: AutoTrack Anime)
 
 ### Summary
+
 A modern, data-first anime tracking platform that allows users to track, rate, review, and share anime they’ve watched, with a strong emphasis on automatic episode tracking, public SEO-driven anime pages, and personal analytics.
 
 The product is designed to replace MyAnimeList and AniList as the primary system of record for anime fans by:
+
 - Eliminating manual tracking friction
 - Embracing streaming-first behavior
 - Leveraging SEO and social sharing for growth
@@ -17,20 +20,24 @@ The product is designed to replace MyAnimeList and AniList as the primary system
 ## 2. Product Strategy & Positioning
 
 Market:
+
 - Consumer app
 
 Identity Model:
+
 - Handle-based usernames
 - Real identity optional
 - Usernames are the primary public identifier
 
 Product Philosophy:
+
 - Data-first
 - Opinions are valuable, but structured data is the foundation
 - Analytics, insights, and discovery are core value props
 
 Hero Feature:
 Automatic tracking via streaming integrations
+
 - Free for all users
 - Rate-limited for non-premium users
 - Primary user acquisition strategy
@@ -39,11 +46,13 @@ Automatic tracking via streaming integrations
 ## 3. Goals & Success Metrics
 
 Primary Goals:
+
 - Minimize manual tracking effort
 - Encourage habitual usage
 - Drive organic acquisition via SEO and sharing
 
 Success Metrics:
+
 - % of users with at least one tracked anime
 - % of users using auto-tracking
 - Weekly Active Users
@@ -53,15 +62,19 @@ Success Metrics:
 ## 4. Technical Stack
 
 Primary Database:
+
 - Postgres (system of record)
 
 Search:
+
 - Meilisearch (titles, fuzzy matching, facets)
 
 Cache & Queues:
+
 - Redis (caching, rate limiting, background jobs)
 
 Object Storage:
+
 - S3 or Cloudflare R2 (share images, banners)
 
 ## 5. Canonical Data Rules
@@ -73,6 +86,7 @@ User data must never depend on external IDs.
 ## 6. Core Data Models
 
 Anime:
+
 - id (UUID)
 - titles (english, romaji, japanese)
 - format
@@ -87,6 +101,7 @@ Anime:
 - edition (JSONB)
 
 User:
+
 - id
 - username
 - display_name
@@ -95,6 +110,7 @@ User:
 - created_at
 
 UserAnime:
+
 - user_id
 - anime_id
 - status
@@ -108,6 +124,7 @@ UserAnime:
 - updated_at
 
 Follow:
+
 - follower_id
 - following_id
 - created_at
@@ -117,9 +134,11 @@ Follow:
 The system will support episode-level tracking without breaking existing data.
 
 Future table:
+
 - user_episode (user_id, anime_id, episode_number, watched, watched_at, rewatch_count)
 
 Constraints:
+
 - current_episode must be derivable
 - no assumption of linear progression
 - status must be recalculable
@@ -133,18 +152,21 @@ Constraints:
 ## 9. Multiple Versions / Editions
 
 Support multiple editions:
+
 - TV
 - Movies
 - Director’s cuts
 - Recaps
 
 Approach:
+
 - Optional edition metadata
 - UI defaults to primary edition
 
 ## 10. Search Architecture
 
 Meilisearch index:
+
 - titles
 - format
 - season
@@ -152,6 +174,7 @@ Meilisearch index:
 - streaming platforms
 
 Ranking:
+
 - relevance
 - popularity
 - average rating
@@ -161,6 +184,7 @@ Ranking:
 Anime pages are public and indexable.
 
 Page types:
+
 - /anime/:slug
 - /studio/:slug
 - /season/:season-year
@@ -172,12 +196,14 @@ SEO pages funnel users into signup and tracking.
 ## 12. Automatic Tracking (Defensive Design)
 
 Constraints:
+
 - No DRM circumvention
 - No video scraping
 - Passive playback detection only
 - Manual override always available
 
 Failure Tolerance:
+
 - Core app always usable
 - Manual tracking always works
 - Auto-tracking degrades gracefully
@@ -185,6 +211,7 @@ Failure Tolerance:
 ## 13. Background Jobs
 
 Redis-backed job system handles:
+
 - Imports
 - Search indexing
 - Auto-tracking validation
@@ -193,6 +220,7 @@ Redis-backed job system handles:
 - Notifications
 
 Requirements:
+
 - Idempotent jobs
 - Retries with backoff
 - Dead-letter queues
@@ -201,29 +229,34 @@ Requirements:
 ## 14. Analytics & Insights
 
 Examples:
+
 - Episodes watched per week
 - Completion rate
 - Rewatch frequency
 - Studio and genre affinity
 
 Premium expansion:
+
 - Exports
 - Long-term trends
 
 ## 15. Growth & Viral Loops
 
 Sharing:
+
 - Monthly and yearly recap cards
 - Public profiles
 - Deep links
 
 Notifications:
+
 - New followers
 - Taste overlap alerts
 - Recaps ready
 - Streaming availability alerts
 
 SEO loops:
+
 - Anime pages to signup
 - Where-to-watch pages to tracking
 
@@ -237,6 +270,7 @@ SEO loops:
 ## 17. Privacy & Data Deletion
 
 Schemas must support:
+
 - Full user deletion
 - Review anonymization
 - Cascading deletes
@@ -260,6 +294,7 @@ Schemas must support:
 ## 20. Milestones
 
 Phase 1:
+
 - Core schema
 - Auth
 - Tracking
@@ -268,11 +303,13 @@ Phase 1:
 - Public profiles
 
 Phase 2:
+
 - Imports
 - Analytics
 - Sharing
 
 Phase 3:
+
 - Episode-level tracking
 - Auto-tracking at scale
 - Premium features

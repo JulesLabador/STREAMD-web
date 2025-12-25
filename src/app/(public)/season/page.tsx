@@ -87,7 +87,7 @@ function groupSeasonsByYear(seasons: SeasonInfo[]): Map<number, SeasonInfo[]> {
     for (const [year, yearSeasons] of grouped) {
         yearSeasons.sort(
             (a, b) =>
-                SEASON_ORDER.indexOf(a.season) - SEASON_ORDER.indexOf(b.season)
+                SEASON_ORDER.indexOf(a.season) - SEASON_ORDER.indexOf(b.season),
         );
         grouped.set(year, yearSeasons);
     }
@@ -259,8 +259,8 @@ export default async function SeasonsPage() {
                                         {isCurrentYear
                                             ? "Browse anime currently airing and recently released this year."
                                             : isFutureYear
-                                            ? "Preview upcoming anime announcements for this year."
-                                            : `Explore ${stats.totalAnime.toLocaleString()} anime titles that aired throughout ${year}.`}
+                                              ? "Preview upcoming anime announcements for this year."
+                                              : `Explore ${stats.totalAnime.toLocaleString()} anime titles that aired throughout ${year}.`}
                                     </p>
                                 )}
                             </div>
