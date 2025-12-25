@@ -46,7 +46,7 @@ flowchart TB
     end
 
     subgraph services [External Services]
-        Meilisearch[Meilisearch]
+        Algolia[Algolia]
         Redis[Upstash Redis]
         R2[Cloudflare R2]
     end
@@ -55,7 +55,7 @@ flowchart TB
     ZustandStores --> ServerActions
     ServerActions --> SupaAuth
     ServerActions --> PostgresDB
-    ServerActions --> Meilisearch
+    ServerActions --> Algolia
     ServerActions --> Redis
     NextApp --> RealtimeSub
     StorageBucket --> R2
@@ -69,7 +69,7 @@ flowchart TB
 | State Management | Zustand                 | ViewModel pattern, client state  |
 | Database         | Supabase PostgreSQL     | Primary data store               |
 | Authentication   | Supabase Auth           | OAuth, email auth, sessions      |
-| Search           | Meilisearch             | Full-text search, fuzzy matching |
+| Search           | Algolia                 | Full-text search, fuzzy matching |
 | Cache            | Upstash Redis           | Caching, rate limiting, queues   |
 | Object Storage   | Cloudflare R2           | Images, share cards, avatars     |
 | Styling          | Tailwind CSS            | Utility-first CSS                |
@@ -80,7 +80,7 @@ flowchart TB
 1. **Next.js App Router with Server Actions** - Eliminates need for separate API layer, provides type-safe server-client communication
 2. **Supabase for Auth + Database** - Managed PostgreSQL with built-in auth, RLS, and realtime subscriptions
 3. **Zustand for State Management** - Lightweight, TypeScript-first state management implementing ViewModel pattern
-4. **Meilisearch for Search** - Fast, typo-tolerant search with faceting support
+4. **Algolia for Search** - Fast, typo-tolerant search with 10K free searches/month
 5. **Upstash Redis** - Serverless Redis for caching and background job queues
 
 ---
@@ -3217,35 +3217,95 @@ function transformUserAnimeRowSimple(row: Record<string, unknown>): UserAnime {
 
 ## 7. Search Architecture
 
-### Meilisearch Configuration
+### Overview
 
-#### `src/lib/meilisearch/client.ts`
+The search system uses Algolia for fast, typo-tolerant search with a unified component architecture that powers both the command palette modal (CMD+K) and the homepage inline search. Algolia's free tier provides 10,000 searches/month and up to 1 million records.
+
+### Architecture Diagram
+
+```mermaid
+flowchart TB
+    subgraph ui [UI Containers]
+        HeaderTrigger[Header Search Trigger]
+        HomeContainer[Homepage Search Container]
+    end
+
+    subgraph shared [Shared Search System]
+        SearchProvider[SearchProvider Context]
+        SearchInput[SearchInput Component]
+        SearchResults[SearchResults Component]
+        SearchResultItem[SearchResultItem Component]
+    end
+
+    subgraph hooks [Core Logic]
+        useSearch[useSearch Hook]
+        useDebounce[useDebounce Hook]
+    end
+
+    subgraph actions [Server Actions]
+        SearchAction[searchAnime Action]
+    end
+
+    subgraph search [Algolia]
+        Index[anime index]
+    end
+
+    HeaderTrigger -->|"opens modal with"| SearchProvider
+    HomeContainer -->|"wraps"| SearchProvider
+    SearchProvider --> SearchInput
+    SearchProvider --> SearchResults
+    SearchResults --> SearchResultItem
+    SearchProvider --> useSearch
+    useSearch --> useDebounce
+    useSearch --> SearchAction
+    SearchAction --> Index
+```
+
+### Algolia Configuration
+
+#### Environment Variables
+
+```env
+NEXT_PUBLIC_ALGOLIA_APP_ID=your-app-id
+NEXT_PUBLIC_ALGOLIA_SEARCH_KEY=your-search-only-key
+ALGOLIA_ADMIN_KEY=your-admin-key
+```
+
+#### `src/lib/algolia/client.ts`
 
 ```typescript
-import { MeiliSearch } from "meilisearch";
+import { algoliasearch } from "algoliasearch";
 
 /**
- * Meilisearch client singleton
+ * Algolia client for search operations
+ * Uses the Search-Only API key for safe client-side usage
  */
-export const meilisearch = new MeiliSearch({
-    host: process.env.MEILISEARCH_HOST!,
-    apiKey: process.env.MEILISEARCH_API_KEY,
-});
+export const algoliaClient = algoliasearch(
+    process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || "",
+    process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY || "",
+);
+
+/**
+ * Algolia admin client for indexing operations
+ * Uses the Admin API key - ONLY use server-side for indexing
+ */
+export function getAlgoliaAdminClient() {
+    return algoliasearch(
+        process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || "",
+        process.env.ALGOLIA_ADMIN_KEY!,
+    );
+}
 
 /**
  * Anime search index name
  */
 export const ANIME_INDEX = "anime";
-```
 
-#### Index Document Structure
-
-```typescript
 /**
- * Document structure for Meilisearch anime index
+ * Document structure for Algolia anime index
  */
 export interface AnimeSearchDocument {
-    id: string;
+    objectID: string;
     slug: string;
     titles: {
         english: string | null;
@@ -3253,191 +3313,150 @@ export interface AnimeSearchDocument {
         japanese: string | null;
     };
     format: "TV" | "MOVIE" | "OVA" | "ONA" | "SPECIAL" | "MUSIC";
-    status:
-        | "FINISHED"
-        | "RELEASING"
-        | "NOT_YET_RELEASED"
-        | "CANCELLED"
-        | "HIATUS";
+    status: string;
     season: string | null;
     seasonYear: number | null;
-    genres: string[];
-    studios: string[];
     popularity: number;
     averageRating: number | null;
     coverImageUrl: string | null;
+    episodeCount: number | null;
 }
 ```
 
-#### Index Settings
+### Search Server Action
+
+#### `src/app/actions/search.ts`
 
 ```typescript
-/**
- * Configure Meilisearch index settings
- */
-export async function configureAnimeIndex() {
-    const index = meilisearch.index(ANIME_INDEX);
-
-    await index.updateSettings({
-        // Searchable attributes in priority order
-        searchableAttributes: [
-            "titles.english",
-            "titles.romaji",
-            "titles.japanese",
-            "genres",
-            "studios",
-        ],
-
-        // Filterable attributes for faceted search
-        filterableAttributes: [
-            "format",
-            "status",
-            "season",
-            "seasonYear",
-            "genres",
-            "studios",
-        ],
-
-        // Sortable attributes
-        sortableAttributes: [
-            "popularity",
-            "averageRating",
-            "titles.romaji",
-            "seasonYear",
-        ],
-
-        // Ranking rules
-        rankingRules: [
-            "words",
-            "typo",
-            "proximity",
-            "attribute",
-            "sort",
-            "exactness",
-            "popularity:desc",
-        ],
-
-        // Typo tolerance
-        typoTolerance: {
-            enabled: true,
-            minWordSizeForTypos: {
-                oneTypo: 4,
-                twoTypos: 8,
-            },
-        },
-    });
-}
-```
-
-#### Search Action
-
-```typescript
-// src/app/actions/search.ts
 "use server";
 
-import {
-    meilisearch,
-    ANIME_INDEX,
-    type AnimeSearchDocument,
-} from "@/lib/meilisearch/client";
-import type { Anime, AnimeFilters } from "@/types/anime";
+import { algoliaClient, ANIME_INDEX } from "@/lib/algolia/client";
+import type { Anime } from "@/types/anime";
 import type { ActionResult } from "@/types/common";
 
 /**
- * Searches anime using Meilisearch
+ * Searches anime using Algolia
+ * Fast, typo-tolerant search across anime titles
  */
 export async function searchAnime(
-    filters: AnimeFilters,
+    query: string,
+    limit: number = 10,
 ): Promise<ActionResult<Anime[]>> {
-    try {
-        const index = meilisearch.index(ANIME_INDEX);
-
-        // Build filter array
-        const filterConditions: string[] = [];
-
-        if (filters.format?.length) {
-            filterConditions.push(
-                `format IN [${filters.format.map((f) => `"${f}"`).join(", ")}]`,
-            );
-        }
-        if (filters.status?.length) {
-            filterConditions.push(
-                `status IN [${filters.status.map((s) => `"${s}"`).join(", ")}]`,
-            );
-        }
-        if (filters.season) {
-            filterConditions.push(`season = "${filters.season}"`);
-        }
-        if (filters.year) {
-            filterConditions.push(`seasonYear = ${filters.year}`);
-        }
-        if (filters.genres?.length) {
-            filterConditions.push(
-                `genres IN [${filters.genres.map((g) => `"${g}"`).join(", ")}]`,
-            );
-        }
-
-        // Build sort
-        const sort: string[] = [];
-        if (filters.sortBy) {
-            const sortField =
-                filters.sortBy === "rating"
-                    ? "averageRating"
-                    : filters.sortBy === "title"
-                      ? "titles.romaji"
-                      : filters.sortBy === "startDate"
-                        ? "seasonYear"
-                        : "popularity";
-            sort.push(`${sortField}:${filters.sortOrder || "desc"}`);
-        }
-
-        const result = await index.search<AnimeSearchDocument>(
-            filters.query || "",
-            {
-                filter: filterConditions.length
-                    ? filterConditions.join(" AND ")
-                    : undefined,
-                sort: sort.length ? sort : undefined,
-                limit: 50,
-            },
-        );
-
-        // Transform to Anime type
-        const anime: Anime[] = result.hits.map((hit) => ({
-            id: hit.id,
-            slug: hit.slug,
-            titles: hit.titles,
-            format: hit.format,
-            status: hit.status,
-            season: hit.season as Anime["season"],
-            seasonYear: hit.seasonYear,
-            popularity: hit.popularity,
-            averageRating: hit.averageRating,
-            coverImageUrl: hit.coverImageUrl,
-            // Fill in defaults for fields not in search index
-            episodeCount: null,
-            episodeDuration: null,
-            startDate: null,
-            endDate: null,
-            synopsis: null,
-            malId: null,
-            anilistId: null,
-            kitsuId: null,
-            edition: null,
-            bannerImageUrl: null,
-            createdAt: "",
-            updatedAt: "",
-        }));
-
-        return { success: true, data: anime };
-    } catch (error) {
-        console.error("Search error:", error);
-        return { success: false, error: "Search failed" };
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) {
+        return { success: true, data: [] };
     }
+
+    const result = await algoliaClient.searchSingleIndex({
+        indexName: ANIME_INDEX,
+        searchParams: {
+            query: trimmedQuery,
+            hitsPerPage: Math.min(50, Math.max(1, limit)),
+        },
+    });
+
+    // Transform and return results
+    return { success: true, data: result.hits.map(transformHit) };
 }
 ```
 
-### Search Sync Strategy
+### Unified Search Components
+
+The search system uses a provider pattern for consistent behavior:
+
+```
+SearchModal (Dialog container)
+  └── SearchProvider
+        ├── SearchInput
+        └── SearchResults
+              └── SearchResultItem (repeated)
+
+InlineSearch (div container)
+  └── SearchProvider
+        ├── SearchInput
+        └── SearchResults
+              └── SearchResultItem (repeated)
+```
+
+#### Core Hook: `useSearch`
+
+```typescript
+// src/hooks/useSearch.ts
+export function useSearch(debounceDelay: number = 150): UseSearchReturn {
+    const [query, setQuery] = useState("");
+    const [results, setResults] = useState<Anime[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const debouncedQuery = useDebounce(query, debounceDelay);
+
+    useEffect(() => {
+        // Perform search when debounced query changes
+        performSearch(debouncedQuery);
+    }, [debouncedQuery]);
+
+    return {
+        query, results, isLoading, selectedIndex,
+        setQuery, clearSearch, navigateUp, navigateDown, getSelectedAnime
+    };
+}
+```
+
+#### SearchProvider Context
+
+```typescript
+// src/components/search/SearchProvider.tsx
+export function SearchProvider({ children, onSelect, onClose }) {
+    const search = useSearch();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+        switch (e.key) {
+            case "ArrowUp": search.navigateUp(); break;
+            case "ArrowDown": search.navigateDown(); break;
+            case "Enter": onSelect(search.getSelectedAnime()); break;
+            case "Escape": onClose(); break;
+        }
+    };
+
+    return (
+        <SearchContext.Provider value={{ ...search, onSelect, onClose }}>
+            <div onKeyDown={handleKeyDown}>{children}</div>
+        </SearchContext.Provider>
+    );
+}
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/lib/algolia/client.ts` | Algolia client singleton |
+| `scripts/index-anime.ts` | Index anime data to Algolia |
+| `src/app/actions/search.ts` | Server action for search queries |
+| `src/hooks/useDebounce.ts` | Generic debounce hook (150ms) |
+| `src/hooks/useSearch.ts` | Core search logic - single source of truth |
+| `src/components/search/SearchProvider.tsx` | Context wrapper - shares state with children |
+| `src/components/search/SearchInput.tsx` | Shared input component |
+| `src/components/search/SearchResults.tsx` | Shared results list |
+| `src/components/search/SearchResultItem.tsx` | Shared result row |
+| `src/components/search/SearchModal.tsx` | Modal container (CMD+K) |
+| `src/components/search/InlineSearch.tsx` | Inline container (homepage) |
+| `src/components/search/HeaderSearch.tsx` | Header trigger + modal |
+
+### Search Indexing
+
+Run the indexing script after importing anime data:
+
+```bash
+npm run index:search
+```
+
+The script:
+1. Fetches all anime from Supabase
+2. Configures Meilisearch index settings
+3. Indexes documents in batches
+
+### Search Sync Strategy (Future)
 
 ```mermaid
 flowchart LR
