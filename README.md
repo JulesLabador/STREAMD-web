@@ -15,6 +15,10 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your-publishable-key
 # WARNING: This key bypasses Row Level Security - keep it secret!
 # Only used for admin operations like bulk imports
 SUPABASE_SECRET_KEY=your-secret-key
+
+# Site URL for sitemap generation (used by next-sitemap)
+# Set this to your production domain
+SITE_URL=https://streamd.app
 ```
 
 ## Getting Started
@@ -74,3 +78,31 @@ This script:
 - `anime.json` file in the project root
 - Valid Supabase credentials in `.env.local`
 - Database tables must already exist (see `docs/technical-spec.md`)
+
+## SEO & Sitemap
+
+This project uses [next-sitemap](https://github.com/iamvishnusankar/next-sitemap) for automatic sitemap generation.
+
+### How it works
+
+1. **Static sitemap** (`sitemap.xml`): Generated at build time for static routes (home, browse pages)
+2. **Dynamic sitemap** (`server-sitemap.xml`): Generated on-demand for dynamic routes (anime, genres, studios, seasons, platforms)
+3. **robots.txt**: Auto-generated with proper crawl directives
+
+### Configuration
+
+The sitemap configuration is in `next-sitemap.config.js`. Key settings:
+
+- **siteUrl**: Set via `SITE_URL` environment variable (defaults to `https://streamd.app`)
+- **changefreq**: Weekly for most pages, daily for browse index pages
+- **priority**: 1.0 for home, 0.9 for browse indexes, 0.8 for category pages, 0.7 for anime pages
+
+### Generated files
+
+After running `npm run build`, the following files are generated in `/public`:
+
+- `sitemap.xml` - Main sitemap index
+- `sitemap-0.xml` - Static routes sitemap
+- `robots.txt` - Search engine directives
+
+The dynamic sitemap is served at `/server-sitemap.xml` and fetches all anime, genres, studios, seasons, and platforms from the database.
