@@ -12,6 +12,30 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HeaderSearch } from "@/components/search";
+
+const HEADER_LINKS = [
+    {
+        label: "Browse",
+        href: "/",
+    },
+    {
+        label: "Browse by Studio",
+        href: "/studio",
+    },
+    {
+        label: "Browse by Genre",
+        href: "/genre",
+    },
+    {
+        label: "Browse by Platform",
+        href: "/platforms",
+    },
+    {
+        label: "Browse by Season",
+        href: "/season",
+    },
+];
 
 /**
  * Main navigation header component
@@ -53,13 +77,19 @@ export async function Header() {
                 </Link>
 
                 {/* Navigation links and auth */}
-                <nav className="flex items-center gap-6">
-                    <Link
-                        href="/"
-                        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                        Browse
-                    </Link>
+                <nav className="flex items-center gap-4">
+                    {HEADER_LINKS.map((link) => (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
+
+                    {/* Search trigger and modal */}
+                    <HeaderSearch />
 
                     {user ? (
                         // Authenticated: Show user dropdown
@@ -114,7 +144,7 @@ function UserDropdown({
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="ghost"
-                    className="relative h-8 w-8 rounded-full"
+                    className="relative h-8 w-8 rounded-full hover:cursor-pointer hover:text-primary"
                 >
                     <Avatar className="h-8 w-8">
                         <AvatarImage
