@@ -1,0 +1,13 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /auth/
+Disallow: /api/
+
+# Host
+Host: streamdanime.io
+
+# Sitemaps
+Sitemap: streamdanime.io/sitemap.xml
+Sitemap: streamdanime.io/server-sitemap.xml
