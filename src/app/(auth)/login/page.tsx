@@ -87,6 +87,19 @@ function LoginForm() {
     const redirectTo = searchParams.get("redirectTo") ?? "/";
 
     /**
+     * Gets the base URL for OAuth redirects
+     * Uses environment variable in production, falls back to window.location.origin
+     */
+    const getBaseUrl = () => {
+        // Use environment variable if available (set in Vercel/production)
+        if (process.env.NEXT_PUBLIC_SITE_URL) {
+            return process.env.NEXT_PUBLIC_SITE_URL;
+        }
+        // Fallback to current origin (works for local dev)
+        return window.location.origin;
+    };
+
+    /**
      * Initiates Google OAuth sign-in flow
      */
     const handleGoogleSignIn = async () => {
@@ -95,14 +108,15 @@ function LoginForm() {
             setError(null);
 
             const supabase = createClient();
+            const baseUrl = getBaseUrl();
 
             const { error: signInError } = await supabase.auth.signInWithOAuth({
                 provider: "google",
                 options: {
                     // Redirect back to callback with the intended destination
-                    redirectTo: `${
-                        window.location.origin
-                    }/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+                    redirectTo: `${baseUrl}/auth/callback?next=${encodeURIComponent(
+                        redirectTo
+                    )}`,
                 },
             });
 
