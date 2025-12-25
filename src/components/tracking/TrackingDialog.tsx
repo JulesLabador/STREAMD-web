@@ -211,7 +211,11 @@ export function TrackingDialog({
                                         return (
                                             <span className="flex items-center gap-2">
                                                 <Icon className="h-4 w-4" />
-                                                {USER_ANIME_STATUS_LABELS[status]}
+                                                {
+                                                    USER_ANIME_STATUS_LABELS[
+                                                        status
+                                                    ]
+                                                }
                                             </span>
                                         );
                                     })()}

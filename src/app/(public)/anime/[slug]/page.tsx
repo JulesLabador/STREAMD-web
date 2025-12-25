@@ -135,8 +135,9 @@ export default async function AnimePage({ params }: AnimePageProps) {
     const trackingResult = isAuthenticated
         ? await getUserAnimeForAnime(anime.id)
         : null;
-    const initialTracking =
-        trackingResult?.success ? trackingResult.data : null;
+    const initialTracking = trackingResult?.success
+        ? trackingResult.data
+        : null;
 
     return (
         <>
@@ -162,10 +163,10 @@ export default async function AnimePage({ params }: AnimePageProps) {
                 <div className="mx-auto max-w-4xl p-4 md:p-6 lg:p-8">
                     {/* Back button */}
                     <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         asChild
-                        className="mb-6 -ml-2"
+                        className="mb-6 -ml-2 h-10"
                     >
                         <Link href="/">
                             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -290,7 +291,7 @@ export default async function AnimePage({ params }: AnimePageProps) {
                                         label="Season"
                                         value={formatSeason(
                                             anime.season,
-                                            anime.seasonYear,
+                                            anime.seasonYear
                                         )}
                                     />
                                 </div>
@@ -405,7 +406,7 @@ export default async function AnimePage({ params }: AnimePageProps) {
                                                 >
                                                     <ExternalLink className="h-3 w-3" />
                                                     {getPlatformName(
-                                                        link.platform,
+                                                        link.platform
                                                     )}
                                                 </a>
                                             </Button>
