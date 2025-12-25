@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Play, LogOut, User } from "lucide-react";
+import { Play, LogOut, User, List } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/actions/auth";
+import { getCurrentUserProfile } from "@/app/actions/user";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -30,6 +31,10 @@ export async function Header() {
     const {
         data: { user },
     } = await supabase.auth.getUser();
+
+    // Fetch user profile to get username (for profile link)
+    const profileResult = user ? await getCurrentUserProfile() : null;
+    const userProfile = profileResult?.success ? profileResult.data : null;
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -62,6 +67,7 @@ export async function Header() {
                             email={user.email ?? ""}
                             avatarUrl={user.user_metadata?.avatar_url}
                             displayName={user.user_metadata?.full_name}
+                            username={userProfile?.username}
                         />
                     ) : (
                         // Not authenticated: Show sign in button
@@ -78,15 +84,21 @@ export async function Header() {
 /**
  * User dropdown menu component
  *
- * Displays user avatar and provides sign out functionality.
+ * Displays user avatar and provides navigation to profile and sign out.
  */
 interface UserDropdownProps {
     email: string;
     avatarUrl?: string;
     displayName?: string;
+    username?: string;
 }
 
-function UserDropdown({ email, avatarUrl, displayName }: UserDropdownProps) {
+function UserDropdown({
+    email,
+    avatarUrl,
+    displayName,
+    username,
+}: UserDropdownProps) {
     // Get initials for avatar fallback
     const initials = displayName
         ? displayName
@@ -125,13 +137,29 @@ function UserDropdown({ email, avatarUrl, displayName }: UserDropdownProps) {
                     </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                    <Link href="/dashboard" className="cursor-pointer">
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {username && (
+                    <>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={`/u/${username}`}
+                                className="cursor-pointer"
+                            >
+                                <User className="mr-2 h-4 w-4" />
+                                My Profile
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={`/u/${username}`}
+                                className="cursor-pointer"
+                            >
+                                <List className="mr-2 h-4 w-4" />
+                                My Anime List
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                    </>
+                )}
                 <form action={signOut}>
                     <DropdownMenuItem asChild>
                         <button type="submit" className="w-full cursor-pointer">

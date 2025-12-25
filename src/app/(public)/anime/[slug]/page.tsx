@@ -15,8 +15,11 @@ import {
     Tv,
 } from "lucide-react";
 import { getAnimeBySlug } from "@/app/actions/anime";
+import { getUserAnimeForAnime } from "@/app/actions/user";
+import { createClient } from "@/lib/supabase/server";
 import { InfoItem } from "@/components/anime/InfoItem";
 import { RatingBarSegmented } from "@/components/anime/RatingBar";
+import { TrackingButton } from "@/components/tracking";
 import { AnimeJsonLd } from "@/components/seo/AnimeJsonLd";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -121,6 +124,20 @@ export default async function AnimePage({ params }: AnimePageProps) {
     const displayTitle = anime.titles.english || anime.titles.romaji;
     const animeUrl = `${SITE_URL}/anime/${anime.slug}`;
 
+    // Check if user is authenticated and fetch their tracking data
+    const supabase = await createClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+    const isAuthenticated = !!user;
+
+    // Fetch user's tracking for this anime (if authenticated)
+    const trackingResult = isAuthenticated
+        ? await getUserAnimeForAnime(anime.id)
+        : null;
+    const initialTracking =
+        trackingResult?.success ? trackingResult.data : null;
+
     return (
         <>
             {/* JSON-LD Structured Data for SEO */}
@@ -215,6 +232,17 @@ export default async function AnimePage({ params }: AnimePageProps) {
                                     />
                                 </div>
                             )}
+
+                            {/* Tracking button */}
+                            <div className="flex justify-center pt-2">
+                                <TrackingButton
+                                    animeId={anime.id}
+                                    animeTitle={displayTitle}
+                                    episodeCount={anime.episodeCount}
+                                    isAuthenticated={isAuthenticated}
+                                    initialTracking={initialTracking}
+                                />
+                            </div>
                         </section>
 
                         {/* ===== INFO CARD ===== */}
