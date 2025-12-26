@@ -214,3 +214,77 @@ export interface UpdateTrackingInput {
     startedAt?: string | null;
     completedAt?: string | null;
 }
+
+// =============================================
+// User Statistics Types
+// =============================================
+
+/**
+ * Yearly breakdown of anime by status
+ * Used for progress bars showing activity per year
+ */
+export interface YearlyAnimeData {
+    year: number;
+    completed: number;
+    watching: number;
+    planned: number;
+    paused: number;
+    dropped: number;
+}
+
+/**
+ * Genre count for distribution charts
+ */
+export interface GenreCount {
+    name: string;
+    count: number;
+}
+
+/**
+ * Rating distribution bucket
+ */
+export interface RatingBucket {
+    rating: number; // 1-10
+    count: number;
+}
+
+/**
+ * Format breakdown (TV, Movie, OVA, etc.)
+ */
+export interface FormatCount {
+    format: string;
+    count: number;
+}
+
+/**
+ * Comprehensive user statistics for the dashboard
+ * Focused on current year with historical data
+ */
+export interface UserStats {
+    /** The year being focused on (typically current year) */
+    currentYear: number;
+
+    /** Total anime tracked this year */
+    totalAnime: number;
+
+    /** Total episodes watched (completed + in-progress) */
+    totalEpisodes: number;
+
+    /** Total watch time in minutes */
+    watchTimeMinutes: number;
+
+    /** Average rating given (null if no ratings) */
+    averageRating: number | null;
+
+    /** Breakdown by year for progress bars */
+    yearlyData: YearlyAnimeData[];
+
+    /** Top genres by anime count */
+    topGenres: GenreCount[];
+
+    /** Distribution of ratings given */
+    ratingDistribution: RatingBucket[];
+
+    /** Breakdown by anime format */
+    formatBreakdown: FormatCount[];
+}

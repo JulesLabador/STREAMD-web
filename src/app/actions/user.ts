@@ -15,8 +15,14 @@ import type {
     UserAnimeWithAnime,
     AddToListInput,
     UpdateTrackingInput,
+    UserStats,
+    YearlyAnimeData,
+    GenreCount,
+    RatingBucket,
+    FormatCount,
 } from "@/types/user";
 import { transformUserRow, transformUserAnimeRow } from "@/types/user";
+import type { AnimeFormat } from "@/types/anime";
 
 // =============================================
 // Profile Actions
@@ -463,10 +469,14 @@ export async function addAnimeToList(
         }
 
         // Track analytics event (fire-and-forget)
-        trackServerEventAsync("anime_added", `https://streamd.app/anime/${animeData.slug}`, {
-            status,
-            anime_slug: animeData.slug,
-        });
+        trackServerEventAsync(
+            "anime_added",
+            `https://streamd.app/anime/${animeData.slug}`,
+            {
+                status,
+                anime_slug: animeData.slug,
+            }
+        );
 
         return {
             success: true,
@@ -595,10 +605,14 @@ export async function updateAnimeTracking(
         // Get anime slug for analytics (fire-and-forget)
         const animeSlug = await getAnimeSlugById(supabase, animeId);
         if (animeSlug) {
-            trackServerEventAsync("anime_updated", `https://streamd.app/anime/${animeSlug}`, {
-                status: input.status,
-                anime_slug: animeSlug,
-            });
+            trackServerEventAsync(
+                "anime_updated",
+                `https://streamd.app/anime/${animeSlug}`,
+                {
+                    status: input.status,
+                    anime_slug: animeSlug,
+                }
+            );
         }
 
         return {
@@ -662,9 +676,13 @@ export async function removeAnimeFromList(
 
         // Track analytics event (fire-and-forget)
         if (animeSlug) {
-            trackServerEventAsync("anime_removed", `https://streamd.app/anime/${animeSlug}`, {
-                anime_slug: animeSlug,
-            });
+            trackServerEventAsync(
+                "anime_removed",
+                `https://streamd.app/anime/${animeSlug}`,
+                {
+                    anime_slug: animeSlug,
+                }
+            );
         }
 
         return { success: true, data: { removed: true } };
@@ -721,5 +739,270 @@ export async function getUserAnimeMap(): Promise<
     } catch (error) {
         console.error("Error fetching user anime map:", error);
         return { success: false, error: "Failed to fetch tracking data" };
+    }
+}
+
+// =============================================
+// Statistics Actions
+// =============================================
+
+/**
+ * Fetches comprehensive statistics for a user's anime watching history
+ * Focused on the current year with historical data available
+ *
+ * @param userId - The user's ID
+ * @returns User statistics or error
+ */
+export async function getUserStats(
+    userId: string
+): Promise<ActionResult<UserStats>> {
+    try {
+        if (!userId) {
+            return {
+                success: false,
+                error: "Invalid user ID",
+                code: "INVALID_INPUT",
+            };
+        }
+
+        const supabase = await createClient();
+        const currentYear = new Date().getFullYear();
+
+        // Fetch all user anime with anime details (public only)
+        const { data: userAnimeData, error: userAnimeError } = await supabase
+            .from("user_anime")
+            .select(
+                `
+                *,
+                anime:anime_id(
+                    id,
+                    format,
+                    episode_count,
+                    episode_duration
+                )
+            `
+            )
+            .eq("user_id", userId)
+            .eq("is_private", false);
+
+        if (userAnimeError) {
+            console.error(
+                "Error fetching user anime for stats:",
+                userAnimeError
+            );
+            return { success: false, error: "Failed to fetch statistics" };
+        }
+
+        // Fetch genre data for user's anime
+        const animeIds = (userAnimeData || []).map((ua) => ua.anime_id);
+        let genreData: { anime_id: string; genreName: string }[] = [];
+
+        if (animeIds.length > 0) {
+            const { data: genreResult, error: genreError } = await supabase
+                .from("anime_genres")
+                .select(
+                    `
+                    anime_id,
+                    genres:genre_id(name)
+                `
+                )
+                .in("anime_id", animeIds);
+
+            if (genreError) {
+                console.error("Error fetching genre data:", genreError);
+                // Continue without genre data
+            } else {
+                // Transform the result - extract genre name from the joined data
+                // Supabase returns the joined genre as an object (single row relation)
+                for (const row of genreResult || []) {
+                    // Cast through unknown to handle Supabase's dynamic typing
+                    const genreObj = row.genres as unknown as {
+                        name: string;
+                    } | null;
+                    if (genreObj?.name) {
+                        genreData.push({
+                            anime_id: row.anime_id as string,
+                            genreName: genreObj.name,
+                        });
+                    }
+                }
+            }
+        }
+
+        // Process data for statistics
+        const yearlyDataMap = new Map<number, YearlyAnimeData>();
+        const genreCountMap = new Map<string, number>();
+        const ratingCountMap = new Map<number, number>();
+        const formatCountMap = new Map<string, number>();
+
+        let totalEpisodes = 0;
+        let totalWatchTimeMinutes = 0;
+        let ratingSum = 0;
+        let ratingCount = 0;
+        let currentYearAnimeCount = 0;
+
+        // Process each user anime entry
+        for (const ua of userAnimeData || []) {
+            const anime = ua.anime as {
+                id: string;
+                format: AnimeFormat;
+                episode_count: number | null;
+                episode_duration: number | null;
+            } | null;
+
+            if (!anime) continue;
+
+            // Determine the year for this entry (use completed_at, started_at, or created_at)
+            let entryYear = currentYear;
+            if (ua.completed_at) {
+                entryYear = new Date(ua.completed_at).getFullYear();
+            } else if (ua.started_at) {
+                entryYear = new Date(ua.started_at).getFullYear();
+            } else if (ua.created_at) {
+                entryYear = new Date(ua.created_at).getFullYear();
+            }
+
+            // Initialize yearly data if needed
+            if (!yearlyDataMap.has(entryYear)) {
+                yearlyDataMap.set(entryYear, {
+                    year: entryYear,
+                    completed: 0,
+                    watching: 0,
+                    planned: 0,
+                    paused: 0,
+                    dropped: 0,
+                });
+            }
+
+            const yearData = yearlyDataMap.get(entryYear)!;
+
+            // Increment status count for the year
+            switch (ua.status) {
+                case "COMPLETED":
+                    yearData.completed++;
+                    break;
+                case "WATCHING":
+                    yearData.watching++;
+                    break;
+                case "PLANNING":
+                    yearData.planned++;
+                    break;
+                case "PAUSED":
+                    yearData.paused++;
+                    break;
+                case "DROPPED":
+                    yearData.dropped++;
+                    break;
+            }
+
+            // Count current year anime
+            if (entryYear === currentYear) {
+                currentYearAnimeCount++;
+            }
+
+            // Calculate episodes watched
+            if (ua.status === "COMPLETED" && anime.episode_count) {
+                totalEpisodes += anime.episode_count;
+            } else if (ua.status === "WATCHING" || ua.status === "PAUSED") {
+                totalEpisodes += ua.current_episode || 0;
+            }
+
+            // Calculate watch time (episodes * duration)
+            const episodesWatched =
+                ua.status === "COMPLETED"
+                    ? anime.episode_count || 0
+                    : ua.current_episode || 0;
+            const duration = anime.episode_duration || 24; // Default 24 min if unknown
+            totalWatchTimeMinutes += episodesWatched * duration;
+
+            // Track ratings (only for current year focus)
+            if (ua.rating !== null && entryYear === currentYear) {
+                const roundedRating = Math.round(ua.rating);
+                ratingCountMap.set(
+                    roundedRating,
+                    (ratingCountMap.get(roundedRating) || 0) + 1
+                );
+                ratingSum += ua.rating;
+                ratingCount++;
+            }
+
+            // Track format breakdown (current year)
+            if (entryYear === currentYear && anime.format) {
+                formatCountMap.set(
+                    anime.format,
+                    (formatCountMap.get(anime.format) || 0) + 1
+                );
+            }
+        }
+
+        // Process genre data (for current year anime)
+        const currentYearAnimeIds = (userAnimeData || [])
+            .filter((ua) => {
+                const entryYear = ua.completed_at
+                    ? new Date(ua.completed_at).getFullYear()
+                    : ua.started_at
+                    ? new Date(ua.started_at).getFullYear()
+                    : ua.created_at
+                    ? new Date(ua.created_at).getFullYear()
+                    : currentYear;
+                return entryYear === currentYear;
+            })
+            .map((ua) => ua.anime_id);
+
+        for (const gd of genreData) {
+            if (currentYearAnimeIds.includes(gd.anime_id)) {
+                genreCountMap.set(
+                    gd.genreName,
+                    (genreCountMap.get(gd.genreName) || 0) + 1
+                );
+            }
+        }
+
+        // Convert maps to sorted arrays
+        const yearlyData: YearlyAnimeData[] = Array.from(
+            yearlyDataMap.values()
+        ).sort((a, b) => b.year - a.year);
+
+        const topGenres: GenreCount[] = Array.from(genreCountMap.entries())
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+
+        const ratingDistribution: RatingBucket[] = [];
+        for (let i = 1; i <= 10; i++) {
+            ratingDistribution.push({
+                rating: i,
+                count: ratingCountMap.get(i) || 0,
+            });
+        }
+
+        const formatBreakdown: FormatCount[] = Array.from(
+            formatCountMap.entries()
+        )
+            .map(([format, count]) => ({ format, count }))
+            .sort((a, b) => b.count - a.count);
+
+        // Calculate average rating
+        const averageRating = ratingCount > 0 ? ratingSum / ratingCount : null;
+
+        return {
+            success: true,
+            data: {
+                currentYear,
+                totalAnime: currentYearAnimeCount,
+                totalEpisodes,
+                watchTimeMinutes: totalWatchTimeMinutes,
+                averageRating: averageRating
+                    ? Math.round(averageRating * 10) / 10
+                    : null,
+                yearlyData,
+                topGenres,
+                ratingDistribution,
+                formatBreakdown,
+            },
+        };
+    } catch (error) {
+        console.error("Error fetching user stats:", error);
+        return { success: false, error: "Failed to fetch statistics" };
     }
 }
