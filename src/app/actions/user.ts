@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { trackServerEventAsync } from "@/lib/analytics/plausible";
 import type { ActionResult, PaginatedResponse } from "@/types/common";
 import type { Anime, AnimeRow } from "@/types/anime";
 import { transformAnimeRow } from "@/types/anime";
@@ -316,6 +317,26 @@ export async function getUserAnimeForAnime(
 // =============================================
 
 /**
+ * Helper function to get anime slug by ID for analytics tracking
+ *
+ * @param supabase - Supabase client instance
+ * @param animeId - The anime's ID
+ * @returns Anime slug or undefined if not found
+ */
+async function getAnimeSlugById(
+    supabase: Awaited<ReturnType<typeof createClient>>,
+    animeId: string
+): Promise<string | undefined> {
+    const { data } = await supabase
+        .from("anime")
+        .select("slug")
+        .eq("id", animeId)
+        .single();
+
+    return data?.slug;
+}
+
+/**
  * Adds an anime to the current user's list
  *
  * @param input - Add to list input data
@@ -366,14 +387,14 @@ export async function addAnimeToList(
             };
         }
 
-        // Check if anime exists
-        const { data: animeExists } = await supabase
+        // Check if anime exists and get slug for analytics
+        const { data: animeData } = await supabase
             .from("anime")
-            .select("id")
+            .select("id, slug")
             .eq("id", animeId)
             .single();
 
-        if (!animeExists) {
+        if (!animeData) {
             return {
                 success: false,
                 error: "Anime not found",
@@ -440,6 +461,12 @@ export async function addAnimeToList(
             console.error("No data returned after insert");
             return { success: false, error: "Failed to add anime to list" };
         }
+
+        // Track analytics event (fire-and-forget)
+        trackServerEventAsync("anime_added", `https://streamd.app/anime/${animeData.slug}`, {
+            status,
+            anime_slug: animeData.slug,
+        });
 
         return {
             success: true,
@@ -565,6 +592,15 @@ export async function updateAnimeTracking(
             return { success: false, error: "Failed to update tracking" };
         }
 
+        // Get anime slug for analytics (fire-and-forget)
+        const animeSlug = await getAnimeSlugById(supabase, animeId);
+        if (animeSlug) {
+            trackServerEventAsync("anime_updated", `https://streamd.app/anime/${animeSlug}`, {
+                status: input.status,
+                anime_slug: animeSlug,
+            });
+        }
+
         return {
             success: true,
             data: transformUserAnimeRow(data as UserAnimeRow),
@@ -609,6 +645,9 @@ export async function removeAnimeFromList(
             };
         }
 
+        // Get anime slug for analytics before deletion
+        const animeSlug = await getAnimeSlugById(supabase, animeId);
+
         // Delete tracking entry
         const { error } = await supabase
             .from("user_anime")
@@ -619,6 +658,13 @@ export async function removeAnimeFromList(
         if (error) {
             console.error("Error removing anime from list:", error);
             return { success: false, error: "Failed to remove anime" };
+        }
+
+        // Track analytics event (fire-and-forget)
+        if (animeSlug) {
+            trackServerEventAsync("anime_removed", `https://streamd.app/anime/${animeSlug}`, {
+                anime_slug: animeSlug,
+            });
         }
 
         return { success: true, data: { removed: true } };
