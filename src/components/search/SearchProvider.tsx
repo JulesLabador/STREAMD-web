@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { useSearch, type UseSearchReturn } from "@/hooks/useSearch";
+import { usePlausible } from "@/components/analytics";
 import type { Anime } from "@/types/anime";
 
 /**
@@ -51,6 +52,7 @@ interface SearchProviderProps {
  * - Search state and actions to all children
  * - Keyboard navigation (arrow up/down, enter, escape)
  * - Navigation to anime pages on selection
+ * - Analytics tracking for search interactions
  *
  * Used by both SearchModal and InlineSearch to share the same
  * search behavior and state management.
@@ -71,6 +73,30 @@ export function SearchProvider({
     const router = useRouter();
     const search = useSearch();
     const containerRef = useRef<HTMLDivElement>(null);
+    const { trackEvent } = usePlausible();
+
+    // Track whether we've already tracked this search query
+    const lastTrackedQuery = useRef<string>("");
+
+    /**
+     * Track search event when results are loaded
+     * Only tracks once per unique query to avoid duplicate events
+     */
+    useEffect(() => {
+        // Only track if we have a query and results have loaded (not loading)
+        if (
+            search.query.trim() &&
+            !search.isLoading &&
+            search.query !== lastTrackedQuery.current
+        ) {
+            // Track the search event
+            trackEvent("search", {
+                query_length: search.query.length,
+                result_count: search.results.length,
+            });
+            lastTrackedQuery.current = search.query;
+        }
+    }, [search.query, search.isLoading, search.results.length, trackEvent]);
 
     /**
      * Handle anime selection
@@ -78,6 +104,12 @@ export function SearchProvider({
      */
     const onSelect = useCallback(
         (anime: Anime) => {
+            // Track search result click
+            trackEvent("search_click", {
+                anime_slug: anime.slug,
+                query_length: search.query.length,
+            });
+
             // Call custom handler if provided
             if (customOnSelect) {
                 customOnSelect(anime);
@@ -89,12 +121,15 @@ export function SearchProvider({
             // Clear search state
             search.clearSearch();
 
+            // Reset tracked query so new searches are tracked
+            lastTrackedQuery.current = "";
+
             // Close search (if handler provided)
             if (customOnClose) {
                 customOnClose();
             }
         },
-        [router, search, customOnSelect, customOnClose],
+        [router, search, customOnSelect, customOnClose, trackEvent],
     );
 
     /**
@@ -103,6 +138,8 @@ export function SearchProvider({
      */
     const onClose = useCallback(() => {
         search.clearSearch();
+        // Reset tracked query so new searches are tracked
+        lastTrackedQuery.current = "";
         if (customOnClose) {
             customOnClose();
         }
@@ -182,4 +219,3 @@ export function useSearchContext(): SearchContextValue {
 
     return context;
 }
-
