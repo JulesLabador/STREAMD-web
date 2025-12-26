@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { Header } from "@/components/layout/Header";
+import { PlausibleProvider } from "@/components/analytics";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,6 +33,7 @@ export const metadata: Metadata = {
  * - Header with navigation
  * - Main content area
  * - Toast notifications (sonner)
+ * - Plausible analytics (page views + custom events)
  */
 export default function RootLayout({
     children,
@@ -43,11 +45,13 @@ export default function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <div className="relative flex min-h-screen flex-col">
-                    <Header />
-                    <main className="flex-1">{children}</main>
-                </div>
-                <Toaster />
+                <PlausibleProvider>
+                    <div className="relative flex min-h-screen flex-col">
+                        <Header />
+                        <main className="flex-1">{children}</main>
+                    </div>
+                    <Toaster />
+                </PlausibleProvider>
             </body>
         </html>
     );
