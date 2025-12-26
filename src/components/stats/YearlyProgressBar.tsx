@@ -1,0 +1,167 @@
+"use client";
+
+import { cn } from "@/lib/utils";
+import type { YearlyAnimeData } from "@/types/user";
+
+/**
+ * Props for the YearlyProgressBar component
+ */
+interface YearlyProgressBarProps {
+    /** Yearly anime data with status counts */
+    data: YearlyAnimeData;
+    /** Whether this is the current/featured year (larger display) */
+    featured?: boolean;
+    /** Optional className for custom styling */
+    className?: string;
+}
+
+/**
+ * YearlyProgressBar component
+ *
+ * Displays a stacked horizontal progress bar showing anime by status:
+ * - Green: Completed
+ * - Blue: Watching
+ * - Gray: Planned
+ * - Yellow: Paused (optional, shown in legend)
+ * - Red: Dropped (optional, shown in legend)
+ */
+export function YearlyProgressBar({
+    data,
+    featured = false,
+    className,
+}: YearlyProgressBarProps) {
+    // Calculate total for percentage calculations
+    const total =
+        data.completed + data.watching + data.planned + data.paused + data.dropped;
+
+    if (total === 0) {
+        return (
+            <div className={cn("space-y-2", className)}>
+                {!featured && (
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium">{data.year}</span>
+                        <span className="text-muted-foreground">No anime tracked</span>
+                    </div>
+                )}
+                <div className="h-3 w-full rounded-full bg-muted" />
+            </div>
+        );
+    }
+
+    // Calculate percentages
+    const completedPct = (data.completed / total) * 100;
+    const watchingPct = (data.watching / total) * 100;
+    const plannedPct = (data.planned / total) * 100;
+    const pausedPct = (data.paused / total) * 100;
+    const droppedPct = (data.dropped / total) * 100;
+
+    return (
+        <div className={cn("space-y-3", className)}>
+            {/* Year label (only for non-featured) */}
+            {!featured && (
+                <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">{data.year}</span>
+                    <span className="text-muted-foreground">{total} anime</span>
+                </div>
+            )}
+
+            {/* Progress bar */}
+            <div
+                className={cn(
+                    "flex w-full overflow-hidden rounded-full",
+                    featured ? "h-6" : "h-3"
+                )}
+            >
+                {/* Completed - Green */}
+                {completedPct > 0 && (
+                    <div
+                        className="bg-green-500 transition-all duration-300"
+                        style={{ width: `${completedPct}%` }}
+                        title={`Completed: ${data.completed}`}
+                    />
+                )}
+
+                {/* Watching - Blue */}
+                {watchingPct > 0 && (
+                    <div
+                        className="bg-blue-500 transition-all duration-300"
+                        style={{ width: `${watchingPct}%` }}
+                        title={`Watching: ${data.watching}`}
+                    />
+                )}
+
+                {/* Planned - Gray */}
+                {plannedPct > 0 && (
+                    <div
+                        className="bg-zinc-400 transition-all duration-300"
+                        style={{ width: `${plannedPct}%` }}
+                        title={`Planned: ${data.planned}`}
+                    />
+                )}
+
+                {/* Paused - Yellow */}
+                {pausedPct > 0 && (
+                    <div
+                        className="bg-yellow-500 transition-all duration-300"
+                        style={{ width: `${pausedPct}%` }}
+                        title={`Paused: ${data.paused}`}
+                    />
+                )}
+
+                {/* Dropped - Red */}
+                {droppedPct > 0 && (
+                    <div
+                        className="bg-red-500 transition-all duration-300"
+                        style={{ width: `${droppedPct}%` }}
+                        title={`Dropped: ${data.dropped}`}
+                    />
+                )}
+            </div>
+
+            {/* Legend */}
+            <div
+                className={cn(
+                    "flex flex-wrap gap-x-4 gap-y-1",
+                    featured ? "text-sm" : "text-xs"
+                )}
+            >
+                {data.completed > 0 && (
+                    <LegendItem color="bg-green-500" label="Completed" count={data.completed} />
+                )}
+                {data.watching > 0 && (
+                    <LegendItem color="bg-blue-500" label="Watching" count={data.watching} />
+                )}
+                {data.planned > 0 && (
+                    <LegendItem color="bg-zinc-400" label="Planned" count={data.planned} />
+                )}
+                {data.paused > 0 && (
+                    <LegendItem color="bg-yellow-500" label="On Hold" count={data.paused} />
+                )}
+                {data.dropped > 0 && (
+                    <LegendItem color="bg-red-500" label="Dropped" count={data.dropped} />
+                )}
+            </div>
+        </div>
+    );
+}
+
+/**
+ * Legend item component for the progress bar
+ */
+interface LegendItemProps {
+    color: string;
+    label: string;
+    count: number;
+}
+
+function LegendItem({ color, label, count }: LegendItemProps) {
+    return (
+        <div className="flex items-center gap-1.5">
+            <div className={cn("h-2.5 w-2.5 rounded-sm", color)} />
+            <span className="text-muted-foreground">
+                {label}: <span className="font-medium text-foreground">{count}</span>
+            </span>
+        </div>
+    );
+}
+
