@@ -22,7 +22,8 @@
 11. [Project Structure](#11-project-structure)
 12. [Dependencies](#12-dependencies)
 13. [Environment Variables](#13-environment-variables)
-14. [Phase Implementation Roadmap](#14-phase-implementation-roadmap)
+14. [Analytics (Plausible)](#14-analytics-plausible)
+15. [Phase Implementation Roadmap](#15-phase-implementation-roadmap)
 
 ---
 
@@ -4239,11 +4240,100 @@ R2_BUCKET_NAME=streamd-assets
 
 # OAuth (configured in Supabase dashboard)
 # Google and Discord OAuth credentials are managed in Supabase
+
+# Plausible Analytics
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=your-domain.com
 ```
 
 ---
 
-## 14. Phase Implementation Roadmap
+## 14. Analytics (Plausible)
+
+### Overview
+
+STREAMD uses Plausible for privacy-friendly analytics with both client-side automatic page views and server-side custom event tracking.
+
+### Architecture
+
+```mermaid
+flowchart TB
+    subgraph ClientSide [Client Side]
+        Script[Plausible Script]
+        PageView[Automatic Page Views]
+        ClientEvents[Client Custom Events]
+    end
+
+    subgraph ServerSide [Server Side]
+        AuthCallback[Auth Callback]
+        UserActions[User Actions]
+        AnalyticsLib[Analytics Library]
+    end
+
+    subgraph Plausible [Plausible Cloud]
+        EventsAPI[Events API]
+        Dashboard[Dashboard]
+    end
+
+    Script --> PageView
+    Script --> ClientEvents
+    ClientEvents --> EventsAPI
+    AuthCallback --> AnalyticsLib
+    UserActions --> AnalyticsLib
+    AnalyticsLib --> EventsAPI
+    PageView --> Dashboard
+    EventsAPI --> Dashboard
+```
+
+### Events Tracked
+
+| Event | Type | Location | Properties |
+|-------|------|----------|------------|
+| Page Views | Auto | Client | URL, referrer (automatic) |
+| User Signup | Server | Auth callback | provider |
+| User Login | Server | Auth callback | provider |
+| Anime Added to List | Server | `addAnimeToList` | status, anime_slug |
+| Anime Tracking Updated | Server | `updateAnimeTracking` | status, anime_slug |
+| Anime Removed from List | Server | `removeAnimeFromList` | anime_slug |
+| Search Performed | Client | SearchProvider | query_length, result_count |
+| Search Result Clicked | Client | SearchProvider | anime_slug |
+
+### Client-Side Tracking
+
+The `PlausibleProvider` component in `src/components/analytics/PlausibleProvider.tsx`:
+- Loads the Plausible script from `plausible.io/js/script.js`
+- Provides `usePlausible()` hook for custom event tracking
+- Gracefully handles missing domain configuration (development)
+
+```typescript
+// Usage in components
+const { trackEvent } = usePlausible();
+trackEvent("search", { query_length: 5, result_count: 10 });
+```
+
+### Server-Side Tracking
+
+The `trackServerEvent()` function in `src/lib/analytics/plausible.ts`:
+- Calls Plausible Events API directly
+- Includes User-Agent and X-Forwarded-For headers for accurate tracking
+- Fire-and-forget variant `trackServerEventAsync()` for non-blocking tracking
+
+```typescript
+// Usage in server actions
+import { trackServerEventAsync } from "@/lib/analytics/plausible";
+
+trackServerEventAsync("anime_added", url, { status: "WATCHING", anime_slug: "naruto" });
+```
+
+### Plausible Dashboard Setup
+
+After deployment, configure goals in Plausible dashboard:
+1. Go to Site Settings > Goals
+2. Add custom event goals: `signup`, `login`, `anime_added`, `anime_updated`, `anime_removed`, `search`, `search_click`
+3. Properties are automatically available for filtering
+
+---
+
+## 15. Phase Implementation Roadmap
 
 ### Phase 1: MVP (Weeks 1-6)
 
