@@ -3,6 +3,20 @@ import { trackServerEventAsync } from "@/lib/analytics/plausible";
 import { NextResponse } from "next/server";
 
 /**
+ * Gets the base URL for redirects
+ * Priority: env variable > x-forwarded-host header > request origin
+ */
+function getBaseUrl(requestUrl: URL): string {
+    // Use environment variable if set (most reliable for production)
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+        return process.env.NEXT_PUBLIC_SITE_URL;
+    }
+
+    // Fallback to request origin (works for local dev)
+    return requestUrl.origin;
+}
+
+/**
  * OAuth callback route handler
  *
  * This route handles the redirect from OAuth providers (Google).
@@ -17,7 +31,9 @@ import { NextResponse } from "next/server";
  * 5. Redirect to dashboard (success) or login (error)
  */
 export async function GET(request: Request) {
-    const { searchParams, origin } = new URL(request.url);
+    const requestUrl = new URL(request.url);
+    const searchParams = requestUrl.searchParams;
+    const baseUrl = getBaseUrl(requestUrl);
 
     // Get the authorization code from the URL
     const code = searchParams.get("code");
@@ -47,10 +63,10 @@ export async function GET(request: Request) {
             });
 
             // Successful authentication - redirect to intended destination
-            return NextResponse.redirect(`${origin}${next}`);
+            return NextResponse.redirect(`${baseUrl}${next}`);
         }
     }
 
     // Authentication failed - redirect to login with error
-    return NextResponse.redirect(`${origin}/login?error=auth`);
+    return NextResponse.redirect(`${baseUrl}/login?error=auth`);
 }
