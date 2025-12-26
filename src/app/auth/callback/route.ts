@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 /**
  * Gets the base URL for redirects
- * Priority: env variable > x-forwarded-host header > request origin
+ * Priority: env variable > request origin
  */
 function getBaseUrl(requestUrl: URL): string {
     // Use environment variable if set (most reliable for production)

@@ -18,7 +18,7 @@ interface UserAnimeCardProps {
  * Gets the badge variant for user anime status
  */
 function getStatusVariant(
-    status: UserAnimeWithAnime["status"],
+    status: UserAnimeWithAnime["status"]
 ): "watching" | "completed" | "planned" | "onHold" | "dropped" {
     switch (status) {
         case "WATCHING":
@@ -65,7 +65,7 @@ export function UserAnimeCard({
             className="group block overflow-hidden rounded-lg transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
             {/* Cover image container with 3:4 aspect ratio */}
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted">
+            <div className="relative aspect-3/4 overflow-hidden rounded-lg bg-muted">
                 {anime.coverImageUrl ? (
                     <Image
                         src={anime.coverImageUrl}
@@ -104,7 +104,7 @@ export function UserAnimeCard({
             </div>
 
             {/* Card content */}
-            <div className="mt-3 space-y-2">
+            <div className="mt-3 space-y-2 mb-4">
                 {/* Title */}
                 <h3 className="line-clamp-2 text-sm font-medium leading-tight text-foreground group-hover:text-primary">
                     {displayTitle}
@@ -127,4 +127,3 @@ export function UserAnimeCard({
         </Link>
     );
 }
-
