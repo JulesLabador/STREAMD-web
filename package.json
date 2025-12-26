@@ -9,7 +9,8 @@
         "start": "next start",
         "lint": "eslint",
         "import:anime": "tsx scripts/import-anime.ts",
-        "index:search": "tsx scripts/index-anime.ts"
+        "index:search": "tsx scripts/index-anime.ts",
+        "sync:season": "tsx scripts/sync-season.ts"
     },
     "dependencies": {
         "@radix-ui/react-aspect-ratio": "^1.1.8",
