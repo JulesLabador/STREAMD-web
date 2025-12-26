@@ -49,7 +49,7 @@ export function SearchResultItem({ anime, index }: SearchResultItemProps) {
                 onSelect(anime);
             }}
             className={cn(
-                "w-full h-20 flex flex-col items-start gap-0.5 px-3 py-2 rounded-md overflow-hidden",
+                "w-full h-20 flex flex-col items-start gap-0.5 px-4 py-2 rounded-md overflow-hidden justify-center",
                 "transition-colors duration-100",
                 "hover:bg-accent hover:cursor-pointer",
                 isSelected && "bg-accent"

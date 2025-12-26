@@ -50,6 +50,8 @@ export function SearchInput({
 
     return (
         <div className={cn("relative", className)}>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+
             {/* Input field using shadcn Input */}
             <Input
                 ref={inputRef}
