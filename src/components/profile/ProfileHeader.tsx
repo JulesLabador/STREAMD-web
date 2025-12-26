@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
     CalendarDays,
     Play,
@@ -5,8 +6,10 @@ import {
     Clock,
     Pause,
     XCircle,
+    BarChart3,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { UserProfileWithStats } from "@/types/user";
 
@@ -87,10 +90,23 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
                         <CalendarDays className="h-4 w-4" />
                         <span>Joined {formatJoinDate(profile.createdAt)}</span>
                     </div>
+
+                    {/* View Stats button */}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        className="mt-2"
+                    >
+                        <Link href={`/u/${profile.username}/stats`}>
+                            <BarChart3 className="mr-2 h-4 w-4" />
+                            View Stats
+                        </Link>
+                    </Button>
                 </div>
             </div>
 
-            {/* Stats cards */}
+            {/* Stats cards - 2 columns on mobile, 5 columns on larger screens */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
                 <StatCard
                     label="Watching"
@@ -116,6 +132,7 @@ export function ProfileHeader({ profile }: ProfileHeaderProps) {
                     label="Dropped"
                     value={profile.stats.dropped}
                     variant="dropped"
+                    spanFull
                 />
             </div>
         </div>
@@ -129,6 +146,8 @@ interface StatCardProps {
     label: string;
     value: number;
     variant: "watching" | "completed" | "planning" | "paused" | "dropped";
+    /** When true, spans full width on mobile (col-span-2) */
+    spanFull?: boolean;
 }
 
 /**
@@ -142,20 +161,11 @@ const STAT_ICONS: Record<StatCardProps["variant"], React.ElementType> = {
     dropped: XCircle,
 };
 
-function StatCard({ label, value, variant }: StatCardProps) {
-    // Color classes based on variant
-    const colorClasses: Record<StatCardProps["variant"], string> = {
-        watching: "border-l-blue-500",
-        completed: "border-l-green-500",
-        planning: "border-l-purple-500",
-        paused: "border-l-yellow-500",
-        dropped: "border-l-red-500",
-    };
-
+function StatCard({ label, value, variant, spanFull = false }: StatCardProps) {
     const Icon = STAT_ICONS[variant];
 
     return (
-        <Card className={`border-l-4 ${colorClasses[variant]}`}>
+        <Card className={spanFull ? "col-span-2 sm:col-span-1" : ""}>
             <CardContent className="p-3">
                 <p className="text-2xl font-bold">{value}</p>
                 <p className="flex items-center gap-1 text-xs text-muted-foreground">

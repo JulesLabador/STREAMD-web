@@ -3,12 +3,24 @@
 import { useState } from "react";
 import { Play, CheckCircle, Clock, Pause, XCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { UserAnimeCard } from "./UserAnimeCard";
 import type { UserAnimeWithAnime, UserAnimeStatus } from "@/types/user";
 import {
     USER_ANIME_STATUS_LABELS,
     USER_ANIME_STATUS_ORDER,
 } from "@/types/user";
+
+/**
+ * Short labels for mobile view
+ */
+const STATUS_SHORT_LABELS: Record<UserAnimeStatus, string> = {
+    WATCHING: "Watching",
+    COMPLETED: "Completed",
+    PLANNING: "Planning",
+    PAUSED: "On Hold",
+    DROPPED: "Dropped",
+};
 
 /**
  * Icon components mapped to each status
@@ -71,25 +83,32 @@ export function AnimeListTabs({
             onValueChange={(value) => setActiveTab(value as UserAnimeStatus)}
             className="w-full"
         >
-            {/* Tab list - full width with increased height */}
-            <TabsList className="w-full h-12">
-                {USER_ANIME_STATUS_ORDER.map((status) => {
-                    const count = animeByStatus[status]?.length ?? 0;
-                    const Icon = STATUS_ICONS[status];
-                    return (
-                        <TabsTrigger
-                            key={status}
-                            value={status}
-                            className="flex-1 gap-1.5 px-3 h-full hover:cursor-pointer hover:text-primary data-[state=inactive]:hover:text-primary"
-                        >
-                            <span>{USER_ANIME_STATUS_LABELS[status]}</span>
-                            <span className="rounded-full bg-muted-foreground/20 px-1.5 py-0.5 text-xs">
-                                {count}
-                            </span>
-                        </TabsTrigger>
-                    );
-                })}
-            </TabsList>
+            {/* Tab list - scrollable on mobile */}
+            <ScrollArea className="w-full">
+                <TabsList className="inline-flex h-10 sm:h-12 w-max min-w-full sm:w-full">
+                    {USER_ANIME_STATUS_ORDER.map((status) => {
+                        const count = animeByStatus[status]?.length ?? 0;
+                        return (
+                            <TabsTrigger
+                                key={status}
+                                value={status}
+                                className="flex-1 gap-1 sm:gap-1.5 px-2 sm:px-3 h-full hover:cursor-pointer hover:text-primary data-[state=inactive]:hover:text-primary text-xs sm:text-sm min-w-max"
+                            >
+                                <span className="sm:hidden">
+                                    {STATUS_SHORT_LABELS[status]}
+                                </span>
+                                <span className="hidden sm:inline">
+                                    {USER_ANIME_STATUS_LABELS[status]}
+                                </span>
+                                <span className="rounded-full bg-muted-foreground/20 px-1 sm:px-1.5 py-0.5 text-[10px] sm:text-xs">
+                                    {count}
+                                </span>
+                            </TabsTrigger>
+                        );
+                    })}
+                </TabsList>
+                <ScrollBar orientation="horizontal" className="h-1.5" />
+            </ScrollArea>
 
             {/* Tab content */}
             {USER_ANIME_STATUS_ORDER.map((status) => (
