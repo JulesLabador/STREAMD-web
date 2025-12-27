@@ -74,6 +74,9 @@ export async function generateMetadata({
             images: anime.coverImageUrl ? [{ url: anime.coverImageUrl }] : [],
             type: "website",
         },
+        alternates: {
+            canonical: `${SITE_URL}/anime/${slug}`,
+        },
     };
 }
 

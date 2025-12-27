@@ -4,10 +4,15 @@ import { getStudios } from "@/app/actions/anime";
 import { BrowsePageHeader, BrowseGrid, BrowseCard } from "@/components/browse";
 
 /**
+ * Site URL for canonical and OG URLs
+ */
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+
+/**
  * Static metadata for the studios index page
  */
 export const metadata: Metadata = {
-    title: "Animation Studios | STREAMD",
+    title: "Animation Studios",
     description:
         "Browse anime by animation studio. Discover anime from MAPPA, Wit Studio, Bones, Kyoto Animation, and more.",
     openGraph: {
@@ -15,6 +20,9 @@ export const metadata: Metadata = {
         description:
             "Browse anime by animation studio. Discover anime from MAPPA, Wit Studio, Bones, Kyoto Animation, and more.",
         type: "website",
+    },
+    alternates: {
+        canonical: `${SITE_URL}/studio`,
     },
 };
 

@@ -4,10 +4,15 @@ import { getGenres } from "@/app/actions/anime";
 import { BrowsePageHeader, BrowseGrid, BrowseCard } from "@/components/browse";
 
 /**
+ * Site URL for canonical and OG URLs
+ */
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+
+/**
  * Static metadata for the genres index page
  */
 export const metadata: Metadata = {
-    title: "Anime Genres | STREAMD",
+    title: "Anime Genres",
     description:
         "Browse anime by genre. Discover Action, Romance, Comedy, Drama, Fantasy, Sci-Fi, and more anime genres.",
     openGraph: {
@@ -15,6 +20,9 @@ export const metadata: Metadata = {
         description:
             "Browse anime by genre. Discover Action, Romance, Comedy, Drama, Fantasy, Sci-Fi, and more anime genres.",
         type: "website",
+    },
+    alternates: {
+        canonical: `${SITE_URL}/genre`,
     },
 };
 

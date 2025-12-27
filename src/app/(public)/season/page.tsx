@@ -7,10 +7,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { AnimeSeason, SeasonInfo } from "@/types/anime";
 
 /**
+ * Site URL for canonical and OG URLs
+ */
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+
+/**
  * Static metadata for the seasons index page
  */
 export const metadata: Metadata = {
-    title: "Anime by Season | STREAMD",
+    title: "Anime by Season",
     description:
         "Browse anime by season. Discover anime from Winter, Spring, Summer, and Fall seasons across all years.",
     openGraph: {
@@ -18,6 +23,9 @@ export const metadata: Metadata = {
         description:
             "Browse anime by season. Discover anime from Winter, Spring, Summer, and Fall seasons across all years.",
         type: "website",
+    },
+    alternates: {
+        canonical: `${SITE_URL}/season`,
     },
 };
 
