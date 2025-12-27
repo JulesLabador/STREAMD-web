@@ -5,8 +5,10 @@ import type {
     Anime,
     AnimeRow,
     AnimeSeason,
+    AnimeWithPlanningCount,
     AnimeWithRelations,
     GenreWithCount,
+    NextSeasonStats,
     PlatformInfo,
     SeasonInfo,
     StreamingPlatform,
@@ -1164,5 +1166,177 @@ export async function getUpcomingSeasonStats(): Promise<
     } catch (error) {
         console.error("Error fetching upcoming season stats:", error);
         return { success: false, error: "Failed to fetch season stats" };
+    }
+}
+
+/**
+ * Gets detailed statistics for the next upcoming season
+ * Includes user planning counts, format breakdown, and most anticipated anime
+ *
+ * @param limit - Maximum number of most anticipated anime to return (default: 6)
+ * @returns Next season stats with most anticipated anime
+ */
+export async function getNextSeasonStats(
+    limit: number = 6,
+): Promise<ActionResult<NextSeasonStats>> {
+    try {
+        const validLimit = Math.min(12, Math.max(1, limit));
+        const supabase = await createClient();
+
+        // Get current date info to determine next season
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = now.getFullYear();
+
+        // Determine current and next season
+        const seasonOrder: AnimeSeason[] = ["WINTER", "SPRING", "SUMMER", "FALL"];
+        let currentSeasonIndex: number;
+
+        if (currentMonth >= 1 && currentMonth <= 3) {
+            currentSeasonIndex = 0; // WINTER
+        } else if (currentMonth >= 4 && currentMonth <= 6) {
+            currentSeasonIndex = 1; // SPRING
+        } else if (currentMonth >= 7 && currentMonth <= 9) {
+            currentSeasonIndex = 2; // SUMMER
+        } else {
+            currentSeasonIndex = 3; // FALL
+        }
+
+        // Calculate next season
+        const nextSeasonIndex = (currentSeasonIndex + 1) % 4;
+        const nextSeason = seasonOrder[nextSeasonIndex];
+        const nextYear = nextSeasonIndex === 0 ? currentYear + 1 : currentYear;
+
+        // Calculate season start date and days until start
+        const seasonStartMonths: Record<AnimeSeason, number> = {
+            WINTER: 0, // January
+            SPRING: 3, // April
+            SUMMER: 6, // July
+            FALL: 9, // October
+        };
+        const startDate = new Date(nextYear, seasonStartMonths[nextSeason], 1);
+        const daysUntilStart = Math.max(
+            0,
+            Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+        );
+
+        // Fetch anime for next season
+        const { data: animeData, error: animeError } = await supabase
+            .from("anime")
+            .select("*")
+            .eq("season", nextSeason)
+            .eq("season_year", nextYear);
+
+        if (animeError) {
+            console.error("Error fetching next season anime:", animeError);
+            return { success: false, error: "Failed to fetch next season data" };
+        }
+
+        const animeCount = animeData?.length || 0;
+
+        // Get anime IDs for this season
+        const animeIds = (animeData || []).map((a) => a.id);
+
+        // Calculate format breakdown
+        const formatBreakdown: Record<string, number> = {};
+        for (const anime of animeData || []) {
+            const format = anime.format || "UNKNOWN";
+            formatBreakdown[format] = (formatBreakdown[format] || 0) + 1;
+        }
+
+        // Count sequels vs new series (based on title patterns)
+        // A sequel typically has "Season", "Part", "2nd", "3rd", etc. in the title
+        let sequelCount = 0;
+        let newSeriesCount = 0;
+        const sequelPatterns =
+            /season\s*\d|part\s*\d|\d+(st|nd|rd|th)\s*season|cour\s*\d|ii|iii|iv|2nd|3rd|4th/i;
+
+        for (const anime of animeData || []) {
+            const titles = anime.titles as { english?: string; romaji?: string };
+            const titleToCheck =
+                titles?.english || titles?.romaji || "";
+            if (sequelPatterns.test(titleToCheck)) {
+                sequelCount++;
+            } else {
+                newSeriesCount++;
+            }
+        }
+
+        // Calculate average popularity
+        const totalPopularity = (animeData || []).reduce(
+            (sum, a) => sum + (a.popularity || 0),
+            0,
+        );
+        const avgPopularity =
+            animeCount > 0 ? Math.round(totalPopularity / animeCount) : 0;
+
+        // Fetch planning counts for these anime from user_anime table
+        const planningCounts = new Map<string, number>();
+        let totalUsersPlanning = 0;
+        let totalPlanningEntries = 0;
+
+        if (animeIds.length > 0) {
+            // Get count of users with PLANNING status for each anime
+            const { data: planningData, error: planningError } = await supabase
+                .from("user_anime")
+                .select("anime_id, user_id")
+                .in("anime_id", animeIds)
+                .eq("status", "PLANNING")
+                .eq("is_private", false);
+
+            if (!planningError && planningData) {
+                // Total planning entries
+                totalPlanningEntries = planningData.length;
+
+                // Count planning entries per anime
+                for (const entry of planningData) {
+                    const current = planningCounts.get(entry.anime_id) || 0;
+                    planningCounts.set(entry.anime_id, current + 1);
+                }
+
+                // Count unique users planning any anime in this season
+                const uniqueUsers = new Set(planningData.map((e) => e.user_id));
+                totalUsersPlanning = uniqueUsers.size;
+            }
+        }
+
+        // Transform anime and add planning counts
+        const animeWithCounts: AnimeWithPlanningCount[] = (animeData as AnimeRow[])
+            .map((row) => ({
+                ...transformAnimeRow(row),
+                planningCount: planningCounts.get(row.id) || 0,
+            }))
+            // Sort by planning count (desc), then by popularity (asc)
+            .sort((a, b) => {
+                if (b.planningCount !== a.planningCount) {
+                    return b.planningCount - a.planningCount;
+                }
+                return a.popularity - b.popularity;
+            })
+            .slice(0, validLimit);
+
+        return {
+            success: true,
+            data: {
+                season: {
+                    season: nextSeason,
+                    year: nextYear,
+                    slug: createSeasonSlug(nextSeason, nextYear),
+                    animeCount,
+                },
+                usersPlanning: totalUsersPlanning,
+                totalPlanningEntries,
+                mostAnticipated: animeWithCounts,
+                daysUntilStart,
+                startDate: startDate.toISOString(),
+                formatBreakdown,
+                sequelCount,
+                newSeriesCount,
+                avgPopularity,
+            },
+        };
+    } catch (error) {
+        console.error("Error fetching next season stats:", error);
+        return { success: false, error: "Failed to fetch next season stats" };
     }
 }
