@@ -211,6 +211,41 @@ export interface PlatformInfo {
 }
 
 /**
+ * Anime with user planning count
+ * Used for "Most Anticipated" sections on upcoming pages
+ */
+export interface AnimeWithPlanningCount extends Anime {
+    planningCount: number;
+}
+
+/**
+ * Statistics for an upcoming season
+ * Used for the upcoming anime page hero section
+ */
+export interface NextSeasonStats {
+    /** Season information */
+    season: SeasonInfo;
+    /** Total unique users planning anime for this season */
+    usersPlanning: number;
+    /** Total planning entries (one user can plan multiple anime) */
+    totalPlanningEntries: number;
+    /** Top anime sorted by planning count */
+    mostAnticipated: AnimeWithPlanningCount[];
+    /** Days until the season starts */
+    daysUntilStart: number;
+    /** Season start date */
+    startDate: string;
+    /** Format breakdown (TV, MOVIE, OVA, etc.) */
+    formatBreakdown: Record<string, number>;
+    /** Number of sequels/continuations */
+    sequelCount: number;
+    /** Number of new original series */
+    newSeriesCount: number;
+    /** Average popularity score of announced anime */
+    avgPopularity: number;
+}
+
+/**
  * Creates a slug from season and year
  * @param season - The anime season
  * @param year - The year
