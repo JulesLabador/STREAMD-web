@@ -23,10 +23,10 @@ export function HeaderSearch() {
                 variant="outline"
                 size="sm"
                 onClick={() => setOpen(true)}
-                className="relative h-9 w-9 p-0 sm:w-auto sm:px-3 sm:pr-12"
+                className="relative h-9 w-auto px-3! pr-12! hover:cursor-pointer"
             >
-                <Search className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline-flex text-muted-foreground">
+                <Search className="h-4 w-4 mr-2" />
+                <span className="inline-flex text-muted-foreground">
                     Search...
                 </span>
                 {/* Keyboard shortcut hint */}
@@ -40,4 +40,3 @@ export function HeaderSearch() {
         </>
     );
 }
-
