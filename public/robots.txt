@@ -6,8 +6,8 @@ Disallow: /auth/
 Disallow: /api/
 
 # Host
-Host: streamdanime.io
+Host: https://streamd.app
 
 # Sitemaps
-Sitemap: streamdanime.io/sitemap.xml
-Sitemap: streamdanime.io/server-sitemap.xml
+Sitemap: https://streamd.app/sitemap.xml
+Sitemap: https://streamd.app/server-sitemap.xml
