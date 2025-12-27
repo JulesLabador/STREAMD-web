@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Users } from "lucide-react";
 import type { Anime } from "@/types/anime";
 import { Badge } from "@/components/ui/badge";
 
@@ -8,6 +9,10 @@ import { Badge } from "@/components/ui/badge";
  */
 interface AnimeCardProps {
     anime: Anime;
+    /** Optional planning count to display (for "Most Anticipated" sections) */
+    planningCount?: number;
+    /** Whether to hide the status badge (default: false) */
+    hideStatus?: boolean;
 }
 
 /**
@@ -52,14 +57,24 @@ function getStatusVariant(
  * - Cover image with aspect ratio
  * - Title (English preferred, fallback to Romaji)
  * - Format badge (TV, Movie, etc.)
- * - Status indicator
+ * - Status indicator (optional)
  * - Episode count
+ * - Planning count badge (optional, for "Most Anticipated" sections)
  *
  * Links to the anime detail page via slug
  */
-export function AnimeCard({ anime }: AnimeCardProps) {
+export function AnimeCard({
+    anime,
+    planningCount,
+    hideStatus = false,
+}: AnimeCardProps) {
     // Prefer English title, fallback to Romaji
     const displayTitle = anime.titles.english || anime.titles.romaji;
+
+    // Determine which badge to show in the top-left corner
+    const showPlanningBadge = planningCount !== undefined && planningCount > 0;
+    const showStatusBadge =
+        !hideStatus && !showPlanningBadge && anime.status === "RELEASING";
 
     return (
         <Link
@@ -85,8 +100,21 @@ export function AnimeCard({ anime }: AnimeCardProps) {
                     </div>
                 )}
 
-                {/* Status badge overlay */}
-                {anime.status === "RELEASING" && (
+                {/* Planning count badge (takes priority over status) */}
+                {showPlanningBadge && (
+                    <div className="absolute left-2 top-2">
+                        <Badge
+                            variant="planned"
+                            className="gap-1 text-xs font-medium"
+                        >
+                            <Users className="h-3 w-3" />
+                            {planningCount.toLocaleString()}
+                        </Badge>
+                    </div>
+                )}
+
+                {/* Status badge overlay (only if no planning badge) */}
+                {showStatusBadge && (
                     <div className="absolute left-2 top-2">
                         <Badge
                             variant={getStatusVariant(anime.status)}
