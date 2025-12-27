@@ -284,7 +284,7 @@ function DesktopNavigation({ user, userProfile }: NavigationProps) {
             <NavigationMenu viewportAlign="end">
                 <NavigationMenuList>
                     <NavigationMenuItem>
-                        <NavigationMenuTrigger className="bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground data-[state=open]:bg-accent/50">
+                        <NavigationMenuTrigger className="bg-transparent text-muted-foreground hover:cursor-pointer hover:bg-accent hover:text-foreground data-[state=open]:bg-accent/50">
                             Browse
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>

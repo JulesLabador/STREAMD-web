@@ -29,7 +29,7 @@ function formatStatus(status: Anime["status"]): string {
  * Gets the badge variant for anime status
  */
 function getStatusVariant(
-    status: Anime["status"],
+    status: Anime["status"]
 ): "watching" | "completed" | "planned" | "onHold" | "secondary" {
     switch (status) {
         case "RELEASING":
@@ -67,7 +67,7 @@ export function AnimeCard({ anime }: AnimeCardProps) {
             className="group block overflow-hidden rounded-lg transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
             {/* Cover image container with 3:4 aspect ratio */}
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted">
+            <div className="relative aspect-3/4 overflow-hidden rounded-lg sm:rounded-md bg-muted">
                 {anime.coverImageUrl ? (
                     <Image
                         src={anime.coverImageUrl}
@@ -107,7 +107,7 @@ export function AnimeCard({ anime }: AnimeCardProps) {
             </div>
 
             {/* Card content */}
-            <div className="mt-3 space-y-1">
+            <div className="mt-3 mb-2 space-y-1">
                 {/* Title */}
                 <h3 className="line-clamp-2 text-sm font-medium leading-tight text-foreground group-hover:text-primary">
                     {displayTitle}
