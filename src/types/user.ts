@@ -230,6 +230,8 @@ export interface YearlyAnimeData {
     planned: number;
     paused: number;
     dropped: number;
+    /** Total anime released for this year (used for relative progress calculation) */
+    totalAnimeForYear: number;
 }
 
 /**

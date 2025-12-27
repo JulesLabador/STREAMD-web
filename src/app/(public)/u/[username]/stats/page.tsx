@@ -143,6 +143,7 @@ export default async function StatsPage({ params }: StatsPageProps) {
         planned: 0,
         paused: 0,
         dropped: 0,
+        totalAnimeForYear: 0,
     };
 
     // Get historical data (excluding current year)

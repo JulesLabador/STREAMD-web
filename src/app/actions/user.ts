@@ -795,7 +795,7 @@ export async function getUserStats(
 
         // Fetch genre data for user's anime
         const animeIds = (userAnimeData || []).map((ua) => ua.anime_id);
-        let genreData: { anime_id: string; genreName: string }[] = [];
+        const genreData: { anime_id: string; genreName: string }[] = [];
 
         if (animeIds.length > 0) {
             const { data: genreResult, error: genreError } = await supabase
@@ -824,6 +824,41 @@ export async function getUserStats(
                             anime_id: row.anime_id as string,
                             genreName: genreObj.name,
                         });
+                    }
+                }
+            }
+        }
+
+        // Collect all years the user has anime entries for
+        const userYears = new Set<number>();
+        for (const ua of userAnimeData || []) {
+            let entryYear = currentYear;
+            if (ua.completed_at) {
+                entryYear = new Date(ua.completed_at).getFullYear();
+            } else if (ua.started_at) {
+                entryYear = new Date(ua.started_at).getFullYear();
+            } else if (ua.created_at) {
+                entryYear = new Date(ua.created_at).getFullYear();
+            }
+            userYears.add(entryYear);
+        }
+
+        // Fetch total anime count for each year from the database
+        const yearsArray = Array.from(userYears);
+        const totalAnimeByYear = new Map<number, number>();
+
+        if (yearsArray.length > 0) {
+            const { data: yearCounts, error: yearCountError } = await supabase
+                .from("anime")
+                .select("season_year")
+                .in("season_year", yearsArray);
+
+            if (!yearCountError && yearCounts) {
+                // Count anime per year
+                for (const row of yearCounts) {
+                    if (row.season_year !== null) {
+                        const year = row.season_year as number;
+                        totalAnimeByYear.set(year, (totalAnimeByYear.get(year) || 0) + 1);
                     }
                 }
             }
@@ -871,6 +906,7 @@ export async function getUserStats(
                     planned: 0,
                     paused: 0,
                     dropped: 0,
+                    totalAnimeForYear: totalAnimeByYear.get(entryYear) || 0,
                 });
             }
 

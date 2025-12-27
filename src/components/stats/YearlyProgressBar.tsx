@@ -18,23 +18,29 @@ interface YearlyProgressBarProps {
 /**
  * YearlyProgressBar component
  *
- * Displays a stacked horizontal progress bar showing anime by status:
+ * Displays a stacked horizontal progress bar showing anime by status
+ * relative to the total anime released for that year:
  * - Green: Completed
  * - Blue: Watching
  * - Gray: Planned
  * - Yellow: Paused (optional, shown in legend)
  * - Red: Dropped (optional, shown in legend)
+ * - Remaining space: Not tracked (muted background)
  */
 export function YearlyProgressBar({
     data,
     featured = false,
     className,
 }: YearlyProgressBarProps) {
-    // Calculate total for percentage calculations
-    const total =
+    // Calculate user's tracked anime count
+    const userTracked =
         data.completed + data.watching + data.planned + data.paused + data.dropped;
 
-    if (total === 0) {
+    // Use totalAnimeForYear as the base for percentage calculations
+    // Fall back to userTracked if totalAnimeForYear is 0 or not available
+    const totalBase = data.totalAnimeForYear > 0 ? data.totalAnimeForYear : userTracked;
+
+    if (userTracked === 0) {
         return (
             <div className={cn("space-y-2", className)}>
                 {!featured && (
@@ -48,12 +54,15 @@ export function YearlyProgressBar({
         );
     }
 
-    // Calculate percentages
-    const completedPct = (data.completed / total) * 100;
-    const watchingPct = (data.watching / total) * 100;
-    const plannedPct = (data.planned / total) * 100;
-    const pausedPct = (data.paused / total) * 100;
-    const droppedPct = (data.dropped / total) * 100;
+    // Calculate percentages relative to total anime for the year
+    const completedPct = (data.completed / totalBase) * 100;
+    const watchingPct = (data.watching / totalBase) * 100;
+    const plannedPct = (data.planned / totalBase) * 100;
+    const pausedPct = (data.paused / totalBase) * 100;
+    const droppedPct = (data.dropped / totalBase) * 100;
+
+    // Calculate the percentage of all tracked anime relative to total
+    const trackedPct = Math.round((userTracked / totalBase) * 100);
 
     return (
         <div className={cn("space-y-3", className)}>
@@ -61,14 +70,26 @@ export function YearlyProgressBar({
             {!featured && (
                 <div className="flex items-center justify-between text-sm">
                     <span className="font-medium">{data.year}</span>
-                    <span className="text-muted-foreground">{total} anime</span>
+                    <span className="text-muted-foreground">
+                        {userTracked} / {data.totalAnimeForYear > 0 ? data.totalAnimeForYear : userTracked} anime ({trackedPct}%)
+                    </span>
                 </div>
             )}
 
-            {/* Progress bar */}
+            {/* Featured year header */}
+            {featured && data.totalAnimeForYear > 0 && (
+                <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">
+                        Tracking <span className="font-medium text-foreground">{userTracked}</span> of{" "}
+                        <span className="font-medium text-foreground">{data.totalAnimeForYear}</span> anime released ({trackedPct}%)
+                    </span>
+                </div>
+            )}
+
+            {/* Progress bar - shows tracked anime relative to total released */}
             <div
                 className={cn(
-                    "flex w-full overflow-hidden rounded-full",
+                    "flex w-full overflow-hidden rounded-full bg-muted",
                     featured ? "h-6" : "h-3"
                 )}
             >
@@ -116,6 +137,8 @@ export function YearlyProgressBar({
                         title={`Dropped: ${data.dropped}`}
                     />
                 )}
+
+                {/* Remaining space shows as muted background (already set on parent) */}
             </div>
 
             {/* Legend */}
