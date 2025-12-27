@@ -358,6 +358,34 @@ export default async function AnimePage({ params }: AnimePageProps) {
                             </CardContent>
                         </Card>
 
+                        {/* ===== GENRES CARD ===== */}
+                        {anime.genres.length > 0 && (
+                            <Card className="border-0">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-base">
+                                        Genres
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex flex-wrap gap-2">
+                                        {anime.genres.map((genre) => (
+                                            <Badge
+                                                key={genre.id}
+                                                variant="secondary"
+                                                asChild
+                                            >
+                                                <Link
+                                                    href={`/genre/${genre.slug}`}
+                                                >
+                                                    {genre.name}
+                                                </Link>
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+
                         {/* ===== STUDIOS CARD ===== */}
                         {anime.studios.length > 0 && (
                             <Card className="border-0">
@@ -369,12 +397,17 @@ export default async function AnimePage({ params }: AnimePageProps) {
                                 <CardContent>
                                     <div className="flex flex-wrap gap-2">
                                         {anime.studios.map((studio) => (
-                                            <Badge
-                                                key={studio.id}
+                                            <Button
                                                 variant="secondary"
+                                                key={studio.id}
+                                                asChild
                                             >
-                                                {studio.name}
-                                            </Badge>
+                                                <Link
+                                                    href={`/studio/${studio.slug}`}
+                                                >
+                                                    {studio.name}
+                                                </Link>
+                                            </Button>
                                         ))}
                                     </div>
                                 </CardContent>
