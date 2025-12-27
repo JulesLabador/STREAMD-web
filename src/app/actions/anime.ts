@@ -1000,3 +1000,169 @@ export async function getAnimeByPlatform(
         return { success: false, error: "Failed to fetch anime" };
     }
 }
+
+// =============================================
+// Upcoming Anime Actions
+// =============================================
+
+/**
+ * Fetches anime that are currently releasing or not yet released
+ * Sorted by start date (ascending) to show soonest first
+ *
+ * @param limit - Maximum number of anime to return (default: 12)
+ * @returns List of upcoming/releasing anime or error
+ */
+export async function getUpcomingAnime(
+    limit: number = 12,
+): Promise<ActionResult<Anime[]>> {
+    try {
+        const validLimit = Math.min(50, Math.max(1, limit));
+
+        const supabase = await createClient();
+
+        // Fetch anime with status RELEASING or NOT_YET_RELEASED
+        // Sort by start_date ascending (soonest first), then by popularity
+        const { data, error } = await supabase
+            .from("anime")
+            .select("*")
+            .in("status", ["RELEASING", "NOT_YET_RELEASED"])
+            .order("start_date", { ascending: true, nullsFirst: false })
+            .order("popularity", { ascending: true })
+            .limit(validLimit);
+
+        if (error) {
+            console.error("Error fetching upcoming anime:", error);
+            return { success: false, error: "Failed to fetch upcoming anime" };
+        }
+
+        // Transform database rows to domain types
+        const animeList = (data as AnimeRow[]).map(transformAnimeRow);
+
+        return { success: true, data: animeList };
+    } catch (error) {
+        console.error("Error fetching upcoming anime:", error);
+        return { success: false, error: "Failed to fetch upcoming anime" };
+    }
+}
+
+/**
+ * Gets anime counts for current and upcoming seasons
+ * Used for the upcoming page hero section
+ *
+ * @returns Object with current season info and next seasons info
+ */
+export async function getUpcomingSeasonStats(): Promise<
+    ActionResult<{
+        currentSeason: SeasonInfo | null;
+        nextSeasons: SeasonInfo[];
+    }>
+> {
+    try {
+        const supabase = await createClient();
+
+        // Get current date info
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = now.getFullYear();
+
+        // Determine current season
+        let currentSeasonName: AnimeSeason;
+        if (currentMonth >= 1 && currentMonth <= 3) {
+            currentSeasonName = "WINTER";
+        } else if (currentMonth >= 4 && currentMonth <= 6) {
+            currentSeasonName = "SPRING";
+        } else if (currentMonth >= 7 && currentMonth <= 9) {
+            currentSeasonName = "SUMMER";
+        } else {
+            currentSeasonName = "FALL";
+        }
+
+        // Fetch all season/year combinations for current and future
+        const { data, error } = await supabase
+            .from("anime")
+            .select("season, season_year")
+            .not("season", "is", null)
+            .not("season_year", "is", null)
+            .gte("season_year", currentYear);
+
+        if (error) {
+            console.error("Error fetching season stats:", error);
+            return { success: false, error: "Failed to fetch season stats" };
+        }
+
+        // Group by season/year and count
+        const seasonMap = new Map<string, SeasonInfo>();
+        const seasonOrder: Record<AnimeSeason, number> = {
+            WINTER: 0,
+            SPRING: 1,
+            SUMMER: 2,
+            FALL: 3,
+        };
+
+        for (const row of data || []) {
+            if (!row.season || !row.season_year) continue;
+
+            const key = `${row.season}-${row.season_year}`;
+            const existing = seasonMap.get(key);
+
+            if (existing) {
+                existing.animeCount++;
+            } else {
+                seasonMap.set(key, {
+                    season: row.season as AnimeSeason,
+                    year: row.season_year,
+                    slug: createSeasonSlug(
+                        row.season as AnimeSeason,
+                        row.season_year,
+                    ),
+                    animeCount: 1,
+                });
+            }
+        }
+
+        // Convert to array and sort chronologically
+        const allSeasons = Array.from(seasonMap.values()).sort((a, b) => {
+            if (a.year !== b.year) return a.year - b.year;
+            return seasonOrder[a.season] - seasonOrder[b.season];
+        });
+
+        // Find current season
+        const currentSeasonKey = `${currentSeasonName}-${currentYear}`;
+        const currentSeason = seasonMap.get(currentSeasonKey) || null;
+
+        // Get next seasons (up to 3 future seasons after current)
+        const currentSeasonIndex = allSeasons.findIndex(
+            (s) => s.season === currentSeasonName && s.year === currentYear,
+        );
+
+        let nextSeasons: SeasonInfo[] = [];
+        if (currentSeasonIndex !== -1) {
+            nextSeasons = allSeasons.slice(
+                currentSeasonIndex + 1,
+                currentSeasonIndex + 4,
+            );
+        } else {
+            // If current season not found, get all future seasons
+            nextSeasons = allSeasons
+                .filter((s) => {
+                    if (s.year > currentYear) return true;
+                    if (s.year === currentYear) {
+                        return seasonOrder[s.season] > seasonOrder[currentSeasonName];
+                    }
+                    return false;
+                })
+                .slice(0, 3);
+        }
+
+        return {
+            success: true,
+            data: {
+                currentSeason,
+                nextSeasons,
+            },
+        };
+    } catch (error) {
+        console.error("Error fetching upcoming season stats:", error);
+        return { success: false, error: "Failed to fetch season stats" };
+    }
+}
