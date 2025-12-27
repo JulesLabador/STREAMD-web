@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import {
     Snowflake,
     Flower2,
@@ -23,13 +22,13 @@ import {
     getNextSeasonStats,
     getUpcomingSeasonStats,
 } from "@/app/actions/anime";
+import { AnimeCard } from "@/components/anime/AnimeCard";
 import { UpcomingJsonLd } from "@/components/seo/UpcomingJsonLd";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type {
     AnimeSeason,
-    AnimeWithPlanningCount,
     NextSeasonStats,
     SeasonInfo,
 } from "@/types/anime";
@@ -324,79 +323,6 @@ function StatCard({
 }
 
 /**
- * Most Anticipated Anime Card with planning count
- */
-function AnticipatedAnimeCard({ anime }: { anime: AnimeWithPlanningCount }) {
-    const displayTitle = anime.titles.english || anime.titles.romaji;
-
-    return (
-        <Link
-            href={`/anime/${anime.slug}`}
-            className="group block overflow-hidden rounded-lg transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-            {/* Cover image container */}
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted">
-                {anime.coverImageUrl ? (
-                    <Image
-                        src={anime.coverImageUrl}
-                        alt={displayTitle}
-                        fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                        className="object-cover transition-opacity group-hover:opacity-90"
-                    />
-                ) : (
-                    <div className="flex h-full items-center justify-center bg-secondary">
-                        <span className="text-4xl text-muted-foreground">
-                            🎬
-                        </span>
-                    </div>
-                )}
-
-                {/* Planning count badge */}
-                {anime.planningCount > 0 && (
-                    <div className="absolute left-2 top-2">
-                        <Badge
-                            variant="planned"
-                            className="gap-1 text-xs font-medium"
-                        >
-                            <Users className="h-3 w-3" />
-                            {anime.planningCount.toLocaleString()}
-                        </Badge>
-                    </div>
-                )}
-
-                {/* Rating overlay */}
-                {anime.averageRating !== null && (
-                    <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-md bg-black/70 px-2 py-1 text-xs font-medium text-white">
-                        <span className="text-yellow-400">★</span>
-                        <span>{anime.averageRating.toFixed(1)}</span>
-                    </div>
-                )}
-            </div>
-
-            {/* Card content */}
-            <div className="mt-3 space-y-1">
-                <h3 className="line-clamp-2 text-sm font-medium leading-tight text-foreground group-hover:text-primary">
-                    {displayTitle}
-                </h3>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{anime.format}</span>
-                    {anime.episodeCount && (
-                        <>
-                            <span className="text-border">•</span>
-                            <span>
-                                {anime.episodeCount}{" "}
-                                {anime.episodeCount === 1 ? "ep" : "eps"}
-                            </span>
-                        </>
-                    )}
-                </div>
-            </div>
-        </Link>
-    );
-}
-
-/**
  * Current Season Card - Compact version
  */
 function CurrentSeasonCard({ season }: { season: SeasonInfo }) {
@@ -407,7 +333,7 @@ function CurrentSeasonCard({ season }: { season: SeasonInfo }) {
         <Link href={`/season/${season.slug}`} className="group block">
             <Card className="relative overflow-hidden border-0 transition-all duration-300 hover:scale-[1.01] hover:shadow-lg">
                 <div
-                    className={`absolute inset-0 bg-gradient-to-br ${config.gradient}`}
+                    className={`absolute inset-0 bg-linear-to-br ${config.gradient}`}
                 />
 
                 <CardContent className="relative flex items-center gap-4 p-5">
@@ -454,7 +380,7 @@ function CompactSeasonCard({ season }: { season: SeasonInfo }) {
         <Link href={`/season/${season.slug}`} className="group block">
             <Card className="relative overflow-hidden border-0 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg">
                 <div
-                    className={`absolute inset-0 bg-gradient-to-br ${config.gradient} opacity-60 transition-opacity group-hover:opacity-100`}
+                    className={`absolute inset-0 bg-linear-to-br ${config.gradient} opacity-60 transition-opacity group-hover:opacity-100`}
                 />
 
                 <CardContent className="relative flex items-center gap-3 p-4">
@@ -591,9 +517,11 @@ export default async function UpcomingPage() {
 
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                             {nextSeasonStats.mostAnticipated.map((anime) => (
-                                <AnticipatedAnimeCard
+                                <AnimeCard
                                     key={anime.id}
                                     anime={anime}
+                                    planningCount={anime.planningCount}
+                                    hideStatus
                                 />
                             ))}
                         </div>
