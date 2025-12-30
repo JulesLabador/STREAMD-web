@@ -2,7 +2,13 @@
 
 import { useCallback, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Check, ChevronsUpDown, Search, X, SlidersHorizontal } from "lucide-react";
+import {
+    Check,
+    ChevronsUpDown,
+    Search,
+    X,
+    SlidersHorizontal,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,7 +122,11 @@ export function AnimeFilters({
 
             // Apply updates
             Object.entries(updates).forEach(([key, value]) => {
-                if (value === null || value === "" || (Array.isArray(value) && value.length === 0)) {
+                if (
+                    value === null ||
+                    value === "" ||
+                    (Array.isArray(value) && value.length === 0)
+                ) {
                     params.delete(key);
                 } else if (Array.isArray(value)) {
                     params.delete(key);
@@ -186,7 +196,8 @@ export function AnimeFilters({
                 updateFilters({ search: null });
             } else if (value) {
                 // For array filters, remove the specific value
-                const currentValues = currentFilters[filterKey as keyof typeof currentFilters];
+                const currentValues =
+                    currentFilters[filterKey as keyof typeof currentFilters];
                 if (Array.isArray(currentValues)) {
                     const newValues = currentValues.filter((v) => v !== value);
                     updateFilters({ [filterKey]: newValues });
@@ -255,7 +266,10 @@ export function AnimeFilters({
             {/* Filter controls row */}
             <div className="flex flex-wrap items-center gap-3">
                 {/* Search input */}
-                <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-auto sm:min-w-[200px]">
+                <form
+                    onSubmit={handleSearchSubmit}
+                    className="relative w-full sm:w-auto sm:min-w-[200px]"
+                >
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         type="text"
@@ -275,7 +289,8 @@ export function AnimeFilters({
                             aria-expanded={genreOpen}
                             className={cn(
                                 "justify-between min-w-[120px] bg-input/30",
-                                currentFilters.genres.length > 0 && "border-primary/50"
+                                currentFilters.genres.length > 0 &&
+                                    "border-primary/50"
                             )}
                         >
                             {getMultiSelectLabel(
@@ -298,13 +313,19 @@ export function AnimeFilters({
                                             key={genre.id}
                                             value={genre.name}
                                             onSelect={() =>
-                                                toggleFilter("genres", genre.slug, currentFilters.genres)
+                                                toggleFilter(
+                                                    "genres",
+                                                    genre.slug,
+                                                    currentFilters.genres
+                                                )
                                             }
                                         >
                                             <Check
                                                 className={cn(
                                                     "mr-2 h-4 w-4",
-                                                    currentFilters.genres.includes(genre.slug)
+                                                    currentFilters.genres.includes(
+                                                        genre.slug
+                                                    )
                                                         ? "opacity-100"
                                                         : "opacity-0"
                                                 )}
@@ -330,7 +351,8 @@ export function AnimeFilters({
                             aria-expanded={yearOpen}
                             className={cn(
                                 "justify-between min-w-[100px] bg-input/30",
-                                currentFilters.years.length > 0 && "border-primary/50"
+                                currentFilters.years.length > 0 &&
+                                    "border-primary/50"
                             )}
                         >
                             {getMultiSelectLabel(
@@ -353,13 +375,19 @@ export function AnimeFilters({
                                             key={year}
                                             value={year.toString()}
                                             onSelect={() =>
-                                                toggleFilter("years", year.toString(), currentFilters.years)
+                                                toggleFilter(
+                                                    "years",
+                                                    year.toString(),
+                                                    currentFilters.years
+                                                )
                                             }
                                         >
                                             <Check
                                                 className={cn(
                                                     "mr-2 h-4 w-4",
-                                                    currentFilters.years.includes(year.toString())
+                                                    currentFilters.years.includes(
+                                                        year.toString()
+                                                    )
                                                         ? "opacity-100"
                                                         : "opacity-0"
                                                 )}
@@ -382,7 +410,8 @@ export function AnimeFilters({
                             aria-expanded={seasonOpen}
                             className={cn(
                                 "justify-between min-w-[110px] bg-input/30",
-                                currentFilters.seasons.length > 0 && "border-primary/50"
+                                currentFilters.seasons.length > 0 &&
+                                    "border-primary/50"
                             )}
                         >
                             {getMultiSelectLabel(
@@ -403,13 +432,19 @@ export function AnimeFilters({
                                             key={option.value}
                                             value={option.label}
                                             onSelect={() =>
-                                                toggleFilter("seasons", option.value, currentFilters.seasons)
+                                                toggleFilter(
+                                                    "seasons",
+                                                    option.value,
+                                                    currentFilters.seasons
+                                                )
                                             }
                                         >
                                             <Check
                                                 className={cn(
                                                     "mr-2 h-4 w-4",
-                                                    currentFilters.seasons.includes(option.value)
+                                                    currentFilters.seasons.includes(
+                                                        option.value
+                                                    )
                                                         ? "opacity-100"
                                                         : "opacity-0"
                                                 )}
@@ -432,7 +467,8 @@ export function AnimeFilters({
                             aria-expanded={formatOpen}
                             className={cn(
                                 "justify-between min-w-[110px] bg-input/30",
-                                currentFilters.formats.length > 0 && "border-primary/50"
+                                currentFilters.formats.length > 0 &&
+                                    "border-primary/50"
                             )}
                         >
                             {getMultiSelectLabel(
@@ -453,13 +489,19 @@ export function AnimeFilters({
                                             key={option.value}
                                             value={option.label}
                                             onSelect={() =>
-                                                toggleFilter("formats", option.value, currentFilters.formats)
+                                                toggleFilter(
+                                                    "formats",
+                                                    option.value,
+                                                    currentFilters.formats
+                                                )
                                             }
                                         >
                                             <Check
                                                 className={cn(
                                                     "mr-2 h-4 w-4",
-                                                    currentFilters.formats.includes(option.value)
+                                                    currentFilters.formats.includes(
+                                                        option.value
+                                                    )
                                                         ? "opacity-100"
                                                         : "opacity-0"
                                                 )}
@@ -482,7 +524,8 @@ export function AnimeFilters({
                             aria-expanded={statusOpen}
                             className={cn(
                                 "justify-between min-w-[130px] bg-input/30",
-                                currentFilters.statuses.length > 0 && "border-primary/50"
+                                currentFilters.statuses.length > 0 &&
+                                    "border-primary/50"
                             )}
                         >
                             {getMultiSelectLabel(
@@ -503,13 +546,19 @@ export function AnimeFilters({
                                             key={option.value}
                                             value={option.label}
                                             onSelect={() =>
-                                                toggleFilter("statuses", option.value, currentFilters.statuses)
+                                                toggleFilter(
+                                                    "statuses",
+                                                    option.value,
+                                                    currentFilters.statuses
+                                                )
                                             }
                                         >
                                             <Check
                                                 className={cn(
                                                     "mr-2 h-4 w-4",
-                                                    currentFilters.statuses.includes(option.value)
+                                                    currentFilters.statuses.includes(
+                                                        option.value
+                                                    )
                                                         ? "opacity-100"
                                                         : "opacity-0"
                                                 )}
@@ -540,7 +589,9 @@ export function AnimeFilters({
             {/* Active filters display */}
             {hasActiveFilters && (
                 <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Active filters:</span>
+                    <span className="text-sm text-muted-foreground">
+                        Active filters:
+                    </span>
 
                     {/* Search filter badge */}
                     {currentFilters.search && (
@@ -558,12 +609,20 @@ export function AnimeFilters({
 
                     {/* Genre filter badges */}
                     {currentFilters.genres.map((genreSlug) => (
-                        <Badge key={genreSlug} variant="secondary" className="gap-1 pr-1">
+                        <Badge
+                            key={genreSlug}
+                            variant="secondary"
+                            className="gap-1 pr-1"
+                        >
                             {getGenreName(genreSlug)}
                             <button
-                                onClick={() => removeFilter("genres", genreSlug)}
+                                onClick={() =>
+                                    removeFilter("genres", genreSlug)
+                                }
                                 className="ml-1 rounded-full p-0.5 hover:bg-muted"
-                                aria-label={`Remove ${getGenreName(genreSlug)} filter`}
+                                aria-label={`Remove ${getGenreName(
+                                    genreSlug
+                                )} filter`}
                             >
                                 <X className="h-3 w-3" />
                             </button>
@@ -572,7 +631,11 @@ export function AnimeFilters({
 
                     {/* Year filter badges */}
                     {currentFilters.years.map((year) => (
-                        <Badge key={year} variant="secondary" className="gap-1 pr-1">
+                        <Badge
+                            key={year}
+                            variant="secondary"
+                            className="gap-1 pr-1"
+                        >
                             {year}
                             <button
                                 onClick={() => removeFilter("years", year)}
@@ -586,12 +649,18 @@ export function AnimeFilters({
 
                     {/* Season filter badges */}
                     {currentFilters.seasons.map((season) => (
-                        <Badge key={season} variant="secondary" className="gap-1 pr-1">
+                        <Badge
+                            key={season}
+                            variant="secondary"
+                            className="gap-1 pr-1"
+                        >
                             {getSeasonLabel(season)}
                             <button
                                 onClick={() => removeFilter("seasons", season)}
                                 className="ml-1 rounded-full p-0.5 hover:bg-muted"
-                                aria-label={`Remove ${getSeasonLabel(season)} filter`}
+                                aria-label={`Remove ${getSeasonLabel(
+                                    season
+                                )} filter`}
                             >
                                 <X className="h-3 w-3" />
                             </button>
@@ -600,12 +669,18 @@ export function AnimeFilters({
 
                     {/* Format filter badges */}
                     {currentFilters.formats.map((format) => (
-                        <Badge key={format} variant="secondary" className="gap-1 pr-1">
+                        <Badge
+                            key={format}
+                            variant="secondary"
+                            className="gap-1 pr-1"
+                        >
                             {getFormatLabel(format)}
                             <button
                                 onClick={() => removeFilter("formats", format)}
                                 className="ml-1 rounded-full p-0.5 hover:bg-muted"
-                                aria-label={`Remove ${getFormatLabel(format)} filter`}
+                                aria-label={`Remove ${getFormatLabel(
+                                    format
+                                )} filter`}
                             >
                                 <X className="h-3 w-3" />
                             </button>
@@ -614,12 +689,18 @@ export function AnimeFilters({
 
                     {/* Status filter badges */}
                     {currentFilters.statuses.map((status) => (
-                        <Badge key={status} variant="secondary" className="gap-1 pr-1">
+                        <Badge
+                            key={status}
+                            variant="secondary"
+                            className="gap-1 pr-1"
+                        >
                             {getStatusLabel(status)}
                             <button
                                 onClick={() => removeFilter("statuses", status)}
                                 className="ml-1 rounded-full p-0.5 hover:bg-muted"
-                                aria-label={`Remove ${getStatusLabel(status)} filter`}
+                                aria-label={`Remove ${getStatusLabel(
+                                    status
+                                )} filter`}
                             >
                                 <X className="h-3 w-3" />
                             </button>
