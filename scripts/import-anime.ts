@@ -20,6 +20,14 @@ dotenv.config({ path: ".env.local" });
 // ============================================================================
 
 /**
+ * Raw related anime object from anime.json
+ */
+interface RawRelatedAnime {
+    id: string; // MAL ID of the related anime
+    relation: string; // Relation type (e.g., "SEQUEL", "Prequel", "Side Story")
+}
+
+/**
  * Raw anime object structure from anime.json
  */
 interface RawAnime {
@@ -56,6 +64,7 @@ interface RawAnime {
     ageRating?: string | null;
     trailerUrl?: string | null;
     seriesID?: string | null;
+    relatedAnime?: RawRelatedAnime[];
 }
 
 /**
@@ -108,6 +117,21 @@ const VALID_PLATFORMS = [
     "AMAZON",
     "HIDIVE",
     "OTHER",
+];
+
+const VALID_RELATION_TYPES = [
+    "SEQUEL",
+    "PREQUEL",
+    "SIDE_STORY",
+    "ALTERNATIVE",
+    "SPIN_OFF",
+    "CHARACTER",
+    "PARENT",
+    "OTHER",
+    "SUMMARY",
+    "ADAPTATION",
+    "SOURCE",
+    "CONTAINS",
 ];
 
 // Platform name mapping from JSON to database enum
@@ -557,6 +581,138 @@ async function createStreamingLinks(
 }
 
 /**
+ * Normalizes a relation type string to the standard enum value
+ * Handles inconsistent casing from source data (e.g., "Sequel" -> "SEQUEL")
+ * @param relation - Raw relation type string
+ * @returns Normalized relation type or "OTHER" if unknown
+ */
+function normalizeRelationType(relation: string): string {
+    // Normalize: uppercase, replace spaces with underscores
+    const normalized = relation
+        .toUpperCase()
+        .replace(/\s+/g, "_")
+        .replace("PARENT_STORY", "PARENT")
+        .replace("ALTERNATIVE_VERSION", "ALTERNATIVE")
+        .replace("ALTERNATIVE_SETTING", "ALTERNATIVE")
+        .replace("FULL_STORY", "PARENT")
+        .replace("SPIN-OFF", "SPIN_OFF");
+
+    // Return normalized value if valid, otherwise default to OTHER
+    return VALID_RELATION_TYPES.includes(normalized) ? normalized : "OTHER";
+}
+
+/**
+ * Imports anime relations from the raw data
+ * This should be called after all anime have been imported
+ * @param supabase - Supabase client
+ * @param animeData - Array of raw anime objects
+ * @returns Number of successfully imported relations
+ */
+async function importAnimeRelations(
+    supabase: SupabaseClient,
+    animeData: RawAnime[],
+): Promise<number> {
+    console.log("\nImporting anime relations...");
+
+    // Build a map of MAL ID to anime UUID for quick lookups
+    const { data: animeList, error: fetchError } = await supabase
+        .from("anime")
+        .select("id, mal_id")
+        .not("mal_id", "is", null);
+
+    if (fetchError) {
+        console.error("Failed to fetch anime list for relations:", fetchError.message);
+        return 0;
+    }
+
+    // Create MAL ID -> UUID map
+    const malIdToUuid = new Map<number, string>();
+    for (const anime of animeList || []) {
+        if (anime.mal_id) {
+            malIdToUuid.set(anime.mal_id, anime.id);
+        }
+    }
+
+    console.log(`  Built lookup map with ${malIdToUuid.size} anime entries`);
+
+    // Collect all relations to import
+    const relations: Array<{
+        source_anime_id: string;
+        target_anime_id: string;
+        relation_type: string;
+    }> = [];
+
+    for (const raw of animeData) {
+        if (!raw.relatedAnime || raw.relatedAnime.length === 0) continue;
+        if (!raw.idMAL) continue;
+
+        const sourceId = malIdToUuid.get(parseInt(raw.idMAL, 10));
+        if (!sourceId) continue;
+
+        for (const related of raw.relatedAnime) {
+            const targetMalId = parseInt(related.id, 10);
+            if (isNaN(targetMalId)) continue;
+
+            const targetId = malIdToUuid.get(targetMalId);
+            if (!targetId) continue;
+
+            // Skip self-references
+            if (sourceId === targetId) continue;
+
+            const relationType = normalizeRelationType(related.relation);
+
+            relations.push({
+                source_anime_id: sourceId,
+                target_anime_id: targetId,
+                relation_type: relationType,
+            });
+        }
+    }
+
+    console.log(`  Found ${relations.length} valid relations to import`);
+
+    if (relations.length === 0) {
+        return 0;
+    }
+
+    // Clear existing relations before importing
+    const { error: deleteError } = await supabase
+        .from("anime_relations")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all
+
+    if (deleteError) {
+        console.error("Failed to clear existing relations:", deleteError.message);
+    }
+
+    // Import relations in batches
+    let successCount = 0;
+    const relationBatchSize = 500;
+
+    for (let i = 0; i < relations.length; i += relationBatchSize) {
+        const batch = relations.slice(i, i + relationBatchSize);
+
+        const { error: insertError } = await supabase
+            .from("anime_relations")
+            .upsert(batch, {
+                onConflict: "source_anime_id,target_anime_id,relation_type",
+            });
+
+        if (insertError) {
+            console.error(
+                `  Failed to import relations batch ${Math.floor(i / relationBatchSize) + 1}:`,
+                insertError.message,
+            );
+        } else {
+            successCount += batch.length;
+        }
+    }
+
+    console.log(`  Successfully imported ${successCount} relations`);
+    return successCount;
+}
+
+/**
  * Imports a batch of anime records
  * @param supabase - Supabase client
  * @param batch - Array of raw anime objects
@@ -719,11 +875,19 @@ async function main(): Promise<void> {
     }
 
     console.log("-".repeat(60));
-    console.log(`Import complete!`);
+    console.log(`Anime import complete!`);
     console.log(`  Total records processed: ${animeData.length}`);
     console.log(`  Successfully imported: ${totalImported}`);
     console.log(`  Failed: ${animeData.length - totalImported}`);
     console.log(`  Studios created: ${studioCache.size}`);
+
+    // Import anime relations after all anime are imported
+    const relationsImported = await importAnimeRelations(supabase, animeData);
+
+    console.log("-".repeat(60));
+    console.log(`Full import complete!`);
+    console.log(`  Anime imported: ${totalImported}`);
+    console.log(`  Relations imported: ${relationsImported}`);
     console.log("=".repeat(60));
 }
 
