@@ -4,12 +4,14 @@ import { getAnimeBySeason } from "@/app/actions/anime";
 import { parseSeasonSlug } from "@/types/anime";
 import { BrowsePageHeader } from "@/components/browse";
 import { AnimeGrid } from "@/components/anime/AnimeGrid";
+import { AnimePagination } from "@/components/anime/AnimePagination";
 
 /**
- * Page props with dynamic slug parameter
+ * Page props with dynamic slug parameter and search params
  */
 interface SeasonPageProps {
     params: Promise<{ slug: string }>;
+    searchParams: Promise<{ page?: string }>;
 }
 
 /**
@@ -62,10 +64,13 @@ export async function generateMetadata({
  * Season detail page
  *
  * Displays anime from a specific season/year in a grid layout.
- * Server Component with SEO optimization.
+ * Server Component with SEO optimization and pagination support.
  */
-export default async function SeasonPage({ params }: SeasonPageProps) {
+export default async function SeasonPage({ params, searchParams }: SeasonPageProps) {
     const { slug } = await params;
+    const resolvedSearchParams = await searchParams;
+    const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page, 10) : 1;
+
     const parsed = parseSeasonSlug(slug);
 
     // Invalid slug format
@@ -73,7 +78,7 @@ export default async function SeasonPage({ params }: SeasonPageProps) {
         notFound();
     }
 
-    const result = await getAnimeBySeason(parsed.season, parsed.year);
+    const result = await getAnimeBySeason(parsed.season, parsed.year, page, 24);
 
     // Handle errors
     if (!result.success) {
@@ -94,6 +99,7 @@ export default async function SeasonPage({ params }: SeasonPageProps) {
     }
 
     const { seasonInfo, anime } = result.data;
+    const { pagination } = anime;
     const seasonName = `${formatSeasonName(seasonInfo.season)} ${seasonInfo.year}`;
 
     return (
@@ -101,7 +107,7 @@ export default async function SeasonPage({ params }: SeasonPageProps) {
             <BrowsePageHeader
                 title={seasonName}
                 description={`Anime that aired in ${seasonName}`}
-                count={anime.pagination.totalCount}
+                count={pagination.totalCount}
                 backHref="/season"
                 backText="All Seasons"
             />
@@ -112,12 +118,25 @@ export default async function SeasonPage({ params }: SeasonPageProps) {
             />
 
             {/* Pagination info */}
-            {anime.pagination.totalCount > 0 && (
+            {pagination.totalCount > 0 && (
                 <div className="mt-8 text-center text-sm text-muted-foreground">
-                    Showing {anime.data.length} of {anime.pagination.totalCount}{" "}
+                    Showing {anime.data.length} of {pagination.totalCount}{" "}
                     anime
+                    {pagination.totalPages > 1 && (
+                        <span>
+                            {" "}
+                            (Page {pagination.page} of {pagination.totalPages})
+                        </span>
+                    )}
                 </div>
             )}
+
+            {/* Pagination controls */}
+            <AnimePagination
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                basePath={`/season/${slug}`}
+            />
         </div>
     );
 }

@@ -4,12 +4,14 @@ import { getAnimeByPlatform } from "@/app/actions/anime";
 import { parsePlatformSlug } from "@/types/anime";
 import { BrowsePageHeader } from "@/components/browse";
 import { AnimeGrid } from "@/components/anime/AnimeGrid";
+import { AnimePagination } from "@/components/anime/AnimePagination";
 
 /**
- * Page props with dynamic platform parameter
+ * Page props with dynamic platform parameter and search params
  */
 interface PlatformPageProps {
     params: Promise<{ platform: string }>;
+    searchParams: Promise<{ page?: string }>;
 }
 
 /**
@@ -52,10 +54,13 @@ export async function generateMetadata({
  * Platform detail page
  *
  * Displays anime available on a specific streaming platform.
- * Server Component with SEO optimization.
+ * Server Component with SEO optimization and pagination support.
  */
-export default async function PlatformPage({ params }: PlatformPageProps) {
+export default async function PlatformPage({ params, searchParams }: PlatformPageProps) {
     const { platform: platformSlug } = await params;
+    const resolvedSearchParams = await searchParams;
+    const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page, 10) : 1;
+
     const platform = parsePlatformSlug(platformSlug);
 
     // Invalid platform slug
@@ -63,7 +68,7 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
         notFound();
     }
 
-    const result = await getAnimeByPlatform(platform);
+    const result = await getAnimeByPlatform(platform, page, 24);
 
     // Handle errors
     if (!result.success) {
@@ -84,13 +89,14 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
     }
 
     const { platformInfo, anime } = result.data;
+    const { pagination } = anime;
 
     return (
         <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <BrowsePageHeader
                 title={platformInfo.name}
                 description={`Anime available on ${platformInfo.name}`}
-                count={anime.pagination.totalCount}
+                count={pagination.totalCount}
                 backHref="/platforms"
                 backText="All Platforms"
             />
@@ -101,12 +107,25 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
             />
 
             {/* Pagination info */}
-            {anime.pagination.totalCount > 0 && (
+            {pagination.totalCount > 0 && (
                 <div className="mt-8 text-center text-sm text-muted-foreground">
-                    Showing {anime.data.length} of {anime.pagination.totalCount}{" "}
+                    Showing {anime.data.length} of {pagination.totalCount}{" "}
                     anime
+                    {pagination.totalPages > 1 && (
+                        <span>
+                            {" "}
+                            (Page {pagination.page} of {pagination.totalPages})
+                        </span>
+                    )}
                 </div>
             )}
+
+            {/* Pagination controls */}
+            <AnimePagination
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                basePath={`/platforms/${platformSlug}`}
+            />
         </div>
     );
 }

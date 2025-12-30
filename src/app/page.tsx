@@ -1,13 +1,15 @@
 import { Metadata } from "next";
 import { getAnimeList } from "@/app/actions/anime";
 import { AnimeGrid } from "@/components/anime/AnimeGrid";
+import { AnimePagination } from "@/components/anime/AnimePagination";
 import { InlineSearch } from "@/components/search";
 import { WebsiteJsonLd } from "@/components/seo/WebsiteJsonLd";
 
 /**
  * Site URL for canonical and OG URLs
  */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.streamdanime.io";
 
 /**
  * Homepage metadata with Open Graph and Twitter Card tags
@@ -46,15 +48,25 @@ export const metadata: Metadata = {
 };
 
 /**
+ * Page props with search params for pagination
+ */
+interface HomePageProps {
+    searchParams: Promise<{ page?: string }>;
+}
+
+/**
  * Home page - Browse anime
  *
  * Server Component that fetches and displays a grid of anime
  * from the database, sorted by popularity. Features an inline
- * search bar for quick anime discovery.
+ * search bar for quick anime discovery and pagination support.
  */
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: HomePageProps) {
+    const resolvedSearchParams = await searchParams;
+    const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page, 10) : 1;
+
     // Fetch anime list from database
-    const result = await getAnimeList(1, 24);
+    const result = await getAnimeList(page, 24);
 
     // Handle error state
     if (!result.success) {
@@ -85,31 +97,44 @@ export default async function HomePage() {
                 {/* Inline search bar */}
                 <div className="mb-8">
                     <InlineSearch
-                    placeholder="Search for anime..."
-                    className="max-w-2xl mx-auto"
-                />
-            </div>
+                        placeholder="Search for anime..."
+                        className="max-w-2xl mx-auto"
+                    />
+                </div>
 
-            {/* Page header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                    Browse Anime
-                </h1>
-                <p className="mt-2 text-muted-foreground">
-                    Discover and track your favorite anime series
-                </p>
-            </div>
+                {/* Page header */}
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                        Browse Anime
+                    </h1>
+                    <p className="mt-2 text-muted-foreground">
+                        Discover and track your favorite anime series
+                    </p>
+                </div>
 
-            {/* Anime grid */}
-            <AnimeGrid anime={animeList} />
+                {/* Anime grid */}
+                <AnimeGrid anime={animeList} />
 
                 {/* Pagination info */}
                 {pagination.totalCount > 0 && (
                     <div className="mt-8 text-center text-sm text-muted-foreground">
                         Showing {animeList.length} of {pagination.totalCount}{" "}
                         anime
+                        {pagination.totalPages > 1 && (
+                            <span>
+                                {" "}
+                                (Page {pagination.page} of {pagination.totalPages})
+                            </span>
+                        )}
                     </div>
                 )}
+
+                {/* Pagination controls */}
+                <AnimePagination
+                    currentPage={pagination.page}
+                    totalPages={pagination.totalPages}
+                    basePath="/"
+                />
             </div>
         </>
     );
