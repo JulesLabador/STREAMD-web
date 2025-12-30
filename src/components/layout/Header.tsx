@@ -293,7 +293,7 @@ function DesktopNavigation({ user, userProfile }: NavigationProps) {
                                 <li className="col-span-2">
                                     <NavigationMenuLink asChild>
                                         <Link
-                                            href="/"
+                                            href="/browse?page=1"
                                             className="flex h-full w-full select-none flex-col justify-end rounded-md bg-linear-to-b from-muted/50 to-muted p-4 no-underline outline-none transition-colors hover:bg-accent focus:shadow-md"
                                         >
                                             <Play className="h-6 w-6 text-primary" />
