@@ -103,13 +103,63 @@ export interface StreamingLink {
 }
 
 /**
- * Anime with related data (genres, studios, streaming links)
+ * Anime relation types
+ * Defines the type of relationship between two anime
+ */
+export type AnimeRelationType =
+    | "SEQUEL"
+    | "PREQUEL"
+    | "SIDE_STORY"
+    | "ALTERNATIVE"
+    | "SPIN_OFF"
+    | "CHARACTER"
+    | "PARENT"
+    | "OTHER"
+    | "SUMMARY"
+    | "ADAPTATION"
+    | "SOURCE"
+    | "CONTAINS";
+
+/**
+ * Anime relation entity
+ * Represents a relationship between two anime
+ */
+export interface AnimeRelation {
+    id: string;
+    sourceAnimeId: string;
+    targetAnimeId: string;
+    relationType: AnimeRelationType;
+}
+
+/**
+ * Related anime with full anime data
+ * Used for displaying related anime on detail pages
+ */
+export interface RelatedAnime {
+    relationType: AnimeRelationType;
+    anime: Anime;
+}
+
+/**
+ * Result type for fetching related anime
+ * Includes error state for graceful error handling in UI
+ */
+export interface RelatedAnimeResult {
+    /** Array of related anime (empty if error or none found) */
+    data: RelatedAnime[];
+    /** Whether there was an error fetching related anime */
+    hasError: boolean;
+}
+
+/**
+ * Anime with related data (genres, studios, streaming links, related anime)
  * Used for detail pages where full information is needed
  */
 export interface AnimeWithRelations extends Anime {
     genres: Genre[];
     studios: Studio[];
     streamingLinks: StreamingLink[];
+    relatedAnime: RelatedAnimeResult;
 }
 
 /**
@@ -261,7 +311,7 @@ export function createSeasonSlug(season: AnimeSeason, year: number): string {
  * @returns Object with season and year, or null if invalid
  */
 export function parseSeasonSlug(
-    slug: string,
+    slug: string
 ): { season: AnimeSeason; year: number } | null {
     const match = slug.match(/^(winter|spring|summer|fall)-(\d{4})$/i);
     if (!match) return null;
@@ -299,4 +349,94 @@ export function parsePlatformSlug(slug: string): StreamingPlatform | null {
     ];
 
     return validPlatforms.includes(platform) ? platform : null;
+}
+
+// =============================================
+// Anime Relations Types & Helpers
+// =============================================
+
+/**
+ * Valid relation types for normalization
+ */
+const VALID_RELATION_TYPES: AnimeRelationType[] = [
+    "SEQUEL",
+    "PREQUEL",
+    "SIDE_STORY",
+    "ALTERNATIVE",
+    "SPIN_OFF",
+    "CHARACTER",
+    "PARENT",
+    "OTHER",
+    "SUMMARY",
+    "ADAPTATION",
+    "SOURCE",
+    "CONTAINS",
+];
+
+/**
+ * Normalizes a relation type string to the standard enum value
+ * Handles inconsistent casing from source data (e.g., "Sequel" -> "SEQUEL")
+ * @param relation - Raw relation type string
+ * @returns Normalized AnimeRelationType or "OTHER" if unknown
+ */
+export function normalizeRelationType(relation: string): AnimeRelationType {
+    // Normalize: uppercase, replace spaces with underscores
+    const normalized = relation
+        .toUpperCase()
+        .replace(/\s+/g, "_")
+        .replace("PARENT_STORY", "PARENT")
+        .replace("ALTERNATIVE_VERSION", "ALTERNATIVE")
+        .replace("ALTERNATIVE_SETTING", "ALTERNATIVE")
+        .replace("FULL_STORY", "PARENT")
+        .replace("SPIN-OFF", "SPIN_OFF") as AnimeRelationType;
+
+    // Return normalized value if valid, otherwise default to OTHER
+    return VALID_RELATION_TYPES.includes(normalized) ? normalized : "OTHER";
+}
+
+/**
+ * Formats a relation type for display
+ * @param relationType - The relation type enum value
+ * @returns Human-readable relation type string
+ */
+export function formatRelationType(relationType: AnimeRelationType): string {
+    const displayMap: Record<AnimeRelationType, string> = {
+        SEQUEL: "Sequel",
+        PREQUEL: "Prequel",
+        SIDE_STORY: "Side Story",
+        ALTERNATIVE: "Alternative",
+        SPIN_OFF: "Spin-Off",
+        CHARACTER: "Character",
+        PARENT: "Parent Story",
+        OTHER: "Other",
+        SUMMARY: "Summary",
+        ADAPTATION: "Adaptation",
+        SOURCE: "Source",
+        CONTAINS: "Contains",
+    };
+    return displayMap[relationType] || relationType;
+}
+
+/**
+ * Gets the display order priority for relation types
+ * Lower numbers appear first (sequels/prequels are most important)
+ * @param relationType - The relation type
+ * @returns Priority number for sorting
+ */
+export function getRelationTypePriority(relationType: AnimeRelationType): number {
+    const priorityMap: Record<AnimeRelationType, number> = {
+        PREQUEL: 1,
+        SEQUEL: 2,
+        PARENT: 3,
+        SIDE_STORY: 4,
+        SPIN_OFF: 5,
+        ALTERNATIVE: 6,
+        SUMMARY: 7,
+        ADAPTATION: 8,
+        SOURCE: 9,
+        CHARACTER: 10,
+        CONTAINS: 11,
+        OTHER: 12,
+    };
+    return priorityMap[relationType] || 99;
 }
