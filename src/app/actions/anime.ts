@@ -234,7 +234,8 @@ async function fetchRelatedAnime(
             .filter((rel) => rel.target_anime !== null)
             .map((rel) => ({
                 relationType: rel.relation_type as AnimeRelationType,
-                anime: transformAnimeRow(rel.target_anime as AnimeRow),
+                // Supabase returns joined data as object, cast through unknown for type safety
+                anime: transformAnimeRow(rel.target_anime as unknown as AnimeRow),
             }));
 
         return { data: relatedAnime, hasError: false };
