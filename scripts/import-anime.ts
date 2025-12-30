@@ -8,9 +8,16 @@
  */
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { customAlphabet } from "nanoid";
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
+
+// Short ID generator: 8-character uppercase alphanumeric
+const generateShortId = customAlphabet(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    8
+);
 
 // Load environment variables from .env.local
 dotenv.config({ path: ".env.local" });
@@ -71,6 +78,7 @@ interface RawAnime {
  * Transformed anime object for database insertion
  */
 interface TransformedAnime {
+    short_id: string;
     slug: string;
     titles: {
         english: string | null;
@@ -400,6 +408,9 @@ function mapPlatform(platform: string): string | null {
  * @returns Transformed anime object for database
  */
 function transformAnime(raw: RawAnime): TransformedAnime {
+    // Generate short ID for URL-stable identification
+    const short_id = generateShortId();
+
     // Generate slug from the anime title (normalized: lowercase, hyphens, URL-safe)
     // Prefer romaji title, fallback to english, then native
     const titleForSlug =
@@ -419,6 +430,7 @@ function transformAnime(raw: RawAnime): TransformedAnime {
     const normalizedEndDate = normalizeDateField(raw.dateEnd);
 
     return {
+        short_id,
         slug,
         titles,
         format: mapFormat(raw.format),

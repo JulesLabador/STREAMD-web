@@ -5,6 +5,7 @@
  * Handles field mapping, data normalization, and slug generation.
  */
 
+import { customAlphabet } from "nanoid";
 import type {
     KitsuAnime,
     KitsuAnimeListResponse,
@@ -17,6 +18,9 @@ import type {
 } from "./types";
 import type { AnimeFormat, AnimeSeason, AnimeStatus } from "@/types/anime";
 
+// Short ID generator: 8-character uppercase alphanumeric
+const generateShortId = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 8);
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -25,6 +29,7 @@ import type { AnimeFormat, AnimeSeason, AnimeStatus } from "@/types/anime";
  * Transformed anime record ready for database insertion
  */
 export interface TransformedAnime {
+    short_id: string;
     slug: string;
     titles: {
         english: string | null;
@@ -301,6 +306,9 @@ export function transformAnime(
 ): TransformedAnime {
     const attrs = anime.attributes;
 
+    // Generate short ID for URL-stable identification
+    const short_id = generateShortId();
+
     // Build titles object
     const titles = {
         english: attrs.titles.en || attrs.titles.en_us || null,
@@ -324,6 +332,7 @@ export function transformAnime(
     const seasonYear = yearOverride || extractYear(attrs.startDate);
 
     return {
+        short_id,
         slug,
         titles,
         format: mapFormat(attrs.subtype),
