@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
             },
             {
                 protocol: "https",
+                hostname:
+                    "kitsu-production-media.s3.us-west-002.backblazeb2.com",
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
                 hostname: "s4.anilist.co",
                 pathname: "/**",
             },
