@@ -344,7 +344,7 @@ function parseIntId(id: string | null | undefined): number | null {
  * @returns ISO date string (YYYY-MM-DD) or null
  */
 function normalizeDateField(
-    dateValue: string | { $date: string } | null | undefined,
+    dateValue: string | { $date: string } | null | undefined
 ): string | null {
     if (!dateValue) return null;
 
@@ -454,7 +454,7 @@ function transformAnime(raw: RawAnime): TransformedAnime {
 async function getOrCreateStudio(
     supabase: SupabaseClient,
     studioName: string,
-    studioCache: Map<string, string>,
+    studioCache: Map<string, string>
 ): Promise<string | null> {
     // Check cache first
     if (studioCache.has(studioName)) {
@@ -499,7 +499,7 @@ async function getOrCreateStudio(
         }
         console.error(
             `Failed to create studio "${studioName}":`,
-            error.message,
+            error.message
         );
         return null;
     }
@@ -517,7 +517,7 @@ async function getOrCreateStudio(
 async function linkAnimeStudios(
     supabase: SupabaseClient,
     animeId: string,
-    studioIds: string[],
+    studioIds: string[]
 ): Promise<void> {
     if (studioIds.length === 0) return;
 
@@ -533,7 +533,7 @@ async function linkAnimeStudios(
     if (error && !error.message.includes("duplicate key value")) {
         console.error(
             `Failed to link studios for anime ${animeId}:`,
-            error.message,
+            error.message
         );
     }
 }
@@ -547,7 +547,7 @@ async function linkAnimeStudios(
 async function createStreamingLinks(
     supabase: SupabaseClient,
     animeId: string,
-    platforms: string[],
+    platforms: string[]
 ): Promise<void> {
     if (!platforms || platforms.length === 0) return;
 
@@ -575,7 +575,7 @@ async function createStreamingLinks(
     if (error && !error.message.includes("duplicate key value")) {
         console.error(
             `Failed to create streaming links for anime ${animeId}:`,
-            error.message,
+            error.message
         );
     }
 }
@@ -610,30 +610,51 @@ function normalizeRelationType(relation: string): string {
  */
 async function importAnimeRelations(
     supabase: SupabaseClient,
-    animeData: RawAnime[],
+    animeData: RawAnime[]
 ): Promise<number> {
     console.log("\nImporting anime relations...");
 
-    // Build a map of MAL ID to anime UUID for quick lookups
-    const { data: animeList, error: fetchError } = await supabase
-        .from("anime")
-        .select("id, mal_id")
-        .not("mal_id", "is", null);
+    // Build a map of AniList ID to anime UUID for quick lookups
+    // Note: relatedAnime IDs in anime.json are AniList IDs, not MAL IDs
+    // Supabase has a default limit of 1000 rows, so we need to paginate
+    const anilistIdToUuid = new Map<number, string>();
+    const pageSize = 1000;
+    let offset = 0;
+    let hasMore = true;
 
-    if (fetchError) {
-        console.error("Failed to fetch anime list for relations:", fetchError.message);
-        return 0;
-    }
+    while (hasMore) {
+        const { data: animeList, error: fetchError } = await supabase
+            .from("anime")
+            .select("id, anilist_id")
+            .not("anilist_id", "is", null)
+            .range(offset, offset + pageSize - 1);
 
-    // Create MAL ID -> UUID map
-    const malIdToUuid = new Map<number, string>();
-    for (const anime of animeList || []) {
-        if (anime.mal_id) {
-            malIdToUuid.set(anime.mal_id, anime.id);
+        if (fetchError) {
+            console.error(
+                "Failed to fetch anime list for relations:",
+                fetchError.message
+            );
+            return 0;
+        }
+
+        // Add to map
+        for (const anime of animeList || []) {
+            if (anime.anilist_id) {
+                anilistIdToUuid.set(anime.anilist_id, anime.id);
+            }
+        }
+
+        // Check if we need to fetch more
+        if (!animeList || animeList.length < pageSize) {
+            hasMore = false;
+        } else {
+            offset += pageSize;
         }
     }
 
-    console.log(`  Built lookup map with ${malIdToUuid.size} anime entries`);
+    console.log(
+        `  Built lookup map with ${anilistIdToUuid.size} anime entries`
+    );
 
     // Collect all relations to import
     const relations: Array<{
@@ -644,16 +665,16 @@ async function importAnimeRelations(
 
     for (const raw of animeData) {
         if (!raw.relatedAnime || raw.relatedAnime.length === 0) continue;
-        if (!raw.idMAL) continue;
+        if (!raw.idAnilist) continue;
 
-        const sourceId = malIdToUuid.get(parseInt(raw.idMAL, 10));
+        const sourceId = anilistIdToUuid.get(parseInt(raw.idAnilist, 10));
         if (!sourceId) continue;
 
         for (const related of raw.relatedAnime) {
-            const targetMalId = parseInt(related.id, 10);
-            if (isNaN(targetMalId)) continue;
+            const targetAnilistId = parseInt(related.id, 10);
+            if (isNaN(targetAnilistId)) continue;
 
-            const targetId = malIdToUuid.get(targetMalId);
+            const targetId = anilistIdToUuid.get(targetAnilistId);
             if (!targetId) continue;
 
             // Skip self-references
@@ -682,7 +703,10 @@ async function importAnimeRelations(
         .neq("id", "00000000-0000-0000-0000-000000000000"); // Delete all
 
     if (deleteError) {
-        console.error("Failed to clear existing relations:", deleteError.message);
+        console.error(
+            "Failed to clear existing relations:",
+            deleteError.message
+        );
     }
 
     // Import relations in batches
@@ -700,8 +724,10 @@ async function importAnimeRelations(
 
         if (insertError) {
             console.error(
-                `  Failed to import relations batch ${Math.floor(i / relationBatchSize) + 1}:`,
-                insertError.message,
+                `  Failed to import relations batch ${
+                    Math.floor(i / relationBatchSize) + 1
+                }:`,
+                insertError.message
             );
         } else {
             successCount += batch.length;
@@ -722,7 +748,7 @@ async function importAnimeRelations(
 async function importBatch(
     supabase: SupabaseClient,
     batch: RawAnime[],
-    studioCache: Map<string, string>,
+    studioCache: Map<string, string>
 ): Promise<number> {
     let successCount = 0;
 
@@ -740,14 +766,14 @@ async function importBatch(
             if (animeError) {
                 console.error(
                     `Failed to import "${transformed.titles.romaji}":`,
-                    animeError.message,
+                    animeError.message
                 );
                 continue;
             }
 
             if (!anime) {
                 console.error(
-                    `No data returned for "${transformed.titles.romaji}"`,
+                    `No data returned for "${transformed.titles.romaji}"`
                 );
                 continue;
             }
@@ -759,7 +785,7 @@ async function importBatch(
                     const studioId = await getOrCreateStudio(
                         supabase,
                         studioName,
-                        studioCache,
+                        studioCache
                     );
                     if (studioId) {
                         studioIds.push(studioId);
@@ -773,7 +799,7 @@ async function importBatch(
                 await createStreamingLinks(
                     supabase,
                     anime.id,
-                    raw.streamingPlatforms,
+                    raw.streamingPlatforms
                 );
             }
 
@@ -793,11 +819,19 @@ async function importBatch(
 /**
  * Main import function
  * Reads anime.json and imports all records to the database
+ * Use --relations-only flag to skip anime import and only import relations
  */
 async function main(): Promise<void> {
     console.log("=".repeat(60));
     console.log("STREAMD Anime Import Script");
     console.log("=".repeat(60));
+
+    // Check for --relations-only flag to skip anime batch processing
+    const relationsOnly = process.argv.includes("--relations-only");
+
+    if (relationsOnly) {
+        console.log("Mode: Relations only (skipping anime import)");
+    }
 
     // Validate environment variables
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -805,7 +839,7 @@ async function main(): Promise<void> {
 
     if (!supabaseUrl || !supabaseKey) {
         console.error(
-            "Error: Missing environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY in .env.local",
+            "Error: Missing environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY in .env.local"
         );
         process.exit(1);
     }
@@ -848,46 +882,55 @@ async function main(): Promise<void> {
         process.exit(1);
     }
 
-    console.log(`Found ${animeData.length} anime records to import`);
+    console.log(`Found ${animeData.length} anime records`);
     console.log("-".repeat(60));
 
-    // Initialize studio cache
-    const studioCache = new Map<string, string>();
-
-    // Process in batches
     let totalImported = 0;
-    const totalBatches = Math.ceil(animeData.length / BATCH_SIZE);
 
-    for (let i = 0; i < animeData.length; i += BATCH_SIZE) {
-        const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
-        const batch = animeData.slice(i, i + BATCH_SIZE);
+    // Skip batch processing if --relations-only flag is set
+    if (!relationsOnly) {
+        // Initialize studio cache
+        const studioCache = new Map<string, string>();
 
-        console.log(
-            `Processing batch ${batchNumber}/${totalBatches} (${batch.length} records)...`,
-        );
+        // Process in batches
+        const totalBatches = Math.ceil(animeData.length / BATCH_SIZE);
 
-        const imported = await importBatch(supabase, batch, studioCache);
-        totalImported += imported;
+        for (let i = 0; i < animeData.length; i += BATCH_SIZE) {
+            const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
+            const batch = animeData.slice(i, i + BATCH_SIZE);
 
-        console.log(
-            `  Batch ${batchNumber} complete: ${imported}/${batch.length} imported successfully`,
-        );
+            console.log(
+                `Processing batch ${batchNumber}/${totalBatches} (${batch.length} records)...`
+            );
+
+            const imported = await importBatch(supabase, batch, studioCache);
+            totalImported += imported;
+
+            console.log(
+                `  Batch ${batchNumber} complete: ${imported}/${batch.length} imported successfully`
+            );
+        }
+
+        console.log("-".repeat(60));
+        console.log(`Anime import complete!`);
+        console.log(`  Total records processed: ${animeData.length}`);
+        console.log(`  Successfully imported: ${totalImported}`);
+        console.log(`  Failed: ${animeData.length - totalImported}`);
+        console.log(`  Studios created: ${studioCache.size}`);
     }
 
-    console.log("-".repeat(60));
-    console.log(`Anime import complete!`);
-    console.log(`  Total records processed: ${animeData.length}`);
-    console.log(`  Successfully imported: ${totalImported}`);
-    console.log(`  Failed: ${animeData.length - totalImported}`);
-    console.log(`  Studios created: ${studioCache.size}`);
-
-    // Import anime relations after all anime are imported
+    // Import anime relations (always runs)
     const relationsImported = await importAnimeRelations(supabase, animeData);
 
     console.log("-".repeat(60));
-    console.log(`Full import complete!`);
-    console.log(`  Anime imported: ${totalImported}`);
-    console.log(`  Relations imported: ${relationsImported}`);
+    if (relationsOnly) {
+        console.log(`Relations import complete!`);
+        console.log(`  Relations imported: ${relationsImported}`);
+    } else {
+        console.log(`Full import complete!`);
+        console.log(`  Anime imported: ${totalImported}`);
+        console.log(`  Relations imported: ${relationsImported}`);
+    }
     console.log("=".repeat(60));
 }
 
