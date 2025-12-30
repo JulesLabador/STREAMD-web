@@ -323,23 +323,35 @@ export async function getUserAnimeForAnime(
 // =============================================
 
 /**
- * Helper function to get anime slug by ID for analytics tracking
+ * Anime URL info for analytics tracking
+ */
+interface AnimeUrlInfo {
+    slug: string;
+    shortId: string;
+}
+
+/**
+ * Helper function to get anime slug and short_id by ID for analytics tracking
  *
  * @param supabase - Supabase client instance
  * @param animeId - The anime's ID
- * @returns Anime slug or undefined if not found
+ * @returns Anime URL info or undefined if not found
  */
-async function getAnimeSlugById(
+async function getAnimeUrlInfoById(
     supabase: Awaited<ReturnType<typeof createClient>>,
     animeId: string
-): Promise<string | undefined> {
+): Promise<AnimeUrlInfo | undefined> {
     const { data } = await supabase
         .from("anime")
-        .select("slug")
+        .select("slug, short_id")
         .eq("id", animeId)
         .single();
 
-    return data?.slug;
+    if (!data?.slug || !data?.short_id) {
+        return undefined;
+    }
+
+    return { slug: data.slug, shortId: data.short_id };
 }
 
 /**
@@ -393,10 +405,10 @@ export async function addAnimeToList(
             };
         }
 
-        // Check if anime exists and get slug for analytics
+        // Check if anime exists and get slug/short_id for analytics
         const { data: animeData } = await supabase
             .from("anime")
-            .select("id, slug")
+            .select("id, slug, short_id")
             .eq("id", animeId)
             .single();
 
@@ -471,7 +483,7 @@ export async function addAnimeToList(
         // Track analytics event (fire-and-forget)
         trackServerEventAsync(
             "anime_added",
-            `https://www.streamdanime.io/anime/${animeData.slug}`,
+            `https://www.streamdanime.io/anime/${animeData.short_id}/${animeData.slug}`,
             {
                 status,
                 anime_slug: animeData.slug,
@@ -602,15 +614,15 @@ export async function updateAnimeTracking(
             return { success: false, error: "Failed to update tracking" };
         }
 
-        // Get anime slug for analytics (fire-and-forget)
-        const animeSlug = await getAnimeSlugById(supabase, animeId);
-        if (animeSlug) {
+        // Get anime URL info for analytics (fire-and-forget)
+        const animeInfo = await getAnimeUrlInfoById(supabase, animeId);
+        if (animeInfo) {
             trackServerEventAsync(
                 "anime_updated",
-                `https://www.streamdanime.io/anime/${animeSlug}`,
+                `https://www.streamdanime.io/anime/${animeInfo.shortId}/${animeInfo.slug}`,
                 {
                     status: input.status,
-                    anime_slug: animeSlug,
+                    anime_slug: animeInfo.slug,
                 }
             );
         }
@@ -659,8 +671,8 @@ export async function removeAnimeFromList(
             };
         }
 
-        // Get anime slug for analytics before deletion
-        const animeSlug = await getAnimeSlugById(supabase, animeId);
+        // Get anime URL info for analytics before deletion
+        const animeInfo = await getAnimeUrlInfoById(supabase, animeId);
 
         // Delete tracking entry
         const { error } = await supabase
@@ -675,12 +687,12 @@ export async function removeAnimeFromList(
         }
 
         // Track analytics event (fire-and-forget)
-        if (animeSlug) {
+        if (animeInfo) {
             trackServerEventAsync(
                 "anime_removed",
-                `https://www.streamdanime.io/anime/${animeSlug}`,
+                `https://www.streamdanime.io/anime/${animeInfo.shortId}/${animeInfo.slug}`,
                 {
-                    anime_slug: animeSlug,
+                    anime_slug: animeInfo.slug,
                 }
             );
         }

@@ -20,16 +20,17 @@ export async function GET() {
     const now = new Date().toISOString();
 
     try {
-        // Fetch all anime slugs
+        // Fetch all anime with short_id and slug
         const { data: animeData } = await supabase
             .from("anime")
-            .select("slug, updated_at")
+            .select("short_id, slug, updated_at")
+            .not("short_id", "is", null)
             .order("popularity", { ascending: true });
 
         if (animeData) {
             for (const anime of animeData) {
                 fields.push({
-                    loc: `${siteUrl}/anime/${anime.slug}`,
+                    loc: `${siteUrl}/anime/${anime.short_id}/${anime.slug}`,
                     lastmod: anime.updated_at || now,
                     changefreq: "weekly",
                     priority: 0.7,

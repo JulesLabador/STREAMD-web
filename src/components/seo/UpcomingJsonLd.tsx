@@ -90,7 +90,7 @@ function buildItemListSchema(
                 item: {
                     "@type": isMovie ? "Movie" : "TVSeries",
                     name: displayTitle,
-                    url: `${siteUrl}/anime/${item.slug}`,
+                    url: `${siteUrl}/anime/${item.shortId}/${item.slug}`,
                 },
             };
 
