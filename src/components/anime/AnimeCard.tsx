@@ -92,10 +92,10 @@ export function AnimeCard({
                         className="object-cover transition-opacity group-hover:opacity-90"
                     />
                 ) : (
-                    // Placeholder when no image
-                    <div className="flex h-full items-center justify-center bg-secondary">
-                        <span className="text-4xl text-muted-foreground">
-                            🎬
+                    // Placeholder when no image - display title centered
+                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-secondary to-muted p-4">
+                        <span className="line-clamp-4 text-center text-sm font-medium leading-snug text-muted-foreground">
+                            {displayTitle}
                         </span>
                     </div>
                 )}
