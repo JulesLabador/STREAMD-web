@@ -36,7 +36,7 @@ export async function generateStaticParams() {
 
     // Generate static pages for top 20 genres by count
     return result.data
-        .sort((a, b) => b.count - a.count)
+        .sort((a, b) => b.animeCount - a.animeCount)
         .slice(0, 20)
         .map((genre) => ({ genre: genre.slug }));
 }
@@ -57,14 +57,14 @@ function generateJsonLd(
             "@type": "TVSeries",
             name: anime.titles?.english || anime.titles?.romaji || "Unknown",
             url: `${SITE_URL}/anime/${anime.shortId}/${anime.slug}`,
-            image: anime.coverImage?.extraLarge || anime.coverImage?.large,
-            description: anime.description
-                ? anime.description.replace(/<[^>]*>/g, "").slice(0, 200)
+            image: anime.coverImageUrl,
+            description: anime.synopsis
+                ? anime.synopsis.replace(/<[^>]*>/g, "").slice(0, 200)
                 : undefined,
-            aggregateRating: anime.averageScore
+            aggregateRating: anime.averageRating
                 ? {
                       "@type": "AggregateRating",
-                      ratingValue: anime.averageScore / 10,
+                      ratingValue: anime.averageRating / 10,
                       bestRating: 10,
                       worstRating: 0,
                       ratingCount: anime.popularity || 1,

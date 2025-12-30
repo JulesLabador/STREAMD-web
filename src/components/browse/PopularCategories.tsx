@@ -44,7 +44,7 @@ const FORMATS = [
 export function PopularCategories({ genres, years }: PopularCategoriesProps) {
     // Get top genres by count
     const topGenres = genres
-        .sort((a, b) => b.count - a.count)
+        .sort((a, b) => b.animeCount - a.animeCount)
         .slice(0, 12);
 
     // Get recent years (last 5)
@@ -85,7 +85,7 @@ export function PopularCategories({ genres, years }: PopularCategoriesProps) {
                             >
                                 {genre.name}
                                 <span className="ml-1 text-xs opacity-60 group-hover:opacity-80">
-                                    ({genre.count.toLocaleString()})
+                                    ({genre.animeCount.toLocaleString()})
                                 </span>
                             </Badge>
                         </Link>

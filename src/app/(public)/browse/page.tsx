@@ -343,22 +343,15 @@ function generateJsonLd(
             "@type": "TVSeries",
             name: anime.titles?.english || anime.titles?.romaji || "Unknown",
             url: `${SITE_URL}/anime/${anime.shortId}/${anime.slug}`,
-            image: anime.coverImage?.extraLarge || anime.coverImage?.large,
-            description: anime.description
-                ? anime.description.replace(/<[^>]*>/g, "").slice(0, 200)
+            image: anime.coverImageUrl,
+            description: anime.synopsis
+                ? anime.synopsis.replace(/<[^>]*>/g, "").slice(0, 200)
                 : undefined,
-            datePublished: anime.startDate
-                ? `${anime.startDate.year}-${String(
-                      anime.startDate.month || 1
-                  ).padStart(2, "0")}-${String(anime.startDate.day || 1).padStart(
-                      2,
-                      "0"
-                  )}`
-                : undefined,
-            aggregateRating: anime.averageScore
+            datePublished: anime.startDate || undefined,
+            aggregateRating: anime.averageRating
                 ? {
                       "@type": "AggregateRating",
-                      ratingValue: anime.averageScore / 10,
+                      ratingValue: anime.averageRating / 10,
                       bestRating: 10,
                       worstRating: 0,
                       ratingCount: anime.popularity || 1,
