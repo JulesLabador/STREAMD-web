@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
@@ -14,7 +14,7 @@ import {
     TrendingUp,
     Tv,
 } from "lucide-react";
-import { getAnimeBySlug } from "@/app/actions/anime";
+import { getAnimeByShortId } from "@/app/actions/anime";
 import { getUserAnimeForAnime } from "@/app/actions/user";
 import { createClient } from "@/lib/supabase/server";
 import { InfoItem } from "@/components/anime/InfoItem";
@@ -41,10 +41,21 @@ const SITE_URL =
     process.env.NEXT_PUBLIC_SITE_URL || "https://www.streamdanime.io";
 
 /**
- * Page props with dynamic slug parameter
+ * Page props with dynamic id and optional slug parameters
+ *
+ * URL format: /anime/{shortId}/{slug}
+ * - shortId: 8-character uppercase alphanumeric ID (required)
+ * - slug: SEO-friendly URL slug (optional, used for canonical URLs)
+ *
+ * Examples:
+ * - /anime/A1B2C3D4/koe-no-katachi (full URL)
+ * - /anime/A1B2C3D4 (ID only, redirects to full URL)
  */
 interface AnimePageProps {
-    params: Promise<{ slug: string }>;
+    params: Promise<{
+        id: string;
+        slug?: string[];
+    }>;
 }
 
 /**
@@ -53,8 +64,8 @@ interface AnimePageProps {
 export async function generateMetadata({
     params,
 }: AnimePageProps): Promise<Metadata> {
-    const { slug } = await params;
-    const result = await getAnimeBySlug(slug);
+    const { id } = await params;
+    const result = await getAnimeByShortId(id);
 
     if (!result.success) {
         return {
@@ -77,7 +88,7 @@ export async function generateMetadata({
             type: "website",
         },
         alternates: {
-            canonical: `${SITE_URL}/anime/${slug}`,
+            canonical: `${SITE_URL}/anime/${anime.shortId}/${anime.slug}`,
         },
     };
 }
@@ -104,11 +115,19 @@ export const revalidate = 3600;
  * - External links
  */
 export default async function AnimePage({ params }: AnimePageProps) {
-    const { slug } = await params;
+    const { id, slug: slugArray } = await params;
+
+    // Normalize the short ID to uppercase
+    const normalizedId = id.toUpperCase();
+
+    // Validate short ID format (8 uppercase alphanumeric characters)
+    if (!/^[A-Z0-9]{8}$/.test(normalizedId)) {
+        notFound();
+    }
 
     // Run anime fetch and auth check in parallel for better performance
     const [result, supabase] = await Promise.all([
-        getAnimeBySlug(slug),
+        getAnimeByShortId(normalizedId),
         createClient(),
     ]);
 
@@ -139,7 +158,19 @@ export default async function AnimePage({ params }: AnimePageProps) {
 
     const anime: AnimeWithRelations = result.data;
     const displayTitle = anime.titles.english || anime.titles.romaji;
-    const animeUrl = `${SITE_URL}/anime/${anime.slug}`;
+
+    // Get the provided slug from URL (if any)
+    const providedSlug = slugArray?.[0];
+
+    // Redirect to canonical URL if:
+    // 1. No slug provided (ID-only URL)
+    // 2. Wrong slug provided (different from anime's actual slug)
+    // 3. ID was lowercase (normalize to uppercase)
+    if (!providedSlug || providedSlug !== anime.slug || id !== normalizedId) {
+        redirect(`/anime/${anime.shortId}/${anime.slug}`);
+    }
+
+    const animeUrl = `${SITE_URL}/anime/${anime.shortId}/${anime.slug}`;
 
     // Get user auth status (already have supabase client from parallel fetch)
     const {
@@ -254,6 +285,8 @@ export default async function AnimePage({ params }: AnimePageProps) {
                             <div className="flex justify-center pt-2">
                                 <TrackingButton
                                     animeId={anime.id}
+                                    animeShortId={anime.shortId}
+                                    animeSlug={anime.slug}
                                     animeTitle={displayTitle}
                                     episodeCount={anime.episodeCount}
                                     isAuthenticated={isAuthenticated}
