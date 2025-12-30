@@ -19,6 +19,7 @@ import { getUserAnimeForAnime } from "@/app/actions/user";
 import { createClient } from "@/lib/supabase/server";
 import { InfoItem } from "@/components/anime/InfoItem";
 import { RatingBarSegmented } from "@/components/anime/RatingBar";
+import { RelatedAnimeSection } from "@/components/anime/RelatedAnimeSection";
 import { TrackingButton } from "@/components/tracking";
 import { AnimeJsonLd } from "@/components/seo/AnimeJsonLd";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +37,8 @@ import type { AnimeWithRelations } from "@/types/anime";
 /**
  * Base URL for the site (used for JSON-LD)
  */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.streamdanime.io";
 
 /**
  * Page props with dynamic slug parameter
@@ -92,6 +94,7 @@ export async function generateMetadata({
  * - Details card (status, popularity, dates)
  * - Studios card
  * - Streaming links card
+ * - Related anime (sequels, prequels, side stories, etc.)
  * - External links
  */
 export default async function AnimePage({ params }: AnimePageProps) {
@@ -450,6 +453,14 @@ export default async function AnimePage({ params }: AnimePageProps) {
                                     </div>
                                 </CardContent>
                             </Card>
+                        )}
+
+                        {/* ===== RELATED ANIME SECTION ===== */}
+                        {(anime.relatedAnime.data.length > 0 ||
+                            anime.relatedAnime.hasError) && (
+                            <RelatedAnimeSection
+                                relatedAnime={anime.relatedAnime}
+                            />
                         )}
 
                         {/* ===== EXTERNAL LINKS (NO CARD) ===== */}
