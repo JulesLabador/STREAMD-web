@@ -49,6 +49,8 @@ export const ANIME_INDEX = "anime";
 export interface AnimeSearchDocument {
     /** Algolia object ID - uses the anime UUID */
     objectID: string;
+    /** Short ID for URL construction (8-char alphanumeric) */
+    shortId: string | null;
     /** URL-friendly slug for navigation */
     slug: string;
     /** Anime titles in multiple languages */

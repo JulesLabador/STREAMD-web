@@ -47,6 +47,7 @@ export async function searchAnime(
         // so we provide default values for them
         const anime: Anime[] = result.hits.map((hit) => ({
             id: hit.objectID,
+            shortId: hit.shortId,
             slug: hit.slug,
             titles: hit.titles,
             format: hit.format as Anime["format"],

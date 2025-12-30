@@ -26,6 +26,7 @@ dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
  */
 interface AnimeSearchDocument {
     objectID: string;
+    shortId: string | null;
     slug: string;
     titles: {
         english: string | null;
@@ -47,6 +48,7 @@ interface AnimeSearchDocument {
  */
 interface AnimeRow {
     id: string;
+    short_id: string | null;
     slug: string;
     titles: {
         english: string | null;
@@ -242,6 +244,7 @@ async function main(): Promise<void> {
     const documents: AnimeSearchDocument[] = (animeData as AnimeRow[]).map(
         (anime) => ({
             objectID: anime.id,
+            shortId: anime.short_id,
             slug: anime.slug,
             titles: anime.titles,
             format: anime.format,
