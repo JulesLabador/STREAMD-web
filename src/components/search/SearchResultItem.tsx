@@ -41,9 +41,14 @@ export function SearchResultItem({ anime, index }: SearchResultItemProps) {
         metadata.push(`${anime.episodeCount} eps`);
     }
 
+    // Use shortId if available, otherwise fall back to slug-only URL
+    const animeUrl = anime.shortId
+        ? `/anime/${anime.shortId}/${anime.slug}`
+        : `/anime/${anime.slug}`;
+
     return (
         <a
-            href={`/anime/${anime.slug}`}
+            href={animeUrl}
             onClick={(e) => {
                 e.preventDefault();
                 onSelect(anime);

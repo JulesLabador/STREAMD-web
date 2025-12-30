@@ -115,8 +115,11 @@ export function SearchProvider({
                 customOnSelect(anime);
             }
 
-            // Navigate to anime page
-            router.push(`/anime/${anime.slug}`);
+            // Navigate to anime page (fallback to slug-only if no shortId)
+            const animeUrl = anime.shortId
+                ? `/anime/${anime.shortId}/${anime.slug}`
+                : `/anime/${anime.slug}`;
+            router.push(animeUrl);
 
             // Clear search state
             search.clearSearch();

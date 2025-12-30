@@ -59,9 +59,14 @@ export function UserAnimeCard({
             ? (userAnime.currentEpisode / anime.episodeCount) * 100
             : 0;
 
+    // Use shortId if available, otherwise fall back to slug-only URL
+    const animeUrl = anime.shortId
+        ? `/anime/${anime.shortId}/${anime.slug}`
+        : `/anime/${anime.slug}`;
+
     return (
         <Link
-            href={`/anime/${anime.slug}`}
+            href={animeUrl}
             className="group block overflow-hidden rounded-lg transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
             {/* Cover image container with 3:4 aspect ratio */}

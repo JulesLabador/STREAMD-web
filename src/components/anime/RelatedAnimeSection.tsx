@@ -81,9 +81,14 @@ function RelatedAnimeCard({ related }: { related: RelatedAnime }) {
     const { anime } = related;
     const displayTitle = anime.titles.english || anime.titles.romaji;
 
+    // Use shortId if available, otherwise fall back to slug-only URL
+    const animeUrl = anime.shortId
+        ? `/anime/${anime.shortId}/${anime.slug}`
+        : `/anime/${anime.slug}`;
+
     return (
         <Link
-            href={`/anime/${anime.slug}`}
+            href={animeUrl}
             className="group flex-shrink-0 w-[140px] sm:w-[160px] transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
         >
             {/* Cover image with 3:4 aspect ratio */}

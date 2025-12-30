@@ -14,6 +14,10 @@ import { USER_ANIME_STATUS_LABELS } from "@/types/user";
 interface TrackingButtonProps {
     /** The anime ID to track */
     animeId: string;
+    /** The anime short ID for URL construction (null if not yet backfilled) */
+    animeShortId: string | null;
+    /** The anime slug for URL construction */
+    animeSlug: string;
     /** The anime title for display in dialog */
     animeTitle: string;
     /** Total episode count (for validation) */
@@ -35,6 +39,8 @@ interface TrackingButtonProps {
  */
 export function TrackingButton({
     animeId,
+    animeShortId,
+    animeSlug,
     animeTitle,
     episodeCount,
     isAuthenticated,
@@ -63,10 +69,11 @@ export function TrackingButton({
      */
     const handleClick = () => {
         if (!isAuthenticated) {
-            // Redirect to login
-            window.location.href = `/login?redirectTo=/anime/${encodeURIComponent(
-                animeId
-            )}`;
+            // Redirect to login with appropriate URL format
+            const redirectPath = animeShortId
+                ? `/anime/${encodeURIComponent(animeShortId)}/${encodeURIComponent(animeSlug)}`
+                : `/anime/${encodeURIComponent(animeSlug)}`;
+            window.location.href = `/login?redirectTo=${redirectPath}`;
             return;
         }
         setIsDialogOpen(true);
