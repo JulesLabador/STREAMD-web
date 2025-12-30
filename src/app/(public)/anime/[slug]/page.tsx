@@ -83,6 +83,12 @@ export async function generateMetadata({
 }
 
 /**
+ * Revalidate anime pages every hour (3600 seconds)
+ * This caches the page data and reduces database load on repeat visits
+ */
+export const revalidate = 3600;
+
+/**
  * Anime detail page
  *
  * Mobile-first, single-column layout displaying:
@@ -99,7 +105,12 @@ export async function generateMetadata({
  */
 export default async function AnimePage({ params }: AnimePageProps) {
     const { slug } = await params;
-    const result = await getAnimeBySlug(slug);
+
+    // Run anime fetch and auth check in parallel for better performance
+    const [result, supabase] = await Promise.all([
+        getAnimeBySlug(slug),
+        createClient(),
+    ]);
 
     // Handle not found
     if (!result.success) {
@@ -130,8 +141,7 @@ export default async function AnimePage({ params }: AnimePageProps) {
     const displayTitle = anime.titles.english || anime.titles.romaji;
     const animeUrl = `${SITE_URL}/anime/${anime.slug}`;
 
-    // Check if user is authenticated and fetch their tracking data
-    const supabase = await createClient();
+    // Get user auth status (already have supabase client from parallel fetch)
     const {
         data: { user },
     } = await supabase.auth.getUser();

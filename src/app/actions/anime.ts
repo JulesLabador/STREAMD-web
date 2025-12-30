@@ -192,7 +192,7 @@ export async function getAnimeBySlug(
 }
 
 /**
- * Fetches related anime for a given anime ID
+ * Fetches related anime for a given anime ID using a single query with join
  * Returns anime that are sequels, prequels, side stories, etc.
  *
  * @param supabase - Supabase client instance
@@ -204,20 +204,23 @@ async function fetchRelatedAnime(
     animeId: string
 ): Promise<RelatedAnimeResult> {
     try {
-        // First, fetch the relations for this anime
-        const { data: relations, error: relationsError } = await supabase
+        // Single query with join - fetches relations and target anime data together
+        const { data: relations, error } = await supabase
             .from("anime_relations")
-            .select("relation_type, target_anime_id")
+            .select(
+                `
+                relation_type,
+                target_anime:target_anime_id(*)
+            `
+            )
             .eq("source_anime_id", animeId);
 
-        if (relationsError) {
+        if (error) {
             // Table might not exist yet - this is expected before migration is run
-            if (relationsError.code === "42P01") {
-                // Table doesn't exist - return empty without error (not user's fault)
+            if (error.code === "42P01") {
                 return { data: [], hasError: false };
             }
-            // Log error but return gracefully with error flag
-            console.error("Error fetching anime relations:", relationsError);
+            console.error("Error fetching anime relations:", error);
             return { data: [], hasError: true };
         }
 
@@ -225,41 +228,14 @@ async function fetchRelatedAnime(
             return { data: [], hasError: false };
         }
 
-        // Get the target anime IDs
-        const targetAnimeIds = relations.map((r) => r.target_anime_id);
-
-        // Fetch the full anime data for all related anime
-        const { data: animeData, error: animeError } = await supabase
-            .from("anime")
-            .select("*")
-            .in("id", targetAnimeIds);
-
-        if (animeError) {
-            console.error("Error fetching related anime data:", animeError);
-            return { data: [], hasError: true };
-        }
-
-        if (!animeData || animeData.length === 0) {
-            return { data: [], hasError: false };
-        }
-
-        // Create a map of anime ID to anime data for quick lookup
-        const animeMap = new Map<string, AnimeRow>();
-        for (const anime of animeData as AnimeRow[]) {
-            animeMap.set(anime.id, anime);
-        }
-
         // Transform the relations into RelatedAnime objects
+        // Filter out any relations where the target anime wasn't found
         const relatedAnime = relations
-            .filter((rel) => animeMap.has(rel.target_anime_id))
-            .map((rel) => {
-                const targetAnime = animeMap.get(rel.target_anime_id)!;
-
-                return {
-                    relationType: rel.relation_type as AnimeRelationType,
-                    anime: transformAnimeRow(targetAnime),
-                };
-            });
+            .filter((rel) => rel.target_anime !== null)
+            .map((rel) => ({
+                relationType: rel.relation_type as AnimeRelationType,
+                anime: transformAnimeRow(rel.target_anime as AnimeRow),
+            }));
 
         return { data: relatedAnime, hasError: false };
     } catch (error) {
