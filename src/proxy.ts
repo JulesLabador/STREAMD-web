@@ -1,17 +1,79 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Proxy for Supabase Auth session management
+ * Checks if a string is a valid short ID format
+ * Valid format: exactly 8 uppercase alphanumeric characters
+ */
+function isValidShortId(id: string): boolean {
+    return /^[A-Z0-9]{8}$/i.test(id);
+}
+
+/**
+ * Proxy for Supabase Auth session management and URL redirects
  *
  * This proxy runs on every request and:
  * 1. Refreshes the auth session if it's expired
  * 2. Protects dashboard routes by redirecting unauthenticated users to login
+ * 3. Redirects old /anime/{slug} URLs to new /anime/{shortId}/{slug} format
  *
  * The session refresh is crucial for maintaining auth state across
  * server-side rendered pages.
  */
 export async function proxy(request: NextRequest) {
+    const { pathname } = request.nextUrl;
+
+    // ========================================
+    // Handle old /anime/{slug} URL redirects
+    // ========================================
+    if (pathname.startsWith("/anime/")) {
+        const segments = pathname.split("/").filter(Boolean);
+        // segments[0] = "anime", segments[1] = first param
+
+        if (segments.length >= 2) {
+            const firstParam = segments[1];
+
+            // If the first param is NOT a valid short ID (8 chars, alphanumeric),
+            // treat it as an old-style slug and try to redirect
+            if (!isValidShortId(firstParam)) {
+                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                const supabaseKey =
+                    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
+
+                if (supabaseUrl && supabaseKey) {
+                    try {
+                        const supabase = createClient(supabaseUrl, supabaseKey);
+
+                        // Look up anime by slug
+                        const { data: anime, error } = await supabase
+                            .from("anime")
+                            .select("short_id, slug")
+                            .eq("slug", firstParam)
+                            .single();
+
+                        if (!error && anime?.short_id) {
+                            // Build the new URL with short ID
+                            const newUrl = new URL(request.url);
+                            newUrl.pathname = `/anime/${anime.short_id}/${anime.slug}`;
+
+                            // 301 permanent redirect for SEO
+                            return NextResponse.redirect(newUrl, {
+                                status: 301,
+                            });
+                        }
+                    } catch {
+                        // On any error, continue to normal processing
+                    }
+                }
+            }
+        }
+    }
+
+    // ========================================
+    // Supabase Auth Session Management
+    // ========================================
+
     // Create a response that we can modify
     let supabaseResponse = NextResponse.next({
         request,
