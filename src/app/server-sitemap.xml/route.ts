@@ -2,9 +2,11 @@ import { getServerSideSitemap, ISitemapField } from "next-sitemap";
 import { createClient } from "@supabase/supabase-js";
 
 /**
- * Server-side sitemap generation for dynamic routes
+ * Server-side sitemap generation for dynamic content routes
  * This generates sitemap entries for all anime, genres, studios, seasons, and platforms
  * at request time, ensuring all database content is indexed
+ *
+ * Note: Browse page filter combinations are in a separate sitemap at /browse-sitemap.xml
  */
 export async function GET() {
     const siteUrl = process.env.SITE_URL || "https://www.streamdanime.io";
@@ -20,7 +22,10 @@ export async function GET() {
     const now = new Date().toISOString();
 
     try {
-        // Fetch all anime with short_id and slug
+        // ============================================================
+        // ANIME PAGES: /anime/{short_id}/{slug}
+        // All individual anime detail pages
+        // ============================================================
         const { data: animeData } = await supabase
             .from("anime")
             .select("short_id, slug, updated_at")
@@ -38,7 +43,10 @@ export async function GET() {
             }
         }
 
-        // Fetch all genre slugs
+        // ============================================================
+        // GENRE PAGES: /genre/{slug}
+        // Traditional genre listing pages (different from /browse/genre/{slug})
+        // ============================================================
         const { data: genreData } = await supabase
             .from("genres")
             .select("slug")
@@ -55,7 +63,10 @@ export async function GET() {
             }
         }
 
-        // Fetch all studio slugs
+        // ============================================================
+        // STUDIO PAGES: /studio/{slug}
+        // All studio detail pages
+        // ============================================================
         const { data: studioData } = await supabase
             .from("studios")
             .select("slug")
@@ -72,7 +83,10 @@ export async function GET() {
             }
         }
 
-        // Fetch all unique season/year combinations
+        // ============================================================
+        // SEASON PAGES: /season/{season}-{year}
+        // All unique season/year combination pages
+        // ============================================================
         const { data: seasonData } = await supabase
             .from("anime")
             .select("season, season_year")
@@ -101,7 +115,10 @@ export async function GET() {
             }
         }
 
-        // Fetch all unique streaming platforms
+        // ============================================================
+        // PLATFORM PAGES: /platforms/{platform}
+        // All streaming platform pages
+        // ============================================================
         const { data: platformData } = await supabase
             .from("streaming_links")
             .select("platform");

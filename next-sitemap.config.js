@@ -24,6 +24,7 @@ module.exports = {
         "/auth/*",
         "/api/*",
         "/server-sitemap.xml", // Exclude server-side sitemap from static generation
+        "/browse-sitemap.xml", // Exclude browse sitemap from static generation
     ],
 
     // Robots.txt configuration
@@ -33,6 +34,9 @@ module.exports = {
             `${
                 process.env.SITE_URL || "https://www.streamdanime.io"
             }/server-sitemap.xml`,
+            `${
+                process.env.SITE_URL || "https://www.streamdanime.io"
+            }/browse-sitemap.xml`,
         ],
         policies: [
             {
