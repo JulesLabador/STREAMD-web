@@ -192,6 +192,128 @@ export async function getAnimeBySlug(
 }
 
 /**
+ * Fetches a single anime by its short ID
+ * Includes related data: studios, streaming links, and related anime
+ *
+ * Short IDs are 8-character uppercase alphanumeric strings used in URLs
+ * for stable, immutable references independent of title changes.
+ *
+ * @param shortId - 8-character uppercase alphanumeric identifier
+ * @returns Anime with relations or error
+ */
+export async function getAnimeByShortId(
+    shortId: string
+): Promise<ActionResult<AnimeWithRelations>> {
+    try {
+        // Validate short ID format (8 uppercase alphanumeric characters)
+        if (!shortId || typeof shortId !== "string") {
+            return {
+                success: false,
+                error: "Invalid short ID",
+                code: "INVALID_INPUT",
+            };
+        }
+
+        // Normalize to uppercase and validate format
+        const normalizedId = shortId.toUpperCase();
+        if (!/^[A-Z0-9]{8}$/.test(normalizedId)) {
+            return {
+                success: false,
+                error: "Invalid short ID format",
+                code: "INVALID_INPUT",
+            };
+        }
+
+        const supabase = await createClient();
+
+        // Fetch anime with related studios via junction table
+        const { data, error } = await supabase
+            .from("anime")
+            .select(
+                `
+        *,
+        anime_studios(
+          studio:studios(id, name, slug)
+        ),
+        streaming_links(id, platform, url, region)
+      `
+            )
+            .eq("short_id", normalizedId)
+            .single();
+
+        if (error) {
+            if (error.code === "PGRST116") {
+                // No rows returned
+                return {
+                    success: false,
+                    error: "Anime not found",
+                    code: "NOT_FOUND",
+                };
+            }
+            console.error("Error fetching anime by short ID:", error);
+            return { success: false, error: "Failed to fetch anime" };
+        }
+
+        if (!data) {
+            return {
+                success: false,
+                error: "Anime not found",
+                code: "NOT_FOUND",
+            };
+        }
+
+        // Transform the response
+        const animeRow = data as AnimeRow & {
+            anime_studios: Array<{
+                studio: { id: string; name: string; slug: string };
+            }>;
+            streaming_links: Array<{
+                id: string;
+                platform: StreamingPlatform;
+                url: string;
+                region: string;
+            }>;
+        };
+
+        const anime = transformAnimeRow(animeRow);
+
+        // Extract studios from junction table results
+        const studios = (animeRow.anime_studios || [])
+            .filter((as) => as.studio)
+            .map((as) => ({
+                id: as.studio.id,
+                name: as.studio.name,
+                slug: as.studio.slug,
+            }));
+
+        // Transform streaming links
+        const streamingLinks = (animeRow.streaming_links || []).map((link) => ({
+            id: link.id,
+            animeId: anime.id,
+            platform: link.platform,
+            url: link.url,
+            region: link.region,
+        }));
+
+        // Fetch related anime
+        const relatedAnime = await fetchRelatedAnime(supabase, anime.id);
+
+        const animeWithRelations: AnimeWithRelations = {
+            ...anime,
+            genres: [], // Genres not implemented in current schema
+            studios,
+            streamingLinks,
+            relatedAnime,
+        };
+
+        return { success: true, data: animeWithRelations };
+    } catch (error) {
+        console.error("Error fetching anime by short ID:", error);
+        return { success: false, error: "Failed to fetch anime" };
+    }
+}
+
+/**
  * Fetches related anime for a given anime ID using a single query with join
  * Returns anime that are sequels, prequels, side stories, etc.
  *

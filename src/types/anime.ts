@@ -51,6 +51,7 @@ export interface AnimeTitles {
  */
 export interface Anime {
     id: string;
+    shortId: string | null;
     slug: string;
     titles: AnimeTitles;
     format: AnimeFormat;
@@ -168,6 +169,7 @@ export interface AnimeWithRelations extends Anime {
  */
 export interface AnimeRow {
     id: string;
+    short_id: string | null;
     slug: string;
     titles: AnimeTitles;
     format: AnimeFormat;
@@ -197,6 +199,7 @@ export interface AnimeRow {
 export function transformAnimeRow(row: AnimeRow): Anime {
     return {
         id: row.id,
+        shortId: row.short_id,
         slug: row.slug,
         titles: row.titles,
         format: row.format,
