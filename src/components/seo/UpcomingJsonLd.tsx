@@ -47,7 +47,7 @@ export function UpcomingJsonLd({
         currentSeason,
         nextSeasons,
         siteUrl,
-        currentYear,
+        currentYear
     );
 
     // Combine schemas into an array
@@ -67,7 +67,7 @@ export function UpcomingJsonLd({
  */
 function buildItemListSchema(
     anime: Anime[],
-    siteUrl: string,
+    siteUrl: string
 ): Record<string, unknown> {
     const schema: Record<string, unknown> = {
         "@context": "https://schema.org",
@@ -138,7 +138,7 @@ function buildWebPageSchema(
     currentSeason: SeasonInfo | null,
     nextSeasons: SeasonInfo[],
     siteUrl: string,
-    currentYear: number,
+    currentYear: number
 ): Record<string, unknown> {
     const seasonName = currentSeason
         ? `${SEASON_NAMES[currentSeason.season]} ${currentSeason.year}`
@@ -182,7 +182,9 @@ function buildWebPageSchema(
     if (currentSeason) {
         relatedLinks.push({
             "@type": "WebPage",
-            name: `${SEASON_NAMES[currentSeason.season]} ${currentSeason.year} Anime`,
+            name: `${SEASON_NAMES[currentSeason.season]} ${
+                currentSeason.year
+            } Anime`,
             url: `${siteUrl}/season/${currentSeason.slug}`,
         });
     }
@@ -208,6 +210,3 @@ function buildWebPageSchema(
 
     return schema;
 }
-
-
-

@@ -1,7 +1,8 @@
 /**
  * Site URL for structured data
  */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.streamdanime.io";
 
 /**
  * WebsiteJsonLd - Structured data component for the homepage
@@ -37,6 +38,3 @@ export function WebsiteJsonLd() {
         />
     );
 }
-
-
-

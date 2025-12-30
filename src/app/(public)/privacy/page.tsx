@@ -5,7 +5,8 @@ import { Shield, Mail, ExternalLink } from "lucide-react";
 /**
  * Site URL for canonical and OG URLs
  */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.streamdanime.io";
 
 /**
  * Last updated date for the privacy policy
@@ -159,9 +160,7 @@ export default function PrivacyPolicyPage() {
                                 <li>Your rating (0-10 scale)</li>
                                 <li>Start and completion dates</li>
                                 <li>Rewatch count</li>
-                                <li>
-                                    Personal notes (up to 5,000 characters)
-                                </li>
+                                <li>Personal notes (up to 5,000 characters)</li>
                                 <li>
                                     Privacy setting (public or private per
                                     entry)
@@ -178,12 +177,8 @@ export default function PrivacyPolicyPage() {
                                 <li>
                                     Reviews you write (minimum 50 characters)
                                 </li>
-                                <li>
-                                    Spoiler flags on your reviews
-                                </li>
-                                <li>
-                                    Helpful votes on reviews
-                                </li>
+                                <li>Spoiler flags on your reviews</li>
+                                <li>Helpful votes on reviews</li>
                             </ul>
                         </Subsection>
 
@@ -210,8 +205,7 @@ export default function PrivacyPolicyPage() {
 
                         <Subsection title="2.6 Analytics Data (Privacy-Friendly)">
                             <p>
-                                We use{" "}
-                                <strong>Plausible Analytics</strong>, a
+                                We use <strong>Plausible Analytics</strong>, a
                                 privacy-focused analytics service. This means:
                             </p>
                             <ul className="list-disc pl-6 space-y-2 mt-3">
@@ -267,16 +261,12 @@ export default function PrivacyPolicyPage() {
                     >
                         <p>We use your information to:</p>
                         <ul className="list-disc pl-6 space-y-2 mt-3">
-                            <li>
-                                Provide and maintain the STREAMD service
-                            </li>
+                            <li>Provide and maintain the STREAMD service</li>
                             <li>
                                 Display your public profile and anime list to
                                 other users
                             </li>
-                            <li>
-                                Calculate and show your watching statistics
-                            </li>
+                            <li>Calculate and show your watching statistics</li>
                             <li>
                                 Power search functionality (anime data only)
                             </li>
@@ -354,9 +344,7 @@ export default function PrivacyPolicyPage() {
                             <strong>We may share data:</strong>
                         </p>
                         <ul className="list-disc pl-6 space-y-2 mt-3">
-                            <li>
-                                If required by law (court order, subpoena)
-                            </li>
+                            <li>If required by law (court order, subpoena)</li>
                             <li>To protect our rights or safety</li>
                             <li>
                                 With service providers listed above (only as
@@ -367,7 +355,9 @@ export default function PrivacyPolicyPage() {
 
                     {/* Your Rights */}
                     <Section id="your-rights" title="6. Your Rights">
-                        <p>You have the following rights regarding your data:</p>
+                        <p>
+                            You have the following rights regarding your data:
+                        </p>
                         <div className="mt-4 space-y-4">
                             <RightCard
                                 title="View Your Data"
@@ -505,7 +495,7 @@ export default function PrivacyPolicyPage() {
                     {/* Children's Privacy */}
                     <Section
                         id="childrens-privacy"
-                        title="9. Children&apos;s Privacy"
+                        title="9. Children's Privacy"
                     >
                         <p>
                             STREAMD is not intended for children under 13 years
@@ -545,10 +535,7 @@ export default function PrivacyPolicyPage() {
                     </Section>
 
                     {/* Changes to Policy */}
-                    <Section
-                        id="changes"
-                        title="11. Changes to This Policy"
-                    >
+                    <Section id="changes" title="11. Changes to This Policy">
                         <p>
                             We may update this Privacy Policy from time to time.
                             When we make material changes, we will:
@@ -684,7 +671,7 @@ function RightCard({
 }) {
     return (
         <div className="flex gap-3">
-            <div className="w-1 bg-primary rounded-full flex-shrink-0" />
+            <div className="w-1 bg-primary rounded-full shrink-0" />
             <div>
                 <h4 className="font-semibold">{title}</h4>
                 <p className="text-sm text-muted-foreground">{description}</p>
@@ -692,4 +679,3 @@ function RightCard({
         </div>
     );
 }
-

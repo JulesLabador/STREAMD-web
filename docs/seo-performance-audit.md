@@ -147,7 +147,7 @@ Overall, STREAMD has a solid foundation for SEO and performance, but there are s
 
 3. **Add canonical URLs**
    - Add `alternates.canonical` to all page metadata
-   - Example: `alternates: { canonical: 'https://streamd.app/anime/slug' }`
+   - Example: `alternates: { canonical: 'https://www.streamdanime.io/anime/slug' }`
 
 ### Medium Priority
 
@@ -189,11 +189,11 @@ export const metadata: Metadata = {
     openGraph: {
         title: "STREAMD - Track Your Anime Journey",
         description: "Track, rate, and share your anime journey with STREAMD",
-        url: "https://streamd.app",
+        url: "https://www.streamdanime.io",
         siteName: "STREAMD",
         images: [
             {
-                url: "https://streamd.app/og-image.png",
+                url: "https://www.streamdanime.io/og-image.png",
                 width: 1200,
                 height: 630,
                 alt: "STREAMD - Anime Tracking Platform",
@@ -205,10 +205,10 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         title: "STREAMD - Track Your Anime Journey",
         description: "Track, rate, and share your anime journey",
-        images: ["https://streamd.app/og-image.png"],
+        images: ["https://www.streamdanime.io/og-image.png"],
     },
     alternates: {
-        canonical: "https://streamd.app",
+        canonical: "https://www.streamdanime.io",
     },
 };
 ```
@@ -222,13 +222,13 @@ export function WebsiteJsonLd() {
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: "STREAMD",
-        url: "https://streamd.app",
+        url: "https://www.streamdanime.io",
         description: "Track, rate, and share your anime journey",
         potentialAction: {
             "@type": "SearchAction",
             target: {
                 "@type": "EntryPoint",
-                urlTemplate: "https://streamd.app/search?q={search_term_string}",
+                urlTemplate: "https://www.streamdanime.io/search?q={search_term_string}",
             },
             "query-input": "required name=search_term_string",
         },

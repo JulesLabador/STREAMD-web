@@ -38,7 +38,8 @@ const isPageEnabled = process.env.ENABLE_UPCOMING_PAGE === "true";
 /**
  * Site URL for canonical and OG URLs
  */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.streamdanime.io";
 
 /**
  * Get next season name for metadata
@@ -163,7 +164,7 @@ function NextSeasonHero({ stats }: { stats: NextSeasonStats }) {
         <section className="relative mb-12 overflow-hidden rounded-2xl">
             {/* Gradient background */}
             <div
-                className={`absolute inset-0 bg-gradient-to-br ${config.heroGradient}`}
+                className={`absolute inset-0 bg-linear-to-br ${config.heroGradient}`}
             />
 
             {/* Decorative elements */}
@@ -561,7 +562,7 @@ export default async function UpcomingPage() {
 
                 {/* Browse All Seasons CTA */}
                 <section>
-                    <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
+                    <Card className="relative overflow-hidden border-0 bg-linear-to-br from-primary/10 via-primary/5 to-transparent">
                         <CardContent className="flex flex-col items-center justify-center p-8 text-center sm:p-12">
                             <Calendar className="mb-4 h-12 w-12 text-primary/60" />
                             <h2 className="text-2xl font-bold text-foreground">

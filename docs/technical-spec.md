@@ -3772,7 +3772,7 @@ import { createClient } from "@/lib/supabase/server";
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = await createClient();
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://streamd.app";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.streamdanime.io";
 
     // Get all anime slugs
     const { data: anime } = await supabase
@@ -4226,7 +4226,7 @@ QSTASH_CURRENT_SIGNING_KEY=your-signing-key
 QSTASH_NEXT_SIGNING_KEY=your-next-signing-key
 
 # Application
-NEXT_PUBLIC_APP_URL=https://streamd.app
+NEXT_PUBLIC_APP_URL=https://www.streamdanime.io
 ```
 
 ### Optional Variables

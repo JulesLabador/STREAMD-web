@@ -7,13 +7,13 @@ import { createClient } from "@supabase/supabase-js";
  * at request time, ensuring all database content is indexed
  */
 export async function GET() {
-    const siteUrl = process.env.SITE_URL || "https://streamd.app";
+    const siteUrl = process.env.SITE_URL || "https://www.streamdanime.io";
 
     // Create a Supabase client for server-side data fetching
     // Using service role or anon key for read-only operations
     const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
     );
 
     const fields: ISitemapField[] = [];
@@ -83,7 +83,9 @@ export async function GET() {
             const seasonSet = new Set<string>();
             for (const row of seasonData) {
                 if (row.season && row.season_year) {
-                    const slug = `${row.season.toLowerCase()}-${row.season_year}`;
+                    const slug = `${row.season.toLowerCase()}-${
+                        row.season_year
+                    }`;
                     seasonSet.add(slug);
                 }
             }

@@ -5,7 +5,8 @@ import { ScrollText, Mail, ExternalLink } from "lucide-react";
 /**
  * Site URL for canonical and OG URLs
  */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.streamdanime.io";
 
 /**
  * Last updated date for the terms of service
@@ -721,7 +722,7 @@ function MiscItem({
 }) {
     return (
         <div className="flex gap-3">
-            <div className="w-1 bg-muted-foreground/30 rounded-full flex-shrink-0" />
+            <div className="w-1 bg-muted-foreground/30 rounded-full shrink-0" />
             <div>
                 <h4 className="font-semibold">{title}</h4>
                 <p className="text-sm text-muted-foreground">{description}</p>

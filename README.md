@@ -18,7 +18,7 @@ SUPABASE_SECRET_KEY=your-secret-key
 
 # Site URL for sitemap generation (used by next-sitemap)
 # Set this to your production domain
-SITE_URL=https://streamd.app
+SITE_URL=https://www.streamdanime.io
 ```
 
 ## Getting Started
@@ -95,7 +95,7 @@ This project uses [next-sitemap](https://github.com/iamvishnusankar/next-sitemap
 
 The sitemap configuration is in `next-sitemap.config.js`. Key settings:
 
-- **siteUrl**: Set via `SITE_URL` environment variable (defaults to `https://streamd.app`)
+- **siteUrl**: Set via `SITE_URL` environment variable (defaults to `https://www.streamdanime.io`)
 - **changefreq**: Weekly for most pages, daily for browse index pages
 - **priority**: 1.0 for home, 0.9 for browse indexes, 0.8 for category pages, 0.7 for anime pages
 

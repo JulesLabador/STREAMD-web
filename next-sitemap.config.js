@@ -1,7 +1,7 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
     // Base URL for the sitemap - update this to your production domain
-    siteUrl: process.env.SITE_URL || "https://streamd.app",
+    siteUrl: process.env.SITE_URL || "https://www.streamdanime.io",
 
     // Generate robots.txt alongside sitemap
     generateRobotsTxt: true,
@@ -30,7 +30,9 @@ module.exports = {
     robotsTxtOptions: {
         // Additional sitemap URLs (for server-side generated sitemaps)
         additionalSitemaps: [
-            `${process.env.SITE_URL || "https://streamd.app"}/server-sitemap.xml`,
+            `${
+                process.env.SITE_URL || "https://www.streamdanime.io"
+            }/server-sitemap.xml`,
         ],
         policies: [
             {

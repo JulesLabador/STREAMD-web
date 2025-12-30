@@ -6,7 +6,8 @@ import { BrowsePageHeader, BrowseGrid, BrowseCard } from "@/components/browse";
 /**
  * Site URL for canonical and OG URLs
  */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://streamd.app";
+const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.streamdanime.io";
 
 /**
  * Static metadata for the platforms index page

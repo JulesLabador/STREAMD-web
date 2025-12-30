@@ -471,7 +471,7 @@ export async function addAnimeToList(
         // Track analytics event (fire-and-forget)
         trackServerEventAsync(
             "anime_added",
-            `https://streamd.app/anime/${animeData.slug}`,
+            `https://www.streamdanime.io/anime/${animeData.slug}`,
             {
                 status,
                 anime_slug: animeData.slug,
@@ -607,7 +607,7 @@ export async function updateAnimeTracking(
         if (animeSlug) {
             trackServerEventAsync(
                 "anime_updated",
-                `https://streamd.app/anime/${animeSlug}`,
+                `https://www.streamdanime.io/anime/${animeSlug}`,
                 {
                     status: input.status,
                     anime_slug: animeSlug,
@@ -678,7 +678,7 @@ export async function removeAnimeFromList(
         if (animeSlug) {
             trackServerEventAsync(
                 "anime_removed",
-                `https://streamd.app/anime/${animeSlug}`,
+                `https://www.streamdanime.io/anime/${animeSlug}`,
                 {
                     anime_slug: animeSlug,
                 }
