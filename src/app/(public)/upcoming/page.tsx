@@ -27,11 +27,7 @@ import { UpcomingJsonLd } from "@/components/seo/UpcomingJsonLd";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type {
-    AnimeSeason,
-    NextSeasonStats,
-    SeasonInfo,
-} from "@/types/anime";
+import type { AnimeSeason, NextSeasonStats, SeasonInfo } from "@/types/anime";
 
 /**
  * Feature flag to enable/disable this page
