@@ -9,8 +9,8 @@ import {
 import { AnimeGrid } from "@/components/anime/AnimeGrid";
 import { AnimeFilters as AnimeFiltersComponent } from "@/components/anime/AnimeFilters";
 import { AnimePagination } from "@/components/anime/AnimePagination";
-import { BrowsePageHeader } from "@/components/browse";
-import type { AnimeSeason, AnimeFormat, AnimeStatus } from "@/types/anime";
+import { BrowsePageHeader, PopularCategories } from "@/components/browse";
+import type { AnimeSeason, AnimeFormat, AnimeStatus, Anime } from "@/types/anime";
 
 /**
  * Site URL for canonical and OG URLs
@@ -290,6 +290,236 @@ function buildCanonicalUrl(filters: AnimeFilters, page: number): string {
 }
 
 /**
+ * Generates JSON-LD structured data for the browse page
+ * Includes ItemList schema for search results and WebPage schema
+ */
+function generateJsonLd(
+    animeList: Anime[],
+    filters: AnimeFilters,
+    genreNames: string[],
+    totalCount: number,
+    canonicalUrl: string,
+    pageTitle: string,
+    pageDescription: string
+) {
+    // Generate breadcrumb items based on active filters
+    const breadcrumbItems = [
+        {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: SITE_URL,
+        },
+        {
+            "@type": "ListItem",
+            position: 2,
+            name: "Browse",
+            item: `${SITE_URL}/browse`,
+        },
+    ];
+
+    // Add filter-specific breadcrumb if applicable
+    if (genreNames.length === 1) {
+        breadcrumbItems.push({
+            "@type": "ListItem",
+            position: 3,
+            name: `${genreNames[0]} Anime`,
+            item: canonicalUrl,
+        });
+    } else if (filters.years && filters.years.length === 1) {
+        breadcrumbItems.push({
+            "@type": "ListItem",
+            position: 3,
+            name: `${filters.years[0]} Anime`,
+            item: canonicalUrl,
+        });
+    }
+
+    // Generate ItemList for anime results
+    const itemListElements = animeList.slice(0, 10).map((anime, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+            "@type": "TVSeries",
+            name: anime.titles?.english || anime.titles?.romaji || "Unknown",
+            url: `${SITE_URL}/anime/${anime.shortId}/${anime.slug}`,
+            image: anime.coverImage?.extraLarge || anime.coverImage?.large,
+            description: anime.description
+                ? anime.description.replace(/<[^>]*>/g, "").slice(0, 200)
+                : undefined,
+            datePublished: anime.startDate
+                ? `${anime.startDate.year}-${String(
+                      anime.startDate.month || 1
+                  ).padStart(2, "0")}-${String(anime.startDate.day || 1).padStart(
+                      2,
+                      "0"
+                  )}`
+                : undefined,
+            aggregateRating: anime.averageScore
+                ? {
+                      "@type": "AggregateRating",
+                      ratingValue: anime.averageScore / 10,
+                      bestRating: 10,
+                      worstRating: 0,
+                      ratingCount: anime.popularity || 1,
+                  }
+                : undefined,
+        },
+    }));
+
+    return {
+        "@context": "https://schema.org",
+        "@graph": [
+            // WebPage schema
+            {
+                "@type": "WebPage",
+                "@id": canonicalUrl,
+                url: canonicalUrl,
+                name: pageTitle,
+                description: pageDescription,
+                isPartOf: {
+                    "@type": "WebSite",
+                    "@id": `${SITE_URL}/#website`,
+                    url: SITE_URL,
+                    name: "STREAMD",
+                },
+                breadcrumb: {
+                    "@type": "BreadcrumbList",
+                    itemListElement: breadcrumbItems,
+                },
+            },
+            // ItemList schema for search results
+            {
+                "@type": "ItemList",
+                name: pageTitle,
+                description: pageDescription,
+                numberOfItems: totalCount,
+                itemListElement: itemListElements,
+            },
+            // CollectionPage schema for better categorization
+            {
+                "@type": "CollectionPage",
+                "@id": `${canonicalUrl}#collection`,
+                url: canonicalUrl,
+                name: pageTitle,
+                description: pageDescription,
+                mainEntity: {
+                    "@type": "ItemList",
+                    numberOfItems: totalCount,
+                },
+            },
+        ],
+    };
+}
+
+/**
+ * Component to render JSON-LD structured data
+ */
+function JsonLdScript({ data }: { data: object }) {
+    return (
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+        />
+    );
+}
+
+/**
+ * Generates SEO keywords based on active filters
+ * Creates relevant keyword combinations for search engines
+ */
+function generateKeywords(
+    filters: AnimeFilters,
+    genreNames: string[]
+): string[] {
+    const keywords: string[] = [
+        "anime",
+        "anime streaming",
+        "anime tracker",
+        "watch anime",
+    ];
+
+    // Add genre-specific keywords
+    if (genreNames.length > 0) {
+        for (const genre of genreNames) {
+            keywords.push(`${genre.toLowerCase()} anime`);
+            keywords.push(`best ${genre.toLowerCase()} anime`);
+            keywords.push(`${genre.toLowerCase()} anime list`);
+        }
+    }
+
+    // Add year-specific keywords
+    if (filters.years && filters.years.length > 0) {
+        for (const year of filters.years) {
+            keywords.push(`${year} anime`);
+            keywords.push(`anime ${year}`);
+            keywords.push(`best anime ${year}`);
+            keywords.push(`new anime ${year}`);
+        }
+
+        // Combine genre + year
+        if (genreNames.length > 0) {
+            for (const genre of genreNames.slice(0, 2)) {
+                for (const year of filters.years.slice(0, 2)) {
+                    keywords.push(`${genre.toLowerCase()} anime ${year}`);
+                }
+            }
+        }
+    }
+
+    // Add season-specific keywords
+    if (filters.seasons && filters.seasons.length > 0) {
+        for (const season of filters.seasons) {
+            const seasonName = SEASON_NAMES[season]?.toLowerCase() || season.toLowerCase();
+            keywords.push(`${seasonName} anime`);
+            keywords.push(`${seasonName} season anime`);
+
+            // Combine season + year
+            if (filters.years && filters.years.length > 0) {
+                for (const year of filters.years.slice(0, 2)) {
+                    keywords.push(`${seasonName} ${year} anime`);
+                }
+            }
+        }
+    }
+
+    // Add format-specific keywords
+    if (filters.formats && filters.formats.length > 0) {
+        for (const format of filters.formats) {
+            const formatName = FORMAT_NAMES[format]?.toLowerCase() || format.toLowerCase();
+            keywords.push(`anime ${formatName}`);
+            if (format === "MOVIE") {
+                keywords.push("anime movies");
+                keywords.push("best anime movies");
+            } else if (format === "TV") {
+                keywords.push("anime series");
+                keywords.push("anime tv shows");
+            }
+        }
+    }
+
+    // Add status-specific keywords
+    if (filters.statuses && filters.statuses.length > 0) {
+        for (const status of filters.statuses) {
+            if (status === "RELEASING") {
+                keywords.push("currently airing anime");
+                keywords.push("ongoing anime");
+                keywords.push("airing anime");
+            } else if (status === "NOT_YET_RELEASED") {
+                keywords.push("upcoming anime");
+                keywords.push("new anime releases");
+            } else if (status === "FINISHED") {
+                keywords.push("completed anime");
+                keywords.push("finished anime");
+            }
+        }
+    }
+
+    // Remove duplicates and limit to 15 keywords
+    return [...new Set(keywords)].slice(0, 15);
+}
+
+/**
  * Generate dynamic metadata for SEO
  */
 export async function generateMetadata({
@@ -343,20 +573,24 @@ export async function generateMetadata({
         totalCount
     );
     const canonicalUrl = buildCanonicalUrl(filters, page);
+    const keywords = generateKeywords(filters, genreNames);
 
     return {
         title,
         description,
+        keywords,
         openGraph: {
             title,
             description,
             url: canonicalUrl,
             type: "website",
+            siteName: "STREAMD",
         },
         twitter: {
             card: "summary_large_image",
             title,
             description,
+            site: "@streamdanime",
         },
         alternates: {
             canonical: canonicalUrl,
@@ -379,7 +613,7 @@ function AnimeGridSkeleton() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {Array.from({ length: 24 }).map((_, i) => (
                 <div key={i} className="space-y-2">
-                    <div className="aspect-[3/4] animate-pulse rounded-lg bg-muted" />
+                    <div className="aspect-3/4 animate-pulse rounded-lg bg-muted" />
                     <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
                     <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
                 </div>
@@ -521,14 +755,51 @@ async function BrowseContent({
         headerTitle = titleParts.join(" ");
     }
 
+    // Generate canonical URL and metadata for JSON-LD
+    const canonicalUrl = buildCanonicalUrl(filters, page);
+    const pageTitle = generatePageTitle(filters, genreNames);
+    const pageDescription = generatePageDescription(
+        filters,
+        genreNames,
+        pagination.totalCount
+    );
+
+    // Generate JSON-LD structured data
+    const jsonLd = generateJsonLd(
+        animeList,
+        filters,
+        genreNames,
+        pagination.totalCount,
+        canonicalUrl,
+        pageTitle,
+        pageDescription
+    );
+
+    // Check if any filters are active
+    const hasActiveFilters =
+        (filters.genres && filters.genres.length > 0) ||
+        (filters.years && filters.years.length > 0) ||
+        (filters.seasons && filters.seasons.length > 0) ||
+        (filters.formats && filters.formats.length > 0) ||
+        (filters.statuses && filters.statuses.length > 0) ||
+        filters.search;
+
     return (
         <>
+            {/* JSON-LD Structured Data */}
+            <JsonLdScript data={jsonLd} />
+
             {/* Page header */}
             <BrowsePageHeader
                 title={headerTitle}
                 description="Discover and filter anime by genre, year, season, format, and more"
                 count={pagination.totalCount}
             />
+
+            {/* Popular Categories - only show when no filters are active */}
+            {!hasActiveFilters && (
+                <PopularCategories genres={genres} years={years} />
+            )}
 
             {/* Filters */}
             <div className="mb-8">
