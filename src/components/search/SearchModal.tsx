@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { SearchProvider } from "./SearchProvider";
 import { SearchInput } from "./SearchInput";
 import { SearchResults } from "./SearchResults";
@@ -59,9 +64,14 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                 className="p-0 gap-0 overflow-hidden text-left"
                 showCloseButton={false}
             >
-                {/* Accessible title (visually hidden) */}
+                {/* Accessible title and description (visually hidden) */}
                 <VisuallyHidden asChild>
                     <DialogTitle>Search anime</DialogTitle>
+                </VisuallyHidden>
+                <VisuallyHidden asChild>
+                    <DialogDescription>
+                        Search for anime titles using the search box below
+                    </DialogDescription>
                 </VisuallyHidden>
 
                 <SearchProvider onClose={handleClose}>
