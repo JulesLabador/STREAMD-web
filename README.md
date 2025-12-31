@@ -44,6 +44,15 @@ SUPABASE_SECRET_KEY=your-secret-key
 # Site URL for sitemap generation (used by next-sitemap)
 # Set this to your production domain
 SITE_URL=https://www.streamdanime.io
+
+# OpenAI API key for AI-generated SEO content (optional)
+# Required only if using the generate:season-content script
+OPENAI_API_KEY=your-openai-api-key
+
+# IndexNow API key for instant search engine notifications (optional)
+# Generate a 32-character hex string (e.g., using: openssl rand -hex 16)
+# When set, URLs are automatically submitted to search engines on every build
+INDEXNOW_KEY=your-32-character-hex-key
 ```
 
 ## Getting Started
@@ -106,6 +115,40 @@ This script:
 - Valid Supabase credentials in `.env.local`
 - Database tables must already exist (see `docs/technical-spec.md`)
 
+### Generate Season SEO Content
+
+To generate AI-powered SEO content for season pages:
+
+```bash
+# First, install the OpenAI package
+npm install openai
+
+# Generate content for a specific season
+npm run generate:season-content -- --season winter --year 2026
+
+# Generate content for all seasons in a year
+npm run generate:season-content -- --year 2025
+
+# Generate content for all seasons in the database
+npm run generate:season-content -- --all
+
+# Force regenerate all content
+npm run generate:season-content -- --all --force
+```
+
+This script:
+
+- Fetches season data (anime count, top titles, genres, format breakdown)
+- Calls OpenAI GPT-4o to generate contextual SEO content
+- Stores meta descriptions, intro paragraphs, and full summaries in the database
+- Generates different content for past, current, and future seasons
+
+**Requirements:**
+
+- `OPENAI_API_KEY` environment variable set in `.env.local`
+- Valid Supabase credentials in `.env.local`
+- Database migration `011_season_content.sql` must be applied
+
 ## SEO & Sitemap
 
 This project uses [next-sitemap](https://github.com/iamvishnusankar/next-sitemap) for automatic sitemap generation.
@@ -133,3 +176,36 @@ After running `npm run build`, the following files are generated in `/public`:
 - `robots.txt` - Search engine directives
 
 The dynamic sitemap is served at `/server-sitemap.xml` and fetches all anime, genres, studios, seasons, and platforms from the database.
+
+### IndexNow Integration
+
+This project supports [IndexNow](https://www.indexnow.org/) for instant search engine notifications. When enabled, all URLs from your sitemaps are automatically submitted to supported search engines (Bing, Yandex, Seznam, Naver) after every build.
+
+**Setup:**
+
+1. Generate a 32-character hex key:
+   ```bash
+   openssl rand -hex 16
+   ```
+
+2. Add the key to your environment variables:
+   ```env
+   INDEXNOW_KEY=your-generated-key
+   ```
+
+3. The build process will automatically:
+   - Create a verification file at `public/[KEY].txt`
+   - Parse all generated sitemaps
+   - Submit URLs to all IndexNow-compatible search engines
+
+**How it works:**
+
+- Runs automatically after `next-sitemap` during `npm run build`
+- Submits URLs in batches (up to 10,000 per request)
+- Gracefully skips if `INDEXNOW_KEY` is not set
+- Does not fail the build if submissions fail
+
+**Files:**
+
+- `src/lib/indexnow/client.ts` - IndexNow API client library
+- `scripts/submit-indexnow.ts` - Build-time submission script
