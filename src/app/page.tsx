@@ -1,8 +1,16 @@
 import { Metadata } from "next";
-import { getAnimeList } from "@/app/actions/anime";
-import { AnimeGrid } from "@/components/anime/AnimeGrid";
-import { AnimePagination } from "@/components/anime/AnimePagination";
-import { InlineSearch } from "@/components/search";
+import {
+    getSeasonalStats,
+    getCurrentSeasonAnime,
+    getNextSeasonStats,
+    getCurrentSeasonStudios,
+} from "@/app/actions/anime";
+import {
+    HeroSection,
+    SeasonSection,
+    UpcomingSection,
+    DiscoverySection,
+} from "@/components/home";
 import { WebsiteJsonLd } from "@/components/seo/WebsiteJsonLd";
 
 /**
@@ -48,93 +56,79 @@ export const metadata: Metadata = {
 };
 
 /**
- * Page props with search params for pagination
- */
-interface HomePageProps {
-    searchParams: Promise<{ page?: string }>;
-}
-
-/**
- * Home page - Browse anime
+ * Home page - Seasonal Command Center
  *
- * Server Component that fetches and displays a grid of anime
- * from the database, sorted by popularity. Features an inline
- * search bar for quick anime discovery and pagination support.
+ * A dynamic dashboard that answers: "What anime should I care about right now?"
+ *
+ * Sections:
+ * 1. Hero Search + Seasonal Context
+ * 2. This Season at a Glance (Most Popular, Highest Rated)
+ * 3. Upcoming Anime (Next Season Preview)
+ * 4. Discovery & Exploration (Studios, Browse Paths)
+ *
+ * All data is fetched in parallel for optimal performance.
  */
-export default async function HomePage({ searchParams }: HomePageProps) {
-    const resolvedSearchParams = await searchParams;
-    const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page, 10) : 1;
+export default async function HomePage() {
+    // Fetch all data in parallel for optimal performance
+    const [
+        seasonalStatsResult,
+        popularAnimeResult,
+        topRatedAnimeResult,
+        nextSeasonResult,
+        studiosResult,
+    ] = await Promise.all([
+        getSeasonalStats(),
+        getCurrentSeasonAnime("popularity", 12),
+        getCurrentSeasonAnime("rating", 12),
+        getNextSeasonStats(12),
+        getCurrentSeasonStudios(6),
+    ]);
 
-    // Fetch anime list from database
-    const result = await getAnimeList(page, 24);
-
-    // Handle error state
-    if (!result.success) {
-        return (
-            <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                <div className="flex min-h-[400px] items-center justify-center">
-                    <div className="text-center">
-                        <h2 className="text-xl font-semibold text-foreground">
-                            Something went wrong
-                        </h2>
-                        <p className="mt-2 text-muted-foreground">
-                            {result.error}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    const { data: animeList, pagination } = result.data;
+    // Extract data with fallbacks
+    const seasonalStats = seasonalStatsResult.success
+        ? seasonalStatsResult.data
+        : null;
+    const popularAnime = popularAnimeResult.success
+        ? popularAnimeResult.data
+        : [];
+    const topRatedAnime = topRatedAnimeResult.success
+        ? topRatedAnimeResult.data
+        : [];
+    const nextSeasonStats = nextSeasonResult.success
+        ? nextSeasonResult.data
+        : null;
+    const studios = studiosResult.success ? studiosResult.data : [];
 
     return (
         <>
             {/* JSON-LD Structured Data for SEO */}
             <WebsiteJsonLd />
 
-            <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                {/* Inline search bar */}
-                <div className="mb-8">
-                    <InlineSearch
-                        placeholder="Search for anime..."
-                        className="max-w-2xl mx-auto"
-                    />
+            <div className="min-h-screen">
+                {/* Hero Section with Search and Seasonal Context */}
+                <HeroSection stats={seasonalStats} />
+
+                {/* Main Content */}
+                <div className="mx-auto max-w-7xl space-y-16 pb-16">
+                    {/* This Season at a Glance */}
+                    {seasonalStats && (
+                        <SeasonSection
+                            season={seasonalStats.season}
+                            year={seasonalStats.year}
+                            slug={seasonalStats.slug}
+                            popularAnime={popularAnime}
+                            topRatedAnime={topRatedAnime}
+                        />
+                    )}
+
+                    {/* Upcoming Anime - Next Season Preview */}
+                    {nextSeasonStats && (
+                        <UpcomingSection stats={nextSeasonStats} />
+                    )}
+
+                    {/* Discovery & Exploration */}
+                    <DiscoverySection studios={studios} />
                 </div>
-
-                {/* Page header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                        Browse Anime
-                    </h1>
-                    <p className="mt-2 text-muted-foreground">
-                        Discover and track your favorite anime series
-                    </p>
-                </div>
-
-                {/* Anime grid */}
-                <AnimeGrid anime={animeList} />
-
-                {/* Pagination info */}
-                {pagination.totalCount > 0 && (
-                    <div className="mt-8 text-center text-sm text-muted-foreground">
-                        Showing {animeList.length} of {pagination.totalCount}{" "}
-                        anime
-                        {pagination.totalPages > 1 && (
-                            <span>
-                                {" "}
-                                (Page {pagination.page} of {pagination.totalPages})
-                            </span>
-                        )}
-                    </div>
-                )}
-
-                {/* Pagination controls */}
-                <AnimePagination
-                    currentPage={pagination.page}
-                    totalPages={pagination.totalPages}
-                    basePath="/"
-                />
             </div>
         </>
     );
