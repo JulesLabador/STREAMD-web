@@ -293,8 +293,7 @@ async function BrowseYearContent({
                 title={`${yearLabel} Anime`}
                 description={`Discover anime series and movies released in ${year}`}
                 count={pagination.totalCount}
-                backHref="/browse"
-                backText="All Anime"
+                backText="Back"
             />
 
             {/* Filters - pre-selected with current year */}

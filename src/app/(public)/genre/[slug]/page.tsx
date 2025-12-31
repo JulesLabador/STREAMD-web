@@ -86,8 +86,7 @@ export default async function GenrePage({ params, searchParams }: GenrePageProps
                 title={genre.name}
                 description={`${genre.name} anime series and movies`}
                 count={pagination.totalCount}
-                backHref="/genre"
-                backText="All Genres"
+                backText="Back"
             />
 
             <AnimeGrid

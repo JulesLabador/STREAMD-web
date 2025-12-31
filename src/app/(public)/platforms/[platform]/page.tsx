@@ -97,8 +97,7 @@ export default async function PlatformPage({ params, searchParams }: PlatformPag
                 title={platformInfo.name}
                 description={`Anime available on ${platformInfo.name}`}
                 count={pagination.totalCount}
-                backHref="/platforms"
-                backText="All Platforms"
+                backText="Back"
             />
 
             <AnimeGrid

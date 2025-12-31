@@ -86,8 +86,7 @@ export default async function StudioPage({ params, searchParams }: StudioPagePro
                 title={studio.name}
                 description={`Anime produced by ${studio.name}`}
                 count={pagination.totalCount}
-                backHref="/studio"
-                backText="All Studios"
+                backText="Back"
             />
 
             <AnimeGrid

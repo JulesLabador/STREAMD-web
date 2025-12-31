@@ -292,8 +292,7 @@ async function BrowseGenreContent({
                 title={`${genre.name} Anime`}
                 description={`Discover the best ${genre.name.toLowerCase()} anime series, movies, and OVAs`}
                 count={pagination.totalCount}
-                backHref="/browse"
-                backText="All Anime"
+                backText="Back"
             />
 
             {/* Filters - pre-selected with current genre */}

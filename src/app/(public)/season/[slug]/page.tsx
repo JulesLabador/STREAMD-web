@@ -108,8 +108,7 @@ export default async function SeasonPage({ params, searchParams }: SeasonPagePro
                 title={seasonName}
                 description={`Anime that aired in ${seasonName}`}
                 count={pagination.totalCount}
-                backHref="/season"
-                backText="All Seasons"
+                backText="Back"
             />
 
             <AnimeGrid
