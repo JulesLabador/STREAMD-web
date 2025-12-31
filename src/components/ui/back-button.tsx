@@ -11,7 +11,13 @@ interface BackButtonProps {
     /** Text to display next to the arrow icon (default: "Back") */
     text?: string;
     /** Button variant (default: "ghost") */
-    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+    variant?:
+        | "default"
+        | "destructive"
+        | "outline"
+        | "secondary"
+        | "ghost"
+        | "link";
     /** Button size (default: "sm") */
     size?: "default" | "sm" | "lg" | "icon";
     /** Additional CSS classes */
@@ -60,5 +66,3 @@ export function BackButton({
         </Button>
     );
 }
-
-

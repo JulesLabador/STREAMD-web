@@ -13,6 +13,122 @@ import type { ActionResult, PaginatedResponse } from "@/types/common";
 import { createSeasonSlug, transformAnimeRow } from "@/types/anime";
 
 // =============================================
+// Season Content Types
+// =============================================
+
+/**
+ * AI-generated SEO content for a season page
+ * Stored in the season_content database table
+ */
+export interface SeasonContent {
+    /** Season identifier (WINTER, SPRING, SUMMER, FALL) */
+    season: AnimeSeason;
+    /** Year */
+    year: number;
+    /** URL slug (e.g., "winter-2026") */
+    slug: string;
+    /** SEO meta description (150-160 chars) */
+    metaDescription: string | null;
+    /** Short intro paragraph for the page */
+    introParagraph: string | null;
+    /** Full season summary (2-3 paragraphs) */
+    fullSummary: string | null;
+    /** When the content was generated */
+    generatedAt: string | null;
+    /** Model used to generate content */
+    modelUsed: string | null;
+}
+
+/**
+ * Database row type for season_content table
+ */
+interface SeasonContentRow {
+    id: string;
+    season: string;
+    year: number;
+    slug: string;
+    meta_description: string | null;
+    intro_paragraph: string | null;
+    full_summary: string | null;
+    generated_at: string | null;
+    model_used: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+/**
+ * Transforms a season_content database row to the domain type
+ */
+function transformSeasonContentRow(row: SeasonContentRow): SeasonContent {
+    return {
+        season: row.season as AnimeSeason,
+        year: row.year,
+        slug: row.slug,
+        metaDescription: row.meta_description,
+        introParagraph: row.intro_paragraph,
+        fullSummary: row.full_summary,
+        generatedAt: row.generated_at,
+        modelUsed: row.model_used,
+    };
+}
+
+// =============================================
+// Season Content Actions
+// =============================================
+
+/**
+ * Fetches AI-generated SEO content for a specific season
+ *
+ * @param slug - Season slug (e.g., "winter-2026")
+ * @returns Season content or null if not found
+ */
+export async function getSeasonContent(
+    slug: string
+): Promise<ActionResult<SeasonContent | null>> {
+    try {
+        const supabase = await createClient();
+
+        const { data, error } = await supabase
+            .from("season_content")
+            .select("*")
+            .eq("slug", slug)
+            .single();
+
+        if (error) {
+            // PGRST116 = not found, which is a valid case
+            if (error.code === "PGRST116") {
+                return { success: true, data: null };
+            }
+            console.error("Error fetching season content:", error);
+            return { success: false, error: "Failed to fetch season content" };
+        }
+
+        return {
+            success: true,
+            data: transformSeasonContentRow(data as SeasonContentRow),
+        };
+    } catch (error) {
+        console.error("Error fetching season content:", error);
+        return { success: false, error: "Failed to fetch season content" };
+    }
+}
+
+/**
+ * Fetches AI-generated SEO content for a season by season/year
+ *
+ * @param season - The anime season
+ * @param year - The year
+ * @returns Season content or null if not found
+ */
+export async function getSeasonContentBySeasonYear(
+    season: AnimeSeason,
+    year: number
+): Promise<ActionResult<SeasonContent | null>> {
+    const slug = createSeasonSlug(season, year);
+    return getSeasonContent(slug);
+}
+
+// =============================================
 // Season Browse Actions
 // =============================================
 
@@ -779,4 +895,3 @@ export async function getNextSeasonStats(
         return { success: false, error: "Failed to fetch next season stats" };
     }
 }
-

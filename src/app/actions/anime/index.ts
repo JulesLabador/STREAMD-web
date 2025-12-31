@@ -22,7 +22,7 @@ export type { AnimeFilters } from "./core";
 // Studio entity actions
 export { getStudios, getStudioBySlug, getCurrentSeasonStudios } from "./studios";
 
-// Season entity actions (includes upcoming)
+// Season entity actions (includes upcoming and SEO content)
 export {
     getSeasons,
     getAnimeBySeason,
@@ -31,8 +31,10 @@ export {
     getUpcomingAnime,
     getUpcomingSeasonStats,
     getNextSeasonStats,
+    getSeasonContent,
+    getSeasonContentBySeasonYear,
 } from "./seasons";
-export type { SeasonAnimeSortBy, CurrentSeasonStats } from "./seasons";
+export type { SeasonAnimeSortBy, CurrentSeasonStats, SeasonContent } from "./seasons";
 
 // Genre entity actions
 export { getGenres, getGenreBySlug } from "./genres";

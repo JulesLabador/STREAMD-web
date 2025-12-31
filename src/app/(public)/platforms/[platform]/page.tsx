@@ -56,10 +56,15 @@ export async function generateMetadata({
  * Displays anime available on a specific streaming platform.
  * Server Component with SEO optimization and pagination support.
  */
-export default async function PlatformPage({ params, searchParams }: PlatformPageProps) {
+export default async function PlatformPage({
+    params,
+    searchParams,
+}: PlatformPageProps) {
     const { platform: platformSlug } = await params;
     const resolvedSearchParams = await searchParams;
-    const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page, 10) : 1;
+    const page = resolvedSearchParams.page
+        ? parseInt(resolvedSearchParams.page, 10)
+        : 1;
 
     const platform = parsePlatformSlug(platformSlug);
 
@@ -108,8 +113,7 @@ export default async function PlatformPage({ params, searchParams }: PlatformPag
             {/* Pagination info */}
             {pagination.totalCount > 0 && (
                 <div className="mt-8 text-center text-sm text-muted-foreground">
-                    Showing {anime.data.length} of {pagination.totalCount}{" "}
-                    anime
+                    Showing {anime.data.length} of {pagination.totalCount} anime
                     {pagination.totalPages > 1 && (
                         <span>
                             {" "}

@@ -38,9 +38,7 @@ export function BrowsePageHeader({
     return (
         <div className="mb-8 space-y-4">
             {/* Back navigation - uses browser history for proper navigation */}
-            {showBack && (
-                <BackButton text={backText} className="-ml-2" />
-            )}
+            {showBack && <BackButton text={backText} className="-ml-2" />}
 
             {/* Title and description */}
             <div>

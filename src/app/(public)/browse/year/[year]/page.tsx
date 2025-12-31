@@ -351,4 +351,3 @@ export default async function BrowseYearPage(props: BrowseYearPageProps) {
         </div>
     );
 }
-

@@ -121,11 +121,14 @@ async function submitToEngine(
             success,
             statusCode: response.status,
             urlCount: request.urlList.length,
-            error: success ? undefined : `HTTP ${response.status}: ${response.statusText}`,
+            error: success
+                ? undefined
+                : `HTTP ${response.status}: ${response.statusText}`,
         };
     } catch (error) {
         // Handle network errors or other exceptions
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        const errorMessage =
+            error instanceof Error ? error.message : "Unknown error";
         return {
             engine,
             success: false,
@@ -255,11 +258,14 @@ export function formatResults(summary: IndexNowSummary): string {
     for (const result of summary.results) {
         const status = result.success ? "✓" : "✗";
         const details = result.error || `${result.urlCount} URLs submitted`;
-        lines.push(`${status} ${result.engine.toUpperCase()}: ${details} (HTTP ${result.statusCode})`);
+        lines.push(
+            `${status} ${result.engine.toUpperCase()}: ${details} (HTTP ${
+                result.statusCode
+            })`
+        );
     }
 
     lines.push(`========================================\n`);
 
     return lines.join("\n");
 }
-

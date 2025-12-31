@@ -147,7 +147,9 @@ async function collectAllUrls(): Promise<string[]> {
     // Note: Server-side sitemaps won't be available during build
     // They are generated at runtime, so we skip them here
     // If you need to include them, run this script after deployment
-    console.log("\nServer-side sitemaps (skipped during build - generated at runtime):");
+    console.log(
+        "\nServer-side sitemaps (skipped during build - generated at runtime):"
+    );
     for (const url of SERVER_SITEMAP_URLS) {
         console.log(`  ${url}`);
     }
@@ -197,7 +199,9 @@ async function main(): Promise<void> {
     if (!INDEXNOW_KEY) {
         console.log("\n⚠️  INDEXNOW_KEY environment variable not set.");
         console.log("   Skipping IndexNow submission.");
-        console.log("   To enable, set INDEXNOW_KEY to a 32-character hex string.\n");
+        console.log(
+            "   To enable, set INDEXNOW_KEY to a 32-character hex string.\n"
+        );
         process.exit(0);
     }
 
@@ -241,7 +245,9 @@ async function main(): Promise<void> {
 
     // Exit with appropriate code
     if (!summary.success) {
-        console.log("⚠️  Some or all submissions failed. Check the results above.\n");
+        console.log(
+            "⚠️  Some or all submissions failed. Check the results above.\n"
+        );
         // Don't fail the build for IndexNow errors - it's not critical
         process.exit(0);
     }
@@ -255,4 +261,3 @@ main().catch((error) => {
     // Don't fail the build for IndexNow errors
     process.exit(0);
 });
-

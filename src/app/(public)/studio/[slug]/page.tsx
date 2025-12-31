@@ -48,10 +48,15 @@ export async function generateMetadata({
  * Displays anime produced by a specific studio in a grid layout.
  * Server Component with SEO optimization and pagination support.
  */
-export default async function StudioPage({ params, searchParams }: StudioPageProps) {
+export default async function StudioPage({
+    params,
+    searchParams,
+}: StudioPageProps) {
     const { slug } = await params;
     const resolvedSearchParams = await searchParams;
-    const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page, 10) : 1;
+    const page = resolvedSearchParams.page
+        ? parseInt(resolvedSearchParams.page, 10)
+        : 1;
 
     const result = await getStudioBySlug(slug, page, 24);
 
@@ -97,8 +102,7 @@ export default async function StudioPage({ params, searchParams }: StudioPagePro
             {/* Pagination info */}
             {pagination.totalCount > 0 && (
                 <div className="mt-8 text-center text-sm text-muted-foreground">
-                    Showing {anime.data.length} of {pagination.totalCount}{" "}
-                    anime
+                    Showing {anime.data.length} of {pagination.totalCount} anime
                     {pagination.totalPages > 1 && (
                         <span>
                             {" "}
