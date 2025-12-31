@@ -1,5 +1,30 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Architecture
+
+### Home Page (Season Hub)
+
+The home page serves as a dynamic seasonal command center that answers: "What anime should I care about right now?"
+
+**Sections:**
+1. **Hero Search + Seasonal Context** - Large search input with keyboard shortcut (/) and current season stats banner
+2. **This Season at a Glance** - Most Popular and Highest Rated carousels for the current anime season
+3. **Upcoming Anime** - Next season preview with countdown, stats cards, and Most Anticipated carousel
+4. **Discovery & Exploration** - Trending studios and browse path links (Seasons, Genres, Studios, Platforms)
+
+**Components (in `src/components/home/`):**
+- `HeroSection.tsx` - Hero with search and seasonal context
+- `AnimeCarousel.tsx` - Reusable horizontal scrollable anime card row
+- `SeasonSection.tsx` - Current season carousels container
+- `UpcomingSection.tsx` - Next season preview with stats
+- `DiscoverySection.tsx` - Discovery modules and browse paths
+- `StudioSpotlight.tsx` - Featured studios grid
+
+**Server Actions (in `src/app/actions/anime.ts`):**
+- `getCurrentSeasonAnime(sortBy, limit)` - Fetches anime for current season sorted by popularity or rating
+- `getSeasonalStats()` - Returns current season statistics (anime count, airing count, new series)
+- `getCurrentSeasonStudios(limit)` - Fetches studios with most anime in current season
+
 ## Environment Variables
 
 Create a `.env.local` file in the root directory with the following variables:
