@@ -191,6 +191,7 @@ async function main(): Promise<void> {
             .select(
                 `
                 id,
+                short_id,
                 slug,
                 titles,
                 format,

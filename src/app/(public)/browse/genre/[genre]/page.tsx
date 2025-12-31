@@ -150,7 +150,9 @@ export async function generateMetadata({
         : 0;
 
     const title = `${genre.name} Anime | STREAMD`;
-    const description = `Browse ${totalCount.toLocaleString()} ${genre.name} anime series. Discover the best ${genre.name.toLowerCase()} shows, movies, and OVAs. Track your favorites on STREAMD.`;
+    const description = `Browse ${totalCount.toLocaleString()} ${
+        genre.name
+    } anime series. Discover the best ${genre.name.toLowerCase()} shows, movies, and OVAs. Track your favorites on STREAMD.`;
     const canonicalUrl = `${SITE_URL}/browse/genre/${genreSlug}`;
 
     return {
@@ -349,4 +351,3 @@ export default async function BrowseGenrePage(props: BrowseGenrePageProps) {
         </div>
     );
 }
-

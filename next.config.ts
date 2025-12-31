@@ -29,6 +29,11 @@ const nextConfig: NextConfig = {
                 hostname: "cdn.myanimelist.net",
                 pathname: "/**",
             },
+            {
+                protocol: "https",
+                hostname: "images.unsplash.com",
+                pathname: "/**",
+            },
         ],
     },
 };
