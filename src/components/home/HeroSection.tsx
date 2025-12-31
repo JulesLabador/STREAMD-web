@@ -161,7 +161,7 @@ export function HeroSection({ stats, bannerImageUrl }: HeroSectionProps) {
 
             {/* Hero Banner - Constrained width with rounded corners */}
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                <div className="relative h-[350px] sm:h-[400px] lg:h-[450px] overflow-hidden rounded-2xl border border-border/50">
+                <div className="relative h-[400px] sm:h-[450px] lg:h-[500px] overflow-hidden rounded-2xl border border-border/50">
                     {/* Background - Image or Gradient */}
                     {bannerImageUrl ? (
                         <div
@@ -205,7 +205,7 @@ export function HeroSection({ stats, bannerImageUrl }: HeroSectionProps) {
                                     </div>
 
                                     {/* Main headline */}
-                                    <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl mt-4">
                                         Discover Your Next
                                         <span className="block text-primary">
                                             Anime Obsession
@@ -213,51 +213,51 @@ export function HeroSection({ stats, bannerImageUrl }: HeroSectionProps) {
                                     </h1>
 
                                     {/* Description */}
-                                    <p className="mt-4 text-lg text-muted-foreground sm:text-xl">
+                                    <p className="mt-2 text-base text-muted-foreground sm:text-lg">
                                         Track, rate, and share your anime
                                         journey with thousands of titles
                                     </p>
 
                                     {/* Stats row */}
                                     {stats && (
-                                        <div className="mt-6 flex flex-wrap items-center gap-4">
+                                        <div className="mt-6 flex flex-wrap items-center gap-2 sm:gap-4">
                                             <div className="flex items-center gap-2">
-                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 border border-primary/20">
-                                                    <Tv className="h-5 w-5 text-primary" />
+                                                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary/10 border border-primary/20">
+                                                    <Tv className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-2xl font-bold text-foreground">
+                                                    <p className="text-lg sm:text-2xl font-bold text-foreground">
                                                         {stats.airingCount}
                                                     </p>
-                                                    <p className="text-xs text-muted-foreground">
+                                                    <p className="text-xs sm:text-sm text-muted-foreground">
                                                         Currently Airing
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="h-10 w-px bg-border" />
+                                            <div className="h-8 w-px sm:h-10 sm:w-px bg-border" />
                                             <div className="flex items-center gap-2">
-                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-chart-2/10 border border-chart-2/20">
-                                                    <Sparkles className="h-5 w-5 text-chart-2" />
+                                                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-chart-2/10 border border-chart-2/20">
+                                                    <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-chart-2" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-2xl font-bold text-foreground">
+                                                    <p className="text-lg sm:text-2xl font-bold text-foreground">
                                                         {stats.newAnimeCount}
                                                     </p>
-                                                    <p className="text-xs text-muted-foreground">
+                                                    <p className="text-xs sm:text-sm text-muted-foreground">
                                                         New This Season
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="h-10 w-px bg-border" />
+                                            <div className="h-8 w-px sm:h-10 sm:w-px bg-border" />
                                             <div className="flex items-center gap-2">
-                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-chart-3/10 border border-chart-3/20">
-                                                    <Play className="h-5 w-5 text-chart-3" />
+                                                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-chart-3/10 border border-chart-3/20">
+                                                    <Play className="h-4 w-4 sm:h-5 sm:w-5 text-chart-3" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-2xl font-bold text-foreground">
+                                                    <p className="text-lg sm:text-2xl font-bold text-foreground">
                                                         {stats.totalAnime}
                                                     </p>
-                                                    <p className="text-xs text-muted-foreground">
+                                                    <p className="text-xs sm:text-sm text-muted-foreground">
                                                         Total This Season
                                                     </p>
                                                 </div>
@@ -266,7 +266,7 @@ export function HeroSection({ stats, bannerImageUrl }: HeroSectionProps) {
                                     )}
 
                                     {/* CTA Buttons */}
-                                    <div className="mt-8 flex flex-wrap gap-3">
+                                    <div className="mt-6 sm:mt-8 flex flex-wrap gap-2 sm:gap-3">
                                         {stats && (
                                             <Button
                                                 asChild

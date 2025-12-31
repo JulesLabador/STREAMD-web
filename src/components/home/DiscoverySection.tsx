@@ -68,13 +68,11 @@ const BROWSE_PATHS = [
  */
 export function DiscoverySection({ studios }: DiscoverySectionProps) {
     return (
-        <section className="space-y-10 px-4 sm:px-6 lg:px-8">
+        <section className="px-4 sm:px-6 lg:px-8">
             {/* Section header */}
             <div>
-                <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                    Discover &amp; Explore
-                </h2>
-                <p className="mt-2 text-muted-foreground">
+                <h2>Discover &amp; Explore</h2>
+                <p className="text-muted-foreground">
                     Find your next favorite anime through different paths
                 </p>
             </div>
@@ -84,9 +82,7 @@ export function DiscoverySection({ studios }: DiscoverySectionProps) {
 
             {/* Browse paths */}
             <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground">
-                    Browse By
-                </h3>
+                <h3>Browse By</h3>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {BROWSE_PATHS.map((path) => {
                         const Icon = path.icon;
@@ -96,19 +92,19 @@ export function DiscoverySection({ studios }: DiscoverySectionProps) {
                                 href={path.href}
                                 className="group"
                             >
-                                <Card className="h-full border-0 bg-card/50 transition-all hover:bg-card hover:shadow-md">
-                                    <CardContent className="flex items-center gap-4 p-4">
+                                <Card className="h-full border-0 bg-card/80 transition-all hover:bg-card hover:shadow-md">
+                                    <CardContent className="flex items-center gap-4 px-4 py-2 sm:py-4">
                                         {/* Icon */}
                                         <div
                                             className={cn(
-                                                "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors",
+                                                "flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl transition-colors",
                                                 path.bgColor,
                                                 "group-hover:scale-105"
                                             )}
                                         >
                                             <Icon
                                                 className={cn(
-                                                    "h-6 w-6",
+                                                    "h-4 w-4 sm:h-6 sm:w-6",
                                                     path.color
                                                 )}
                                             />
@@ -116,16 +112,16 @@ export function DiscoverySection({ studios }: DiscoverySectionProps) {
 
                                         {/* Content */}
                                         <div className="min-w-0 flex-1">
-                                            <h4 className="font-medium text-foreground transition-colors group-hover:text-primary">
+                                            <h4 className="text-sm sm:text-base font-medium text-foreground transition-colors group-hover:text-primary">
                                                 {path.title}
                                             </h4>
-                                            <p className="text-xs text-muted-foreground">
+                                            <p className="text-xs sm:text-sm text-muted-foreground">
                                                 {path.description}
                                             </p>
                                         </div>
 
-                                        {/* Arrow */}
-                                        <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
+                                        {/* Arrow - hidden on mobile to give text more space */}
+                                        <ArrowRight className="hidden sm:block h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
                                     </CardContent>
                                 </Card>
                             </Link>

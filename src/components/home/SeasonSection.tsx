@@ -47,13 +47,11 @@ export function SeasonSection({
     const seasonName = `${SEASON_NAMES[season]} ${year}`;
 
     return (
-        <section className="space-y-10">
+        <section className="space-y-6 sm:space-y-10">
             {/* Section header */}
             <div className="px-4 sm:px-6 lg:px-8">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                    {seasonName} at a Glance
-                </h2>
-                <p className="mt-2 text-muted-foreground">
+                <h2>{seasonName} at a Glance</h2>
+                <p className="text-muted-foreground">
                     Explore what&apos;s airing this season
                 </p>
             </div>

@@ -109,7 +109,7 @@ export default async function HomePage() {
                 <HeroSection stats={seasonalStats} />
 
                 {/* Main Content */}
-                <div className="mx-auto max-w-7xl space-y-16 pb-16">
+                <div className="mx-auto max-w-7xl space-y-10 sm:space-y-16 pb-16">
                     {/* This Season at a Glance */}
                     {seasonalStats && (
                         <SeasonSection
