@@ -49,14 +49,6 @@ export function BrowsePageHeader({
                     <p className="mt-2 text-muted-foreground">{description}</p>
                 )}
             </div>
-
-            {/* Count display */}
-            {count !== undefined && (
-                <p className="text-sm text-muted-foreground">
-                    {count.toLocaleString()}{" "}
-                    {count === 1 ? countLabel.replace(/s$/, "") : countLabel}
-                </p>
-            )}
         </div>
     );
 }
