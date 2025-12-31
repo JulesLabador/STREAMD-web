@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
 import {
-    ArrowLeft,
     Calendar,
     CalendarDays,
     Clock,
@@ -22,6 +21,7 @@ import { RatingBarSegmented } from "@/components/anime/RatingBar";
 import { RelatedAnimeSection } from "@/components/anime/RelatedAnimeSection";
 import { TrackingButton } from "@/components/tracking";
 import { AnimeJsonLd } from "@/components/seo/AnimeJsonLd";
+import { BackButton } from "@/components/ui/back-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -208,18 +208,12 @@ export default async function AnimePage({ params }: AnimePageProps) {
 
                 {/* Main container - mobile first padding */}
                 <div className="mx-auto max-w-4xl p-4 md:p-6 lg:p-8">
-                    {/* Back button */}
-                    <Button
+                    {/* Back button - uses browser history for proper navigation */}
+                    <BackButton
+                        text="Back"
                         variant="outline"
-                        size="sm"
-                        asChild
                         className="mb-6 -ml-2 h-10"
-                    >
-                        <Link href="/">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Browse
-                        </Link>
-                    </Button>
+                    />
 
                     {/* Content sections with consistent spacing */}
                     <div className="space-y-6">
