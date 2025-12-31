@@ -235,6 +235,18 @@
 
 @layer utilities {
     /*
+   * Hide scrollbar utility
+   * Used for horizontal carousels
+   */
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /*
    * Status color utilities
    * Use these for status-specific styling
    */
