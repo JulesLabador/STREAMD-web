@@ -1,6 +1,4 @@
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/back-button";
 
 /**
  * Props for the BrowsePageHeader component
@@ -14,9 +12,9 @@ interface BrowsePageHeaderProps {
     count?: number;
     /** Unit label for the count (default: "anime") */
     countLabel?: string;
-    /** Back link URL (optional) */
-    backHref?: string;
-    /** Back link text (default: "Back") */
+    /** Whether to show back navigation (default: true) */
+    showBack?: boolean;
+    /** Back button text (default: "Back") */
     backText?: string;
 }
 
@@ -24,7 +22,7 @@ interface BrowsePageHeaderProps {
  * BrowsePageHeader component
  *
  * Consistent header for browse pages with:
- * - Optional back navigation
+ * - Optional back navigation (uses browser history)
  * - Page title
  * - Optional description
  * - Optional count display
@@ -34,19 +32,14 @@ export function BrowsePageHeader({
     description,
     count,
     countLabel = "anime",
-    backHref,
+    showBack = true,
     backText = "Back",
 }: BrowsePageHeaderProps) {
     return (
         <div className="mb-8 space-y-4">
-            {/* Back navigation */}
-            {backHref && (
-                <Button variant="ghost" size="sm" asChild className="-ml-2">
-                    <Link href={backHref}>
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        {backText}
-                    </Link>
-                </Button>
+            {/* Back navigation - uses browser history for proper navigation */}
+            {showBack && (
+                <BackButton text={backText} className="-ml-2" />
             )}
 
             {/* Title and description */}
