@@ -1,12 +1,19 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import { getAnimeBySeason, getSeasonContent } from "@/app/actions/anime";
 import { parseSeasonSlug } from "@/types/anime";
 import { BrowsePageHeader } from "@/components/browse";
 import { AnimeGrid } from "@/components/anime/AnimeGrid";
 import { AnimePagination } from "@/components/anime/AnimePagination";
 import { SeasonJsonLd } from "@/components/seo";
+import {
+    SeasonBadge,
+    SeasonNavigation,
+    SeasonSummary,
+    SEASON_MONTHS,
+    formatSeasonName,
+    getSeasonTimeContext,
+} from "@/components/season";
 
 /**
  * Site URL for canonical and OG URLs
@@ -20,67 +27,6 @@ const SITE_URL =
 interface SeasonPageProps {
     params: Promise<{ slug: string }>;
     searchParams: Promise<{ page?: string }>;
-}
-
-/**
- * Season configuration for month ranges
- */
-const SEASON_MONTHS: Record<string, string> = {
-    WINTER: "January - March",
-    SPRING: "April - June",
-    SUMMER: "July - September",
-    FALL: "October - December",
-};
-
-/**
- * Formats season name for display
- * @param season - Season enum value
- * @returns Formatted season name
- */
-function formatSeasonName(season: string): string {
-    return season.charAt(0) + season.slice(1).toLowerCase();
-}
-
-/**
- * Determines if a season is in the past, present, or future
- */
-function getSeasonTimeContext(
-    season: string,
-    year: number
-): "past" | "current" | "future" {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1;
-
-    // Determine current season
-    let currentSeason: string;
-    if (currentMonth >= 1 && currentMonth <= 3) {
-        currentSeason = "WINTER";
-    } else if (currentMonth >= 4 && currentMonth <= 6) {
-        currentSeason = "SPRING";
-    } else if (currentMonth >= 7 && currentMonth <= 9) {
-        currentSeason = "SUMMER";
-    } else {
-        currentSeason = "FALL";
-    }
-
-    const seasonOrder = ["WINTER", "SPRING", "SUMMER", "FALL"];
-    const targetSeasonIndex = seasonOrder.indexOf(season);
-    const currentSeasonIndex = seasonOrder.indexOf(currentSeason);
-
-    if (year > currentYear) {
-        return "future";
-    } else if (year < currentYear) {
-        return "past";
-    } else {
-        if (targetSeasonIndex > currentSeasonIndex) {
-            return "future";
-        } else if (targetSeasonIndex < currentSeasonIndex) {
-            return "past";
-        } else {
-            return "current";
-        }
-    }
 }
 
 /**
@@ -115,9 +61,14 @@ export async function generateMetadata({
 
     const { seasonInfo } = seasonResult.data;
     const content = contentResult.success ? contentResult.data : null;
-    const seasonName = `${formatSeasonName(seasonInfo.season)} ${seasonInfo.year}`;
+    const seasonName = `${formatSeasonName(seasonInfo.season)} ${
+        seasonInfo.year
+    }`;
     const months = SEASON_MONTHS[seasonInfo.season];
-    const timeContext = getSeasonTimeContext(seasonInfo.season, seasonInfo.year);
+    const timeContext = getSeasonTimeContext(
+        seasonInfo.season,
+        seasonInfo.year
+    );
 
     // Use AI-generated description or create a contextual fallback
     let description: string;
@@ -138,7 +89,9 @@ export async function generateMetadata({
     const keywords = [
         `${seasonName.toLowerCase()} anime`,
         `anime ${seasonInfo.year}`,
-        `${formatSeasonName(seasonInfo.season).toLowerCase()} ${seasonInfo.year} anime`,
+        `${formatSeasonName(seasonInfo.season).toLowerCase()} ${
+            seasonInfo.year
+        } anime`,
         `new anime ${months.split(" - ")[0].toLowerCase()} ${seasonInfo.year}`,
         "anime season",
         "anime schedule",
@@ -166,83 +119,6 @@ export async function generateMetadata({
             canonical: `${SITE_URL}/season/${slug}`,
         },
     };
-}
-
-/**
- * Season Summary Section
- * Displays AI-generated content when available
- */
-function SeasonSummary({
-    introParagraph,
-    fullSummary,
-    seasonName,
-    timeContext,
-}: {
-    introParagraph: string | null;
-    fullSummary: string | null;
-    seasonName: string;
-    timeContext: "past" | "current" | "future";
-}) {
-    // If no AI content, show a minimal contextual intro
-    if (!introParagraph && !fullSummary) {
-        return null;
-    }
-
-    return (
-        <section className="mb-8">
-            {/* Intro paragraph - always visible */}
-            {introParagraph && (
-                <p className="text-lg leading-relaxed text-foreground/90">
-                    {introParagraph}
-                </p>
-            )}
-
-            {/* Full summary - collapsible for longer content */}
-            {fullSummary && (
-                <details className="group mt-4">
-                    <summary className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary hover:text-primary/80">
-                        <span>Read more about {seasonName}</span>
-                        <ChevronDown className="h-4 w-4 transition-transform group-open:hidden" />
-                        <ChevronUp className="hidden h-4 w-4 transition-transform group-open:block" />
-                    </summary>
-                    <div className="mt-4 space-y-4 text-muted-foreground">
-                        {fullSummary.split("\n\n").map((paragraph, index) => (
-                            <p key={index} className="leading-relaxed">
-                                {paragraph}
-                            </p>
-                        ))}
-                    </div>
-                </details>
-            )}
-        </section>
-    );
-}
-
-/**
- * Season Badge Component
- * Shows contextual badge for current/upcoming seasons
- */
-function SeasonBadge({
-    timeContext,
-}: {
-    timeContext: "past" | "current" | "future";
-}) {
-    if (timeContext === "past") {
-        return null;
-    }
-
-    return (
-        <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
-                timeContext === "current"
-                    ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                    : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-            }`}
-        >
-            <Sparkles className="h-3 w-3" />
-            {timeContext === "current" ? "Now Airing" : "Upcoming"}
-        </span>
-    );
 }
 
 /**
@@ -298,8 +174,13 @@ export default async function SeasonPage({
     const { seasonInfo, anime } = result.data;
     const { pagination } = anime;
     const content = contentResult.success ? contentResult.data : null;
-    const seasonName = `${formatSeasonName(seasonInfo.season)} ${seasonInfo.year}`;
-    const timeContext = getSeasonTimeContext(seasonInfo.season, seasonInfo.year);
+    const seasonName = `${formatSeasonName(seasonInfo.season)} ${
+        seasonInfo.year
+    }`;
+    const timeContext = getSeasonTimeContext(
+        seasonInfo.season,
+        seasonInfo.year
+    );
     const months = SEASON_MONTHS[seasonInfo.season];
 
     // Get top anime for JSON-LD (first page only)
@@ -363,6 +244,12 @@ export default async function SeasonPage({
                     currentPage={pagination.page}
                     totalPages={pagination.totalPages}
                     basePath={`/season/${slug}`}
+                />
+
+                {/* Season Navigation */}
+                <SeasonNavigation
+                    currentSeason={seasonInfo.season}
+                    currentYear={seasonInfo.year}
                 />
             </div>
         </>
