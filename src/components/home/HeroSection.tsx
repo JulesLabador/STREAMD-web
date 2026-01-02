@@ -14,7 +14,7 @@ import { SearchProvider } from "@/components/search/SearchProvider";
 import { SearchInput } from "@/components/search/SearchInput";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Button } from "@/components/ui/button";
-import type { CurrentSeasonStats } from "@/app/actions/anime";
+import type { CurrentSeasonStats } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
 /**

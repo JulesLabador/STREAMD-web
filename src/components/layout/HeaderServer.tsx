@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentUserProfile } from "@/app/actions/user";
+import { getCurrentUserProfile } from "@/lib/queries";
 import { HeaderClient } from "./Header";
 
 /**

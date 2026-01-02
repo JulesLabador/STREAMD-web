@@ -1,5 +1,5 @@
 import type { Anime, SeasonInfo } from "@/types/anime";
-import type { SeasonContent } from "@/app/actions/anime/seasons";
+import type { SeasonContent } from "@/lib/queries/seasons";
 
 /**
  * Props for the SeasonJsonLd component
