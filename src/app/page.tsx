@@ -4,7 +4,7 @@ import {
     getCurrentSeasonAnime,
     getNextSeasonStats,
     getCurrentSeasonStudios,
-} from "@/app/actions/anime";
+} from "@/lib/queries";
 import {
     HeroSection,
     SeasonSection,

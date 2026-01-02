@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { Play } from "lucide-react";
-import { getPlatforms } from "@/app/actions/anime";
+import { getPlatforms } from "@/lib/queries";
 import { BrowsePageHeader, BrowseGrid, BrowseCard } from "@/components/browse";
 
 /**

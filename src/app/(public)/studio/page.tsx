@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { Building2 } from "lucide-react";
-import { getStudios } from "@/app/actions/anime";
+import { getStudios } from "@/lib/queries";
 import { BrowsePageHeader, BrowseGrid, BrowseCard } from "@/components/browse";
 
 /**

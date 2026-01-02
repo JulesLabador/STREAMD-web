@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Snowflake, Flower2, Sun, Leaf, Calendar, Film } from "lucide-react";
-import { getSeasons } from "@/app/actions/anime";
+import { getSeasons } from "@/lib/queries";
 import { BrowsePageHeader } from "@/components/browse";
 import { Card, CardContent } from "@/components/ui/card";
 import type { AnimeSeason, SeasonInfo } from "@/types/anime";

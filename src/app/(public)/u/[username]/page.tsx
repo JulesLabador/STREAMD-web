@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getUserProfile, getUserAnimeByStatus } from "@/app/actions/user";
+import { getUserProfile, getUserAnimeByStatus } from "@/lib/queries";
 import { ProfileHeader, AnimeListTabs } from "@/components/profile";
 import { Button } from "@/components/ui/button";
 import type { UserAnimeWithAnime, UserAnimeStatus } from "@/types/user";

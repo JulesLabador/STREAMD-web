@@ -13,7 +13,7 @@ import {
     TrendingUp,
     Tv,
 } from "lucide-react";
-import { getAnimeByShortId } from "@/app/actions/anime";
+import { getAnimeByShortId } from "@/lib/queries";
 import { getUserAnimeForAnime } from "@/app/actions/user";
 import { createClient } from "@/lib/supabase/server";
 import { InfoItem } from "@/components/anime/InfoItem";

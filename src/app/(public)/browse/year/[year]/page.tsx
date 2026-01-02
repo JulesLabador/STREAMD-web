@@ -6,7 +6,7 @@ import {
     getGenres,
     getAvailableYears,
     type AnimeFilters,
-} from "@/app/actions/anime";
+} from "@/lib/queries";
 import { AnimeGrid } from "@/components/anime/AnimeGrid";
 import { AnimeFilters as AnimeFiltersComponent } from "@/components/anime/AnimeFilters";
 import { AnimePagination } from "@/components/anime/AnimePagination";

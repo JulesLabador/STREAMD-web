@@ -21,7 +21,7 @@ import {
 import {
     getNextSeasonStats,
     getUpcomingSeasonStats,
-} from "@/app/actions/anime";
+} from "@/lib/queries";
 import { AnimeCard } from "@/components/anime/AnimeCard";
 import { UpcomingJsonLd } from "@/components/seo/UpcomingJsonLd";
 import { Button } from "@/components/ui/button";

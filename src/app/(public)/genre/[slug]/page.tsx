@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { getGenreBySlug } from "@/app/actions/anime";
+import { getGenreBySlug } from "@/lib/queries";
 import { BrowsePageHeader } from "@/components/browse";
 import { AnimeGrid } from "@/components/anime/AnimeGrid";
 import { AnimePagination } from "@/components/anime/AnimePagination";

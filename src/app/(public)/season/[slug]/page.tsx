@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { getAnimeBySeason, getSeasonContent } from "@/app/actions/anime";
+import { getAnimeBySeason, getSeasonContent } from "@/lib/queries";
 import { parseSeasonSlug } from "@/types/anime";
 import { BrowsePageHeader } from "@/components/browse";
 import { AnimeGrid } from "@/components/anime/AnimeGrid";

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { Tag } from "lucide-react";
-import { getGenres } from "@/app/actions/anime";
+import { getGenres } from "@/lib/queries";
 import { BrowsePageHeader, BrowseGrid, BrowseCard } from "@/components/browse";
 
 /**

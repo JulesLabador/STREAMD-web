@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { getAnimeByPlatform } from "@/app/actions/anime";
+import { getAnimeByPlatform } from "@/lib/queries";
 import { parsePlatformSlug } from "@/types/anime";
 import { BrowsePageHeader } from "@/components/browse";
 import { AnimeGrid } from "@/components/anime/AnimeGrid";

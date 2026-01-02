@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Tv, Play, Clock, Star } from "lucide-react";
-import { getUserProfile, getUserStats } from "@/app/actions/user";
+import { getUserProfile, getUserStats } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
