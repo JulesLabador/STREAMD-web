@@ -8,3 +8,5 @@ export { AnimePagination } from "./AnimePagination";
 export { InfoItem } from "./InfoItem";
 export { RatingBarGradient, RatingBarSegmented } from "./RatingBar";
 export { RelatedAnimeSection } from "./RelatedAnimeSection";
+export { RelatedAnimeSectionAsync } from "./RelatedAnimeSectionAsync";
+export { RelatedAnimeSectionSkeleton } from "./RelatedAnimeSectionSkeleton";
