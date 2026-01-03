@@ -87,13 +87,14 @@ function buildTVSeriesSchema(
         }));
     }
 
-    // Aggregate rating
-    if (anime.averageRating !== null) {
+    // Aggregate rating (only include if we have both rating and popularity for ratingCount)
+    if (anime.averageRating !== null && anime.popularity > 0) {
         schema.aggregateRating = {
             "@type": "AggregateRating",
             ratingValue: anime.averageRating,
             bestRating: 10,
             worstRating: 0,
+            ratingCount: anime.popularity,
         };
     }
 
@@ -170,13 +171,14 @@ function buildMovieSchema(
         }));
     }
 
-    // Aggregate rating
-    if (anime.averageRating !== null) {
+    // Aggregate rating (only include if we have both rating and popularity for ratingCount)
+    if (anime.averageRating !== null && anime.popularity > 0) {
         schema.aggregateRating = {
             "@type": "AggregateRating",
             ratingValue: anime.averageRating,
             bestRating: 10,
             worstRating: 0,
+            ratingCount: anime.popularity,
         };
     }
 
