@@ -901,4 +901,3 @@ export async function getNextSeasonStats(
         return { success: false, error: "Failed to fetch next season stats" };
     }
 }
-
