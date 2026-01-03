@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,12 +14,15 @@ import {
     TrendingUp,
     Tv,
 } from "lucide-react";
-import { getAnimeByShortId } from "@/lib/queries";
+import { getAnimeByShortId, getAnimeByShortIdForMetadata } from "@/lib/queries";
 import { getUserAnimeForAnime } from "@/app/actions/user";
 import { createClient } from "@/lib/supabase/server";
 import { InfoItem } from "@/components/anime/InfoItem";
 import { RatingBarSegmented } from "@/components/anime/RatingBar";
-import { RelatedAnimeSection } from "@/components/anime/RelatedAnimeSection";
+import {
+    RelatedAnimeSectionAsync,
+    RelatedAnimeSectionSkeleton,
+} from "@/components/anime";
 import { TrackingButton } from "@/components/tracking";
 import { AnimeJsonLd } from "@/components/seo/AnimeJsonLd";
 import { BackButton } from "@/components/ui/back-button";
@@ -65,7 +69,8 @@ export async function generateMetadata({
     params,
 }: AnimePageProps): Promise<Metadata> {
     const { id } = await params;
-    const result = await getAnimeByShortId(id);
+    // Use lightweight query for metadata - skips related anime fetch
+    const result = await getAnimeByShortIdForMetadata(id);
 
     if (!result.success) {
         return {
@@ -493,12 +498,10 @@ export default async function AnimePage({ params }: AnimePageProps) {
                         )}
 
                         {/* ===== RELATED ANIME SECTION ===== */}
-                        {(anime.relatedAnime.data.length > 0 ||
-                            anime.relatedAnime.hasError) && (
-                            <RelatedAnimeSection
-                                relatedAnime={anime.relatedAnime}
-                            />
-                        )}
+                        {/* Deferred loading with Suspense for better initial page load */}
+                        <Suspense fallback={<RelatedAnimeSectionSkeleton />}>
+                            <RelatedAnimeSectionAsync animeId={anime.id} />
+                        </Suspense>
 
                         {/* ===== EXTERNAL LINKS (NO CARD) ===== */}
                         {(anime.malId || anime.anilistId || anime.kitsuId) && (
