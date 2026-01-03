@@ -194,6 +194,72 @@ export async function getAnimeBySlug(
 }
 
 /**
+ * Fetches basic anime data by short ID for metadata generation
+ * This is a lightweight query that skips related anime fetching
+ *
+ * @param shortId - 8-character uppercase alphanumeric identifier
+ * @returns Basic anime data or error
+ */
+export async function getAnimeByShortIdForMetadata(
+    shortId: string
+): Promise<ActionResult<Anime>> {
+    try {
+        // Validate short ID format
+        if (!shortId || typeof shortId !== "string") {
+            return {
+                success: false,
+                error: "Invalid short ID",
+                code: "INVALID_INPUT",
+            };
+        }
+
+        const normalizedId = shortId.toUpperCase();
+        if (!/^[A-Z0-9]{8}$/.test(normalizedId)) {
+            return {
+                success: false,
+                error: "Invalid short ID format",
+                code: "INVALID_INPUT",
+            };
+        }
+
+        const supabase = await createClient();
+
+        // Simple query - no joins needed for metadata
+        const { data, error } = await supabase
+            .from("anime")
+            .select("*")
+            .eq("short_id", normalizedId)
+            .single();
+
+        if (error) {
+            if (error.code === "PGRST116") {
+                return {
+                    success: false,
+                    error: "Anime not found",
+                    code: "NOT_FOUND",
+                };
+            }
+            console.error("Error fetching anime for metadata:", error);
+            return { success: false, error: "Failed to fetch anime" };
+        }
+
+        if (!data) {
+            return {
+                success: false,
+                error: "Anime not found",
+                code: "NOT_FOUND",
+            };
+        }
+
+        const anime = transformAnimeRow(data as AnimeRow);
+        return { success: true, data: anime };
+    } catch (error) {
+        console.error("Error fetching anime for metadata:", error);
+        return { success: false, error: "Failed to fetch anime" };
+    }
+}
+
+/**
  * Fetches a single anime by its short ID
  * Includes related data: studios, streaming links, and related anime
  *
@@ -297,15 +363,13 @@ export async function getAnimeByShortId(
             region: link.region,
         }));
 
-        // Fetch related anime
-        const relatedAnime = await fetchRelatedAnime(supabase, anime.id);
-
+        // Skip related anime fetch - it will be loaded separately via Suspense
         const animeWithRelations: AnimeWithRelations = {
             ...anime,
             genres: [], // Genres not implemented in current schema
             studios,
             streamingLinks,
-            relatedAnime,
+            relatedAnime: { data: [], hasError: false }, // Placeholder - loaded separately
         };
 
         return { success: true, data: animeWithRelations };
@@ -313,6 +377,20 @@ export async function getAnimeByShortId(
         console.error("Error fetching anime by short ID:", error);
         return { success: false, error: "Failed to fetch anime" };
     }
+}
+
+/**
+ * Fetches related anime for a given anime ID
+ * Exported for use with Suspense to defer loading
+ *
+ * @param animeId - UUID of the source anime
+ * @returns RelatedAnimeResult with data array and error state
+ */
+export async function getRelatedAnime(
+    animeId: string
+): Promise<RelatedAnimeResult> {
+    const supabase = await createClient();
+    return fetchRelatedAnime(supabase, animeId);
 }
 
 /**
@@ -892,4 +970,3 @@ export async function getAvailableYears(): Promise<ActionResult<number[]>> {
         return { success: false, error: "Failed to fetch years" };
     }
 }
-
